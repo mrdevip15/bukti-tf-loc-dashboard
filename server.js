@@ -5,7 +5,7 @@ const path = require('path');
 
 const MAX_PHOTOS = 10;
 const SESSION_TTL_MS = 30 * 60 * 1000;
-const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
+const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 const INVOICE_ID_PATTERN = /^[A-Za-z0-9_-]{32}$/;
 
 function requiredEnv(name, env = process.env) {
@@ -196,7 +196,7 @@ function createApp({ env = process.env, telegramClient, invoiceStore } = {}) {
     });
     next();
   });
-  app.use(express.json({ limit: '4mb', strict: true }));
+  app.use(express.json({ limit: '10mb', strict: true }));
 
   function requireAdmin(req, res, next) {
     const supplied = Buffer.from(sha256(req.get('authorization') || ''), 'hex');

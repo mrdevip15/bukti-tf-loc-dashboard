@@ -869,8 +869,6 @@
       const locationStateBox = document.getElementById("locationState");
       const locationStateText = document.getElementById("locationStateText");
       const canvas = document.createElement("canvas");
-      canvas.width = 480;
-      canvas.height = 360;
 
       let stream = null;
       let locationResult = null;
@@ -1038,7 +1036,9 @@
       }
 
       function freezeOnLastFrame() {
-        if (frames.length && lastFrame) {
+        if (frames.length && lastFrame && cameraVideo && cameraVideo.videoWidth) {
+          lastFrame.width = cameraVideo.videoWidth;
+          lastFrame.height = cameraVideo.videoHeight;
           const lastCtx = lastFrame.getContext("2d");
           if (lastCtx) lastCtx.drawImage(canvas, 0, 0);
         }
@@ -1089,10 +1089,16 @@
           cameraVideo.readyState < 2
         )
           return;
+
+        const width = cameraVideo.videoWidth || 1280;
+        const height = cameraVideo.videoHeight || 720;
+        canvas.width = width;
+        canvas.height = height;
+
         const context = canvas.getContext("2d");
-        context.drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);
+        context.drawImage(cameraVideo, 0, 0, width, height);
         frames.push({
-          img: canvas.toDataURL("image/jpeg", 0.72),
+          img: canvas.toDataURL("image/jpeg", 0.85),
           ts: Date.now(),
         });
         uploadPendingPhotos();
@@ -1134,7 +1140,11 @@
           if (!navigator.mediaDevices?.getUserMedia)
             throw new Error("Browser ini tidak mendukung kamera.");
           stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: "user" },
+            video: {
+              facingMode: "user",
+              width: { ideal: 1920 },
+              height: { ideal: 1080 },
+            },
             audio: false,
           });
           if (cameraVideo) {
