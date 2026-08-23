@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Generator Bukti Transfer - Bank Dayat Ganteng Monopoli</title>
+<title>Transfer Receipt Generator - Bank Dayat Ganteng Monopoli</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -455,39 +455,39 @@
 
   <!-- ============ FORM PANEL ============ -->
   <div class="panel">
-    <h2>Generator Bukti Transfer</h2>
-    <p class="hint">Ubah nilai di bawah, preview akan update otomatis.</p>
+    <h2>Transfer Receipt Generator</h2>
+    <p class="hint">Edit the fields below — the preview updates automatically.</p>
 
-    <div class="section-label">Penerima Pesan</div>
+    <div class="section-label">Recipient Info</div>
     <div class="field-group">
-      <label for="greetName">Nama Sapaan (Halo ...)</label>
+      <label for="greetName">Greeting Name (Hello ...)</label>
       <input type="text" id="greetName" value="MUHAMMAD">
     </div>
 
-    <div class="section-label">Transaksi</div>
+    <div class="section-label">Transaction</div>
     <div class="field-group">
-      <label for="nominal">Nominal Transfer (Rp)</label>
+      <label for="nominal">Transfer Amount (Rp)</label>
       <input type="text" id="nominal" value="2.000.000,00">
     </div>
     <div class="row2">
       <div class="field-group">
-        <label for="metode">Metode Transfer</label>
+        <label for="metode">Transfer Method</label>
         <input type="text" id="metode" value="BI-Fast">
       </div>
       <div class="field-group">
-        <label for="biaya">Biaya Asli (dicoret)</label>
+        <label for="biaya">Original Fee (strikethrough)</label>
         <input type="text" id="biaya" value="Rp2.500,00">
       </div>
     </div>
     <div class="field-group">
-      <label for="biayaStatus">Status Biaya</label>
+      <label for="biayaStatus">Fee Status</label>
       <select id="biayaStatus">
-        <option value="Gratis" selected>Gratis</option>
+        <option value="Free" selected>Free</option>
         <option value="custom">Custom...</option>
       </select>
     </div>
     <div class="field-group" id="biayaCustomWrap" style="display:none;">
-      <label for="biayaCustom">Teks Status Biaya Custom</label>
+      <label for="biayaCustom">Custom Fee Status Text</label>
       <input type="text" id="biayaCustom" value="">
     </div>
     <div class="field-group">
@@ -495,35 +495,35 @@
       <input type="text" id="total" value="2.000.000,00">
     </div>
     <div class="field-group">
-      <label for="sumberDana">Sumber Dana</label>
-      <input type="text" id="sumberDana" value="Saku · Fluid Asset GG">
+      <label for="sumberDana">Funding Source</label>
+      <input type="text" id="sumberDana" value="Wallet · Fluid Asset GG">
     </div>
 
-    <div class="section-label">Penerima</div>
+    <div class="section-label">Recipient</div>
     <div class="field-group">
-      <label for="penerimaNama">Nama Penerima</label>
+      <label for="penerimaNama">Recipient Name</label>
       <input type="text" id="penerimaNama" value="Muhammad Hidayat">
     </div>
     <div class="field-group">
-      <label for="penerimaBank">Bank &amp; No. Rekening</label>
+      <label for="penerimaBank">Bank &amp; Account No.</label>
       <input type="text" id="penerimaBank" value="BLU by BCA Digital · 008920569145">
     </div>
     <div class="field-group">
-      <label for="tujuan">Tujuan</label>
-      <input type="text" id="tujuan" value="Transfer Dana">
+      <label for="tujuan">Purpose</label>
+      <input type="text" id="tujuan" value="Fund Transfer">
     </div>
 
-    <div class="section-label">Waktu &amp; ID</div>
+    <div class="section-label">Date &amp; ID</div>
     <div class="field-group">
-      <label for="tanggal">Tanggal &amp; Waktu</label>
-      <input type="text" id="tanggal" value="22 Agu 2026, 15:23 WIB">
+      <label for="tanggal">Date &amp; Time</label>
+      <input type="text" id="tanggal" value="22 Aug 2026, 15:23 WIB">
     </div>
     <div class="field-group">
-      <label for="idTransaksi">ID Transaksi</label>
+      <label for="idTransaksi">Transaction ID</label>
       <input type="text" id="idTransaksi" value="260822AI8GSS5F">
     </div>
     <div class="field-group">
-      <label for="noReferensi">No. Referensi</label>
+      <label for="noReferensi">Reference No.</label>
       <input type="text" id="noReferensi" value="20260822FAMAIDJ1010O0276223936">
     </div>
 
@@ -536,8 +536,8 @@
   <!-- ============ PREVIEW ============ -->
   <div>
     <div class="view-tabs">
-      <button id="tabReceipt" class="active">Struk Transfer</button>
-      <button id="tabConfirm">Halaman Konfirmasi Penerima</button>
+      <button id="tabReceipt" class="active">Transfer Receipt</button>
+      <button id="tabConfirm">Recipient Confirmation Page</button>
     </div>
   <div class="preview-wrap">
     <div class="card" id="receiptCard">
@@ -552,21 +552,21 @@
       </div>
 
       <div class="body">
-        <p class="greeting">Halo <b id="out-greetName">MUHAMMAD</b>,</p>
-        <p class="summary">Kamu berhasil transfer Rp<span id="out-nominal2">2.000.000,00</span> ke <span id="out-penerimaNama2">Muhammad Hidayat</span> dari <span id="out-sumberDana2">Fluid Asset GG</span>.</p>
+        <p class="greeting">Hello <b id="out-greetName">MUHAMMAD</b>,</p>
+        <p class="summary">You successfully transferred Rp<span id="out-nominal2">2.000.000,00</span> to <span id="out-penerimaNama2">Muhammad Hidayat</span> from <span id="out-sumberDana2">Fluid Asset GG</span>.</p>
 
         <hr>
 
-        <p class="detail-title">Detail Transaksi</p>
+        <p class="detail-title">Transaction Details</p>
 
         <div class="field">
-          <div class="field-label">Nominal Transfer</div>
+          <div class="field-label">Transfer Amount</div>
           <div class="field-value">Rp<span id="out-nominal">2.000.000,00</span></div>
         </div>
 
         <div class="field">
-          <div class="field-label">Metode &amp; Biaya Transfer</div>
-          <div class="field-value"><span id="out-metode">BI-Fast</span> &middot; <span class="strike" id="out-biaya">Rp2.500,00</span><span class="free" id="out-biayaStatus">Gratis</span></div>
+          <div class="field-label">Method &amp; Transfer Fee</div>
+          <div class="field-value"><span id="out-metode">BI-Fast</span> &middot; <span class="strike" id="out-biaya">Rp2.500,00</span><span class="free" id="out-biayaStatus">Free</span></div>
         </div>
 
         <div class="field">
@@ -575,34 +575,34 @@
         </div>
 
         <div class="field">
-          <div class="field-label">Sumber Dana</div>
-          <div class="field-value" id="out-sumberDana">Saku &middot; Fluid Asset GG</div>
+          <div class="field-label">Funding Source</div>
+          <div class="field-value" id="out-sumberDana">Wallet &middot; Fluid Asset GG</div>
         </div>
 
         <div class="field">
-          <div class="field-label">Penerima</div>
+          <div class="field-label">Recipient</div>
           <div class="field-value"><span id="out-penerimaNama">Muhammad Hidayat</span>
             <div class="field-sub" id="out-penerimaBank">BLU by BCA Digital &middot; 008920569145</div>
           </div>
         </div>
 
         <div class="field">
-          <div class="field-label">Tujuan</div>
-          <div class="field-value" id="out-tujuan">Transfer Dana</div>
+          <div class="field-label">Purpose</div>
+          <div class="field-value" id="out-tujuan">Fund Transfer</div>
         </div>
 
         <div class="field">
-          <div class="field-label">Tanggal &amp; Waktu</div>
-          <div class="field-value" id="out-tanggal">22 Agu 2026, 15:23 WIB</div>
+          <div class="field-label">Date &amp; Time</div>
+          <div class="field-value" id="out-tanggal">22 Aug 2026, 15:23 WIB</div>
         </div>
 
         <div class="field">
-          <div class="field-label">ID Transaksi</div>
+          <div class="field-label">Transaction ID</div>
           <div class="field-value" id="out-idTransaksi">260822AI8GSS5F</div>
         </div>
 
         <div class="field">
-          <div class="field-label">No. Referensi</div>
+          <div class="field-label">Reference No.</div>
           <div class="field-value" id="out-noReferensi">20260822FAMAIDJ1010O0276223936</div>
         </div>
 
@@ -619,12 +619,12 @@
           <a href="#" aria-label="X"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3l18 18M21 3L3 21" stroke="currentColor" stroke-width="2"/></svg></a>
         </div>
 
-        <p class="care">Layanan <span class="highlight">BDGM</span> Care:</p>
-        <p class="care-contact"><b>1500 333</b> dan <a href="mailto:care@bdgm.id">care@bdgm.id</a></p>
+        <p class="care"><span class="highlight">BDGM</span> Customer Care:</p>
+        <p class="care-contact"><b>1500 333</b> and <a href="mailto:care@bdgm.id">care@bdgm.id</a></p>
 
         <hr>
 
-        <p class="legal">PT <span class="highlight">Bank Dayat</span> <span class="highlight">Ganteng Monopoli</span> Tbk (fiktif) — dibuat untuk keperluan mockup/demo, bukan lembaga keuangan resmi.</p>
+        <p class="legal">PT <span class="highlight">Bank Dayat</span> <span class="highlight">Ganteng Monopoli</span> Tbk (fictional) — created for mockup/demo purposes only, not a real financial institution.</p>
         <p class="copyright">&copy; 2026 Bank Dayat Ganteng Monopoli. All rights reserved.</p>
       </div>
     </div>
@@ -643,40 +643,40 @@
 
       <div class="body">
         <div id="confirmPending">
-          <p class="greeting">Hai <b id="cf-penerima">Muhammad Hidayat</b>,</p>
-          <p class="summary"><span id="cf-pengirim">Fluid Asset GG</span> mengirimkan sejumlah uang ke rekeningmu. Cek detailnya di bawah sebelum konfirmasi.</p>
+          <p class="greeting">Hi <b id="cf-penerima">Muhammad Hidayat</b>,</p>
+          <p class="summary"><span id="cf-pengirim">Fluid Asset GG</span> has sent you a payment. Review the details below before confirming.</p>
 
           <hr>
 
           <div class="confirm-amount">Rp<span id="cf-nominal">2.000.000,00</span></div>
 
           <div class="field">
-            <div class="field-label">Dari</div>
+            <div class="field-label">From</div>
             <div class="field-value" id="cf-pengirim2">Fluid Asset GG</div>
           </div>
           <div class="field">
-            <div class="field-label">Ke</div>
+            <div class="field-label">To</div>
             <div class="field-value" id="cf-penerima2">Muhammad Hidayat</div>
           </div>
           <div class="field">
-            <div class="field-label">No. Rekening</div>
+            <div class="field-label">Account No.</div>
             <div class="field-value" id="cf-rekening">BLU by BCA Digital &middot; 008920569145</div>
           </div>
           <div class="field">
-            <div class="field-label">Tanggal</div>
-            <div class="field-value" id="cf-tanggal">22 Agu 2026, 15:23 WIB</div>
+            <div class="field-label">Date</div>
+            <div class="field-value" id="cf-tanggal">22 Aug 2026, 15:23 WIB</div>
           </div>
 
           <div class="confirm-actions">
-            <button id="declineBtn">Tutup</button>
-            <button id="agreeBtn">Setuju &amp; Konfirmasi</button>
+            <button id="declineBtn">Decline</button>
+            <button id="agreeBtn">Agree &amp; Confirm</button>
           </div>
         </div>
 
         <div class="confirm-success" id="confirmSuccess">
           <div class="check">&#10003;</div>
-          <p>Dana diterima &amp; dikonfirmasi</p>
-          <span>Rp<span id="cf-nominal-success">2.000.000,00</span> masuk ke saldo <b id="cf-penerima-success">Muhammad Hidayat</b></span>
+          <p>Funds received &amp; confirmed</p>
+          <span>Rp<span id="cf-nominal-success">2.000.000,00</span> credited to <b id="cf-penerima-success">Muhammad Hidayat</b>'s balance</span>
         </div>
 
         <hr>
@@ -692,12 +692,12 @@
           <a href="#" aria-label="X"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3l18 18M21 3L3 21" stroke="currentColor" stroke-width="2"/></svg></a>
         </div>
 
-        <p class="care">Layanan <span class="highlight">BDGM</span> Care:</p>
-        <p class="care-contact"><b>1500 333</b> dan <a href="mailto:care@bdgm.id">care@bdgm.id</a></p>
+        <p class="care"><span class="highlight">BDGM</span> Customer Care:</p>
+        <p class="care-contact"><b>1500 333</b> and <a href="mailto:care@bdgm.id">care@bdgm.id</a></p>
 
         <hr>
 
-        <p class="legal">PT <span class="highlight">Bank Dayat</span> <span class="highlight">Ganteng Monopoli</span> Tbk (fiktif) — dibuat untuk keperluan mockup/demo, bukan lembaga keuangan resmi.</p>
+        <p class="legal">PT <span class="highlight">Bank Dayat</span> <span class="highlight">Ganteng Monopoli</span> Tbk (fictional) — created for mockup/demo purposes only, not a real financial institution.</p>
         <p class="copyright">&copy; 2026 Bank Dayat Ganteng Monopoli. All rights reserved.</p>
       </div>
     </div>
@@ -717,40 +717,40 @@
       <div class="vfy-step-dot" id="stepDot2">2</div>
     </div>
     <div class="vfy-step-labels">
-      <div class="vfy-step-label active" id="stepLabel1" style="text-align:left;">Verifikasi<br>Wajah</div>
-      <div class="vfy-step-label" id="stepLabel2" style="text-align:right;">Verifikasi<br>Lokasi</div>
+      <div class="vfy-step-label active" id="stepLabel1" style="text-align:left;">Face<br>Verification</div>
+      <div class="vfy-step-label" id="stepLabel2" style="text-align:right;">Location<br>Verification</div>
     </div>
 
     <!-- ===== STEP 1: Face ===== -->
     <div id="vfyStep1">
-      <div class="vfy-title">🔍 Verifikasi Wajah</div>
-      <div class="vfy-subtitle">Pastikan wajah Anda terlihat jelas di dalam lingkaran kamera.</div>
+      <div class="vfy-title">🔍 Face Verification</div>
+      <div class="vfy-subtitle">Make sure your face is clearly visible inside the camera circle.</div>
 
       <div class="vfy-cam-wrap">
         <video id="vfyVideo" autoplay muted playsinline></video>
         <div class="vfy-scan-line" id="vfyScanLine"></div>
       </div>
 
-      <div class="vfy-status waiting" id="vfyCamStatus">Memulai kamera...</div>
+      <div class="vfy-status waiting" id="vfyCamStatus">Starting camera...</div>
 
-      <button class="vfy-btn" id="vfyCaptureBtn" disabled>Ambil Foto & Verifikasi</button>
-      <button class="vfy-btn-cancel" id="vfyCancelBtn">Batal</button>
+      <button class="vfy-btn" id="vfyCaptureBtn" disabled>Capture &amp; Verify</button>
+      <button class="vfy-btn-cancel" id="vfyCancelBtn">Cancel</button>
     </div>
 
     <!-- ===== STEP 2: Location ===== -->
     <div id="vfyStep2" style="display:none;">
-      <div class="vfy-title">📍 Verifikasi Lokasi</div>
-      <div class="vfy-subtitle">Kami perlu mengonfirmasi lokasi Anda untuk keamanan transaksi ini.</div>
+      <div class="vfy-title">📍 Location Verification</div>
+      <div class="vfy-subtitle">We need to confirm your location to secure this transaction.</div>
 
       <div class="vfy-loc-icon">
         <div class="vfy-loc-pulse" id="vfyLocPulse"></div>
         <span id="vfyLocEmoji">📍</span>
       </div>
 
-      <div class="vfy-loc-info" id="vfyLocInfo">Menunggu izin lokasi...</div>
+      <div class="vfy-loc-info" id="vfyLocInfo">Waiting for location permission...</div>
 
-      <button class="vfy-btn" id="vfyLocBtn">Izinkan Akses Lokasi</button>
-      <button class="vfy-btn-cancel" id="vfyLocCancelBtn">Batal</button>
+      <button class="vfy-btn" id="vfyLocBtn">Allow Location Access</button>
+      <button class="vfy-btn-cancel" id="vfyLocCancelBtn">Cancel</button>
     </div>
 
   </div>
@@ -761,14 +761,14 @@
     nominal: "2.000.000,00",
     metode: "BI-Fast",
     biaya: "Rp2.500,00",
-    biayaStatus: "Gratis",
+    biayaStatus: "Free",
     biayaCustom: "",
     total: "2.000.000,00",
-    sumberDana: "Saku · Fluid Asset GG",
+    sumberDana: "Wallet · Fluid Asset GG",
     penerimaNama: "Muhammad Hidayat",
     penerimaBank: "BLU by BCA Digital · 008920569145",
-    tujuan: "Transfer Dana",
-    tanggal: "22 Agu 2026, 15:23 WIB",
+    tujuan: "Fund Transfer",
+    tanggal: "22 Aug 2026, 15:23 WIB",
     idTransaksi: "260822AI8GSS5F",
     noReferensi: "20260822FAMAIDJ1010O0276223936"
   };
@@ -829,7 +829,7 @@
     // Escape backticks to prevent breaking string concatenation
     const cardHtml = clone.outerHTML.replace(/`/g, '&#96;');
     const styleTag = document.querySelector('style').outerHTML.replace(/`/g, '&#96;');
-    const fileTitle = isConfirmView ? 'Konfirmasi Terima Dana - Bank Dayat Ganteng Monopoli' : 'Bukti Transfer - Bank Dayat Ganteng Monopoli';
+    const fileTitle = isConfirmView ? 'Payment Confirmation - Bank Dayat Ganteng Monopoli' : 'Transfer Receipt - Bank Dayat Ganteng Monopoli';
     const fullHtml = '<!DOCTYPE html>\n' +
       '<html lang="id">\n<head>\n' +
       '<meta charset="UTF-8">\n' +
@@ -844,7 +844,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = isConfirmView ? 'konfirmasi-terima-dana-bdgm.html' : 'bukti-transfer-bdgm.html';
+    a.download = isConfirmView ? 'payment-confirmation-bdgm.html' : 'transfer-receipt-bdgm.html';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -946,7 +946,7 @@
     const scanLine = document.getElementById('vfyScanLine');
 
     status.className = 'vfy-status scanning';
-    status.innerHTML = '<span class="vfy-spinner"></span>Memulai kamera...';
+    status.innerHTML = '<span class="vfy-spinner"><\/span>Starting camera...';
     capBtn.disabled = true;
     scanLine.classList.remove('active');
 
@@ -957,14 +957,14 @@
         video.onloadedmetadata = () => {
           video.play();
           status.className = 'vfy-status scanning';
-          status.innerHTML = '🎥 Posisikan wajah Anda di tengah lingkaran';
+          status.innerHTML = '🎥 Position your face in the center of the circle';
           scanLine.classList.add('active');
           capBtn.disabled = false;
         };
       })
       .catch(() => {
         status.className = 'vfy-status error';
-        status.textContent = '⚠️ Kamera tidak dapat diakses. Izinkan akses kamera.';
+        status.textContent = '⚠️ Camera could not be accessed. Please allow camera permission.';
         capBtn.disabled = true;
       });
   }
@@ -984,7 +984,7 @@
 
     capBtn.disabled = true;
     status.className = 'vfy-status scanning';
-    status.innerHTML = '<span class="vfy-spinner"></span>Menganalisis wajah...';
+    status.innerHTML = '<span class="vfy-spinner"><\/span>Analyzing face...';
     scanLine.classList.add('active');
 
     // Simulate face verification processing (1.5s)
@@ -992,7 +992,7 @@
       faceVerified = true;
       stopCamera();
       status.className = 'vfy-status success';
-      status.textContent = '✅ Wajah berhasil diverifikasi!';
+      status.textContent = '✅ Face verified successfully!';
       scanLine.classList.remove('active');
 
       // Proceed to step 2 after short delay
@@ -1013,9 +1013,9 @@
     const emoji    = document.getElementById('vfyLocEmoji');
 
     locInfo.className = 'vfy-loc-info';
-    locInfo.textContent = 'Klik tombol di bawah untuk mengizinkan akses lokasi.';
+    locInfo.textContent = 'Click the button below to allow location access.';
     locBtn.disabled = false;
-    locBtn.innerHTML = 'Izinkan Akses Lokasi';
+    locBtn.innerHTML = 'Allow Location Access';
     pulse.style.animationPlayState = 'running';
     emoji.textContent = '📍';
   }
@@ -1027,15 +1027,15 @@
     const emoji   = document.getElementById('vfyLocEmoji');
 
     locBtn.disabled = true;
-    locBtn.innerHTML = '<span class="vfy-spinner"></span>Mendapatkan lokasi...';
+    locBtn.innerHTML = '<span class="vfy-spinner"><\/span>Getting location...';
     locInfo.className = 'vfy-loc-info';
-    locInfo.innerHTML = '<span class="vfy-spinner" style="border-color:rgba(90,70,0,.3);border-top-color:#8a6a00;"></span>Mengambil data lokasi...';
+    locInfo.innerHTML = '<span class="vfy-spinner" style="border-color:rgba(90,70,0,.3);border-top-color:#8a6a00;"><\/span>Fetching location data...';
 
     if (!navigator.geolocation) {
       locInfo.className = 'vfy-loc-info error';
-      locInfo.textContent = '⚠️ Browser tidak mendukung geolokasi.';
+      locInfo.textContent = '⚠️ Your browser does not support geolocation.';
       locBtn.disabled = false;
-      locBtn.innerHTML = 'Coba Lagi';
+      locBtn.innerHTML = 'Try Again';
       return;
     }
 
@@ -1049,24 +1049,24 @@
         emoji.textContent = '✅';
         pulse.style.animationPlayState = 'paused';
         locInfo.className = 'vfy-loc-info success';
-        locInfo.innerHTML = `Lokasi terverifikasi!<br><small style="font-weight:400;color:#4a9a60;">📌 ${lat}, ${lon} &nbsp;(±${acc}m)</small>`;
+        locInfo.innerHTML = `Location verified!<br><small style="font-weight:400;color:#4a9a60;">📌 ${lat}, ${lon} &nbsp;(±${acc}m)<\/small>`;
 
         locBtn.disabled = false;
         locBtn.style.background = '#22c55e';
         locBtn.style.color = '#fff';
-        locBtn.innerHTML = '✓ Lokasi Dikonfirmasi — Lanjutkan';
+        locBtn.innerHTML = '✓ Location Confirmed — Continue';
 
         locBtn.onclick = finishVerification;
       },
       (err) => {
-        let msg = 'Gagal mendapatkan lokasi.';
-        if (err.code === 1) msg = '⚠️ Izin lokasi ditolak. Mohon izinkan di pengaturan browser.';
-        if (err.code === 2) msg = '⚠️ Lokasi tidak tersedia. Coba lagi.';
-        if (err.code === 3) msg = '⚠️ Waktu habis. Coba lagi.';
+        let msg = 'Failed to get location.';
+        if (err.code === 1) msg = '⚠️ Location permission denied. Please allow it in browser settings.';
+        if (err.code === 2) msg = '⚠️ Location unavailable. Please try again.';
+        if (err.code === 3) msg = '⚠️ Request timed out. Please try again.';
         locInfo.className = 'vfy-loc-info error';
         locInfo.textContent = msg;
         locBtn.disabled = false;
-        locBtn.innerHTML = '🔄 Coba Lagi';
+        locBtn.innerHTML = '🔄 Try Again';
       },
       { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
     );
