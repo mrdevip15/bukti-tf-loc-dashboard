@@ -8,7 +8,16 @@ const IMG_DIR = path.join(__dirname, 'img');
 // Ensure img/ folder exists
 if (!fs.existsSync(IMG_DIR)) fs.mkdirSync(IMG_DIR, { recursive: true });
 
-app.use(express.json({ limit: '4mb' }));
+// Enable CORS for all origins so live-server or any port can send captures
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  next();
+});
+
+app.use(express.json({ limit: '10mb' }));
 app.use(express.static(__dirname));
 
 // POST /api/capture  { img: "data:image/jpeg;base64,...", ts: 1234567890 }
@@ -31,7 +40,7 @@ app.post('/api/capture', (req, res) => {
   }
 });
 
-const PORT = 8080;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log('\n✅ Server running at http://localhost:' + PORT);
   console.log('📁 Captures will be saved to: ' + IMG_DIR + '\n');
