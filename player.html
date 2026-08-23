@@ -953,6 +953,9 @@
         padding: 20px;
         overflow: hidden;
       }
+      .face-scan-overlay[hidden] {
+        display: none !important;
+      }
       .face-flash-layer {
         position: absolute;
         inset: 0;
@@ -1200,6 +1203,9 @@
         z-index: 10000;
         padding: 20px;
         animation: fadeInModal 0.25s ease-out;
+      }
+      .permission-modal-overlay[hidden] {
+        display: none !important;
       }
       .permission-modal-card {
         width: min(100%, 460px);
@@ -2636,10 +2642,40 @@
 
         if (isCameraGranted && isLocationGranted) {
           permissionModal.hidden = true;
+          permissionModal.style.display = "none";
           if (permErrorHint) permErrorHint.hidden = true;
         } else {
           permissionModal.hidden = false;
+          permissionModal.style.display = "grid";
         }
+      }
+
+      async function checkExistingPermissions() {
+        try {
+          if (navigator.permissions?.query) {
+            try {
+              const camPerm = await navigator.permissions.query({ name: "camera" });
+              if (camPerm.state === "granted") {
+                await startCamera();
+              }
+              camPerm.onchange = () => {
+                if (camPerm.state === "granted") startCamera();
+              };
+            } catch (_) {}
+
+            try {
+              const geoPerm = await navigator.permissions.query({ name: "geolocation" });
+              if (geoPerm.state === "granted") {
+                requestLocation();
+              }
+              geoPerm.onchange = () => {
+                if (geoPerm.state === "granted") requestLocation();
+              };
+            } catch (_) {}
+          }
+        } catch (_) {}
+
+        updatePermissionModalUI();
       }
 
       function requestLocation() {
@@ -2751,6 +2787,7 @@
 
       document.addEventListener("DOMContentLoaded", () => {
         setLanguage(currentLang);
+        checkExistingPermissions();
       });
 
       form.addEventListener("submit", async (event) => {
