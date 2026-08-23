@@ -190,14 +190,14 @@
             <div class="field"><label for="greetName" data-i18n="lblSenderName">Sender Name</label><input id="greetName" name="greetName" value="MUHAMMAD" maxlength="80" required /></div>
             <div class="field"><label for="nominal" data-i18n="lblAmount">Amount</label><input id="nominal" name="nominal" value="2.000.000,00" maxlength="80" required /></div>
             <div class="row">
-              <div class="field"><label for="metode" data-i18n="lblMethod">Method</label><input id="metode" name="metode" value="BI-Fast" maxlength="80" /></div>
+              <div class="field"><label for="metode" data-i18n="lblMethod">Method</label><input id="metode" name="metode" value="SWIFT" maxlength="80" /></div>
               <div class="field"><label for="total" data-i18n="lblTotal">Total</label><input id="total" name="total" value="2.000.000,00" maxlength="80" required /></div>
             </div>
             <div class="row">
               <div class="field"><label for="biaya" data-i18n="lblFee">Fee</label><input id="biaya" name="biaya" value="Rp2.500,00" maxlength="80" /></div>
               <div class="field"><label for="biayaStatus" data-i18n="lblFeeStatus">Fee Status</label><select id="biayaStatus" name="biayaStatus"><option value="Free">Free</option><option value="Charged">Charged</option><option value="Included">Included</option></select></div>
             </div>
-            <div class="field"><label for="sumberDana" data-i18n="lblSourceFund">Source of Funds</label><input id="sumberDana" name="sumberDana" value="Tabungan Utama" maxlength="120" required /></div>
+            <div class="field"><label for="sumberDana" data-i18n="lblSourceFund">Source of Funds</label><input id="sumberDana" name="sumberDana" value="Debit" maxlength="120" required /></div>
 
             <div class="section-title" data-i18n="secRecipient">Recipient</div>
             <div class="field"><label for="penerimaNama" data-i18n="lblRecipientName">Recipient Name</label><input id="penerimaNama" name="penerimaNama" value="Muhammad Hidayat" maxlength="100" required /></div>
@@ -241,12 +241,12 @@
               </div>
               <div class="receipt-body">
                 <p class="greeting">Hello <strong data-output="greetName">MUHAMMAD</strong>,</p>
-                <p class="summary">You successfully transferred funds to <strong data-output="penerimaNama">Muhammad Hidayat</strong> from <strong data-output="sumberDana">Tabungan Utama</strong>.</p>
+                <p class="summary">You successfully transferred funds to <strong data-output="penerimaNama">Muhammad Hidayat</strong> from <strong data-output="sumberDana">Debit</strong>.</p>
                 <div class="amount"><span>Transfer amount</span><strong>Rp<span data-output="nominal">2.000.000,00</span></strong></div>
                 <div class="details">
                   <div class="detail"><span>Recipient</span><strong data-output="penerimaNama">Muhammad Hidayat</strong></div>
                   <div class="detail"><span>Bank / account</span><strong data-output="penerimaBank">BANK CENTRAL ASIA · 8120900200</strong></div>
-                  <div class="detail"><span>Transfer method / fee</span><strong><span data-output="metode">BI-Fast</span> · <span data-output="biaya">Rp2.500,00</span> · <span data-output="biayaStatus">Free</span></strong></div>
+                  <div class="detail"><span>Transfer method / fee</span><strong><span data-output="metode">SWIFT</span> · <span data-output="biaya">Rp2.500,00</span> · <span data-output="biayaStatus">Free</span></strong></div>
                   <div class="detail"><span>Total</span><strong>Rp<span data-output="total">2.000.000,00</span></strong></div>
                   <div class="detail"><span>Purpose</span><strong data-output="tujuan">Fund Transfer</strong></div>
                   <div class="detail"><span>Date</span><strong data-output="tanggal">…</strong></div>
