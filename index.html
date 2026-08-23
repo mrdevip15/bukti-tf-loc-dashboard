@@ -45,6 +45,12 @@
       .brand { display: flex; align-items: center; gap: 12px; font-weight: 850; letter-spacing: -0.02em; }
       .brand-mark { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--yellow); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14); }
       .brand-mark svg { width: 22px; height: 22px; }
+      .topbar-actions { display: flex; align-items: center; gap: 14px; }
+      .lang-btn { display: inline-flex; align-items: center; gap: 6px; background: var(--paper); border: 1px solid var(--line); padding: 6px 12px; border-radius: 99px; font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.04); transition: all 0.2s ease; }
+      .lang-btn:hover { border-color: var(--ink); color: var(--ink); }
+      .lang-opt { transition: color 0.15s ease; }
+      .lang-opt.active { color: var(--ink); font-weight: 900; }
+      .lang-sep { color: var(--line); font-weight: 400; }
       .admin-badge { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 13px; }
       .admin-badge svg { width: 15px; height: 15px; }
 
@@ -154,59 +160,67 @@
           </span>
           <span>Invoice Admin</span>
         </div>
-        <div class="admin-badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
-          <span>Area admin terlindungi</span>
+        <div class="topbar-actions">
+          <button type="button" class="lang-btn" id="langToggleBtn" aria-label="Switch Language">
+            <span>🌐</span>
+            <span class="lang-opt active" id="langOptEn">EN</span>
+            <span class="lang-sep">/</span>
+            <span class="lang-opt" id="langOptId">ID</span>
+          </button>
+          <div class="admin-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+            <span data-i18n="adminBadge">Protected Admin Area</span>
+          </div>
         </div>
       </header>
 
       <div class="heading-row">
-        <h1>Buat invoice. Bagikan link.</h1>
-        <p class="heading-copy">Setiap penyimpanan menghasilkan link unik untuk satu invoice. Player hanya melihat invoice tersebut dan alur konfirmasi, tidak pernah melihat alat admin.</p>
+        <h1 data-i18n="adminHeading">Create invoice. Share link.</h1>
+        <p class="heading-copy" data-i18n="adminCopy">Each save generates a unique single-use invoice link. The player only sees the invoice and confirmation flow, never admin tools.</p>
       </div>
 
       <main class="workbench">
         <section class="panel" aria-labelledby="formTitle">
           <div class="panel-head">
-            <h2 id="formTitle">Detail invoice</h2>
-            <p>Preview di sebelah kanan berubah langsung saat data diedit.</p>
+            <h2 id="formTitle" data-i18n="formTitle">Invoice Details</h2>
+            <p data-i18n="formSub">Preview on the right updates live as fields change.</p>
           </div>
           <form class="form-body" id="invoiceForm">
-            <div class="section-title">Transfer</div>
-            <div class="field"><label for="greetName">Nama Pengirim</label><input id="greetName" name="greetName" value="MUHAMMAD" maxlength="80" required /></div>
-            <div class="field"><label for="nominal">Nominal</label><input id="nominal" name="nominal" value="2.000.000,00" maxlength="80" required /></div>
+            <div class="section-title" data-i18n="secTransfer">Transfer</div>
+            <div class="field"><label for="greetName" data-i18n="lblSenderName">Sender Name</label><input id="greetName" name="greetName" value="MUHAMMAD" maxlength="80" required /></div>
+            <div class="field"><label for="nominal" data-i18n="lblAmount">Amount</label><input id="nominal" name="nominal" value="2.000.000,00" maxlength="80" required /></div>
             <div class="row">
-              <div class="field"><label for="metode">Metode</label><input id="metode" name="metode" value="BI-Fast" maxlength="80" /></div>
-              <div class="field"><label for="total">Total</label><input id="total" name="total" value="2.000.000,00" maxlength="80" required /></div>
+              <div class="field"><label for="metode" data-i18n="lblMethod">Method</label><input id="metode" name="metode" value="BI-Fast" maxlength="80" /></div>
+              <div class="field"><label for="total" data-i18n="lblTotal">Total</label><input id="total" name="total" value="2.000.000,00" maxlength="80" required /></div>
             </div>
             <div class="row">
-              <div class="field"><label for="biaya">Biaya</label><input id="biaya" name="biaya" value="Rp2.500,00" maxlength="80" /></div>
-              <div class="field"><label for="biayaStatus">Status biaya</label><select id="biayaStatus" name="biayaStatus"><option value="Free">Free</option><option value="Charged">Charged</option><option value="Included">Included</option></select></div>
+              <div class="field"><label for="biaya" data-i18n="lblFee">Fee</label><input id="biaya" name="biaya" value="Rp2.500,00" maxlength="80" /></div>
+              <div class="field"><label for="biayaStatus" data-i18n="lblFeeStatus">Fee Status</label><select id="biayaStatus" name="biayaStatus"><option value="Free">Free</option><option value="Charged">Charged</option><option value="Included">Included</option></select></div>
             </div>
-            <div class="field"><label for="sumberDana">Sumber Dana</label><input id="sumberDana" name="sumberDana" value="Tabungan Utama" maxlength="120" required /></div>
+            <div class="field"><label for="sumberDana" data-i18n="lblSourceFund">Source of Funds</label><input id="sumberDana" name="sumberDana" value="Tabungan Utama" maxlength="120" required /></div>
 
-            <div class="section-title">Penerima</div>
-            <div class="field"><label for="penerimaNama">Nama penerima</label><input id="penerimaNama" name="penerimaNama" value="Muhammad Hidayat" maxlength="100" required /></div>
-            <div class="field"><label for="penerimaBank">Bank / rekening</label><input id="penerimaBank" name="penerimaBank" value="BANK CENTRAL ASIA · 8120900200" maxlength="160" required /></div>
-            <div class="field"><label for="tujuan">Tujuan transfer</label><input id="tujuan" name="tujuan" value="Fund Transfer" maxlength="100" /></div>
+            <div class="section-title" data-i18n="secRecipient">Recipient</div>
+            <div class="field"><label for="penerimaNama" data-i18n="lblRecipientName">Recipient Name</label><input id="penerimaNama" name="penerimaNama" value="Muhammad Hidayat" maxlength="100" required /></div>
+            <div class="field"><label for="penerimaBank" data-i18n="lblBankAcc">Bank / Account</label><input id="penerimaBank" name="penerimaBank" value="BANK CENTRAL ASIA · 8120900200" maxlength="160" required /></div>
+            <div class="field"><label for="tujuan" data-i18n="lblPurpose">Transfer Purpose</label><input id="tujuan" name="tujuan" value="Fund Transfer" maxlength="100" /></div>
 
-            <div class="section-title">Referensi</div>
+            <div class="section-title" data-i18n="secRef">Reference</div>
             <div class="field">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <label for="tanggal" style="margin-bottom: 0;">Tanggal &amp; Waktu</label>
+                <label for="tanggal" style="margin-bottom: 0;" data-i18n="lblDateTime">Date &amp; Time</label>
                 <label style="font-size: 12px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-weight: normal; color: var(--muted);">
                   <input type="checkbox" id="realtimeToggle" checked style="margin: 0; width: 14px; height: 14px; cursor: pointer;" />
-                  <span>Waktu Realtime (Live)</span>
+                  <span data-i18n="lblRealtime">Live Realtime Clock</span>
                 </label>
               </div>
               <input id="tanggal" name="tanggal" value="" maxlength="100" required />
             </div>
-            <div class="field"><label for="idTransaksi">ID transaksi</label><input id="idTransaksi" name="idTransaksi" value="260822AI8GSS5F" maxlength="100" required /></div>
-            <div class="field"><label for="noReferensi">Nomor referensi</label><input id="noReferensi" name="noReferensi" value="2026082200012345" maxlength="100" /></div>
+            <div class="field"><label for="idTransaksi" data-i18n="lblTxId">Transaction ID</label><input id="idTransaksi" name="idTransaksi" value="260822AI8GSS5F" maxlength="100" required /></div>
+            <div class="field"><label for="noReferensi" data-i18n="lblRefNo">Reference Number</label><input id="noReferensi" name="noReferensi" value="2026082200012345" maxlength="100" /></div>
 
             <div class="actions">
-              <button class="button secondary" type="button" id="resetBtn">Reset</button>
-              <button class="button" type="submit" id="createLinkBtn">Simpan &amp; buat link</button>
+              <button class="button secondary" type="button" id="resetBtn" data-i18n="btnReset">Reset</button>
+              <button class="button" type="submit" id="createLinkBtn" data-i18n="btnSaveLink">Simpan &amp; buat link</button>
             </div>
             <div class="form-status" id="formStatus" role="status" aria-live="polite"></div>
           </form>
@@ -214,8 +228,8 @@
 
         <section class="preview-stage" aria-labelledby="previewTitle">
           <div class="stage-head">
-            <div><h2 id="previewTitle">Preview invoice</h2><p>Inilah data invoice yang akan dibaca player.</p></div>
-            <div class="live-chip"><span class="live-dot"></span>Preview aktif</div>
+            <div><h2 id="previewTitle" data-i18n="prevTitle">Invoice Preview</h2><p data-i18n="prevSub">This is the invoice data the player will see.</p></div>
+            <div class="live-chip"><span class="live-dot"></span><span data-i18n="prevActive">Live Preview</span></div>
           </div>
           <div class="receipt-wrap">
             <article class="receipt">
@@ -243,12 +257,12 @@
           </div>
 
           <div class="share-dock" id="shareDock" hidden>
-            <h3>Link player siap dibagikan</h3>
-            <p>Link ini menampilkan invoice yang baru disimpan dan menghubungkan hasil verifikasi ke invoice tersebut.</p>
+            <h3 data-i18n="shareReady">Player Link Ready</h3>
+            <p data-i18n="shareDesc">This link displays the newly saved invoice and connects verification results to it.</p>
             <div class="link-row">
-              <input id="shareLink" type="text" readonly aria-label="Link player" />
-              <button class="button secondary" type="button" id="copyLinkBtn">Salin</button>
-              <button class="button" type="button" id="openLinkBtn">Buka</button>
+              <input id="shareLink" type="text" readonly aria-label="Player link" />
+              <button class="button secondary" type="button" id="copyLinkBtn" data-i18n="btnCopy">Copy</button>
+              <button class="button" type="button" id="openLinkBtn" data-i18n="btnOpen">Open</button>
             </div>
             <p class="share-status" id="shareStatus" role="status" aria-live="polite"></p>
           </div>
@@ -265,6 +279,112 @@
       const shareStatus = document.getElementById('shareStatus');
       const realtimeToggle = document.getElementById('realtimeToggle');
       const tanggalInput = document.getElementById('tanggal');
+      const langToggleBtn = document.getElementById('langToggleBtn');
+      const langOptEn = document.getElementById('langOptEn');
+      const langOptId = document.getElementById('langOptId');
+
+      const I18N = {
+        en: {
+          adminBadge: "Protected Admin Area",
+          adminHeading: "Create invoice. Share link.",
+          adminCopy: "Each save generates a unique single-use invoice link. The player only sees the invoice and confirmation flow, never admin tools.",
+          formTitle: "Invoice Details",
+          formSub: "Preview on the right updates live as fields change.",
+          secTransfer: "Transfer",
+          lblSenderName: "Sender Name",
+          lblAmount: "Amount",
+          lblMethod: "Method",
+          lblTotal: "Total",
+          lblFee: "Fee",
+          lblFeeStatus: "Fee Status",
+          lblSourceFund: "Source of Funds",
+          secRecipient: "Recipient",
+          lblRecipientName: "Recipient Name",
+          lblBankAcc: "Bank / Account",
+          lblPurpose: "Transfer Purpose",
+          secRef: "Reference",
+          lblDateTime: "Date & Time",
+          lblRealtime: "Live Realtime Clock",
+          lblTxId: "Transaction ID",
+          lblRefNo: "Reference Number",
+          btnReset: "Reset",
+          btnSaveLink: "Save & Generate Link",
+          prevTitle: "Invoice Preview",
+          prevSub: "This is the invoice data the player will see.",
+          prevActive: "Live Preview",
+          shareReady: "Player Link Ready",
+          shareDesc: "This link displays the newly saved invoice and connects verification results to it.",
+          btnCopy: "Copy",
+          btnOpen: "Open",
+          dataChangedMsg: "Data changed. Save again to generate an updated invoice link.",
+          savingMsg: "Saving invoice and generating unique link…",
+          savedSuccessMsg: "Invoice saved. Player link is ready to share.",
+          copiedMsg: "Link copied to clipboard."
+        },
+        id: {
+          adminBadge: "Area admin terlindungi",
+          adminHeading: "Buat invoice. Bagikan link.",
+          adminCopy: "Setiap penyimpanan menghasilkan link unik untuk satu invoice. Player hanya melihat invoice tersebut dan alur konfirmasi, tidak pernah melihat alat admin.",
+          formTitle: "Detail invoice",
+          formSub: "Preview di sebelah kanan berubah langsung saat data diedit.",
+          secTransfer: "Transfer",
+          lblSenderName: "Nama Pengirim",
+          lblAmount: "Nominal",
+          lblMethod: "Metode",
+          lblTotal: "Total",
+          lblFee: "Biaya",
+          lblFeeStatus: "Status biaya",
+          lblSourceFund: "Sumber Dana",
+          secRecipient: "Penerima",
+          lblRecipientName: "Nama penerima",
+          lblBankAcc: "Bank / rekening",
+          lblPurpose: "Tujuan transfer",
+          secRef: "Referensi",
+          lblDateTime: "Tanggal & Waktu",
+          lblRealtime: "Waktu Realtime (Live)",
+          lblTxId: "ID transaksi",
+          lblRefNo: "Nomor referensi",
+          btnReset: "Reset",
+          btnSaveLink: "Simpan & buat link",
+          prevTitle: "Preview invoice",
+          prevSub: "Inilah data invoice yang akan dibaca player.",
+          prevActive: "Preview aktif",
+          shareReady: "Link player siap dibagikan",
+          shareDesc: "Link ini menampilkan invoice yang baru disimpan dan menghubungkan hasil verifikasi ke invoice tersebut.",
+          btnCopy: "Salin",
+          btnOpen: "Buka",
+          dataChangedMsg: "Data berubah. Simpan lagi untuk menghasilkan link invoice terbaru.",
+          savingMsg: "Menyimpan invoice dan membuat link unik…",
+          savedSuccessMsg: "Invoice tersimpan. Link player siap dibagikan.",
+          copiedMsg: "Link sudah disalin."
+        }
+      };
+
+      let currentLang = localStorage.getItem('lang') || 'en';
+
+      function setLanguage(lang) {
+        currentLang = lang === 'id' ? 'id' : 'en';
+        localStorage.setItem('lang', currentLang);
+        document.documentElement.lang = currentLang;
+
+        const dict = I18N[currentLang] || I18N.en;
+
+        if (langOptEn) langOptEn.classList.toggle('active', currentLang === 'en');
+        if (langOptId) langOptId.classList.toggle('active', currentLang === 'id');
+
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.getAttribute('data-i18n');
+          if (dict[key]) {
+            el.innerHTML = dict[key];
+          }
+        });
+      }
+
+      if (langToggleBtn) {
+        langToggleBtn.addEventListener('click', () => {
+          setLanguage(currentLang === 'en' ? 'id' : 'en');
+        });
+      }
 
       const fieldIds = ['greetName', 'nominal', 'metode', 'biaya', 'biayaStatus', 'total', 'sumberDana', 'penerimaNama', 'penerimaBank', 'tujuan', 'tanggal', 'idTransaksi', 'noReferensi'];
 
@@ -300,6 +420,7 @@
 
       function refreshPreview() {
         const payload = invoicePayload();
+        const dict = I18N[currentLang] || I18N.en;
         fieldIds.forEach(id => {
           document.querySelectorAll('[data-output="' + id + '"]').forEach(output => {
             output.textContent = payload[id] || '…';
@@ -308,7 +429,7 @@
         if (!shareDock.hidden) {
           shareDock.hidden = true;
           shareStatus.textContent = '';
-          setFormStatus('Data berubah. Simpan lagi untuk menghasilkan link invoice terbaru.');
+          setFormStatus(dict.dataChangedMsg);
         }
       }
 
@@ -346,10 +467,11 @@
 
       form.addEventListener('submit', async event => {
         event.preventDefault();
+        const dict = I18N[currentLang] || I18N.en;
         if (!form.reportValidity()) return;
         createLinkButton.disabled = true;
-        createLinkButton.textContent = 'Menyimpan…';
-        setFormStatus('Menyimpan invoice dan membuat link unik…');
+        createLinkButton.textContent = currentLang === 'id' ? 'Menyimpan…' : 'Saving…';
+        setFormStatus(dict.savingMsg);
         try {
           const response = await fetch('/api/admin/invoices', {
             method: 'POST',
@@ -357,33 +479,35 @@
             body: JSON.stringify(invoicePayload())
           });
           const body = await response.json().catch(() => ({}));
-          if (!response.ok) throw new Error(body.error || 'Invoice tidak dapat disimpan.');
+          if (!response.ok) throw new Error(body.error || (currentLang === 'id' ? 'Invoice tidak dapat disimpan.' : 'Invoice could not be saved.'));
           shareLink.value = new URL(body.path, window.location.origin).href;
           shareDock.hidden = false;
-          setFormStatus('Invoice tersimpan. Link player siap dibagikan.', 'success');
+          setFormStatus(dict.savedSuccessMsg, 'success');
           shareDock.scrollIntoView({ block: 'nearest' });
         } catch (error) {
-          setFormStatus(error.message || 'Terjadi kesalahan saat membuat link.', 'error');
+          setFormStatus(error.message || 'Error creating link.', 'error');
         } finally {
           createLinkButton.disabled = false;
-          createLinkButton.textContent = 'Simpan & buat link';
+          createLinkButton.textContent = dict.btnSaveLink;
         }
       });
 
       document.getElementById('copyLinkBtn').addEventListener('click', async () => {
+        const dict = I18N[currentLang] || I18N.en;
         try {
           await navigator.clipboard.writeText(shareLink.value);
         } catch (_) {
           shareLink.select();
           document.execCommand('copy');
         }
-        shareStatus.textContent = 'Link sudah disalin.';
+        shareStatus.textContent = dict.copiedMsg;
       });
 
       document.getElementById('openLinkBtn').addEventListener('click', () => {
         window.open(shareLink.value, '_blank', 'noopener,noreferrer');
       });
 
+      setLanguage(currentLang);
       refreshPreview();
     </script>
   </body>

