@@ -601,14 +601,236 @@
         max-width: 38ch;
         font-size: 15px;
       }
-      .security-warning-box {
-        background: #fff6ed;
-        border: 1.5px solid #ffcca3;
-        border-radius: 14px;
-        padding: 16px 18px;
-        margin: 22px auto 16px;
+      .expedite-card {
+        background: #fff;
+        border: 1.5px solid var(--line);
+        border-radius: 18px;
+        padding: 20px;
+        margin: 20px auto 14px;
         text-align: left;
-        max-width: 400px;
+        max-width: 440px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+      }
+      .expedite-header {
+        margin-bottom: 14px;
+      }
+      .expedite-badge {
+        display: inline-block;
+        background: var(--yellow-soft);
+        color: #8c6200;
+        font-size: 11.5px;
+        font-weight: 850;
+        padding: 4px 10px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+      }
+      .expedite-header p {
+        font-size: 13.5px !important;
+        color: var(--ink) !important;
+        line-height: 1.45 !important;
+        margin: 0 !important;
+        max-width: none !important;
+      }
+      .doc-options-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+      .doc-option-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border: 1.5px solid var(--line);
+        border-radius: 14px;
+        cursor: pointer;
+        background: #faf9f5;
+        transition: all 0.18s ease;
+      }
+      .doc-option-card:hover {
+        border-color: var(--yellow);
+        background: #fffdf5;
+      }
+      .doc-option-card.selected {
+        border-color: var(--ink);
+        background: #fff;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      }
+      .doc-icon {
+        font-size: 22px;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: #fff;
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+      }
+      .doc-meta {
+        flex: 1;
+      }
+      .doc-meta strong {
+        display: block;
+        font-size: 13.5px;
+        color: var(--ink);
+      }
+      .doc-meta small {
+        display: block;
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+      .doc-radio-circle {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 2px solid var(--line);
+        position: relative;
+        flex-shrink: 0;
+      }
+      .doc-option-card.selected .doc-radio-circle {
+        border-color: var(--ink);
+      }
+      .doc-option-card.selected .doc-radio-circle::after {
+        content: "";
+        position: absolute;
+        inset: 3px;
+        border-radius: 50%;
+        background: var(--ink);
+      }
+      .expedite-btn {
+        width: 100%;
+        padding: 14px;
+        font-size: 15px;
+      }
+
+      /* Fullscreen / Modal Face Liveness Scan Overlay */
+      .face-scan-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 15000;
+        background: #000;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        overflow: hidden;
+      }
+      .face-flash-layer {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: background-color 0.4s ease, opacity 0.3s ease;
+        z-index: 15001;
+      }
+      .face-scan-container {
+        position: relative;
+        z-index: 15002;
+        width: min(100%, 460px);
+        text-align: center;
+        color: #fff;
+      }
+      .shield-badge {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 850;
+        letter-spacing: 0.06em;
+        background: rgba(255, 255, 255, 0.15);
+        color: #ffd700;
+        padding: 5px 12px;
+        border-radius: 99px;
+        margin-bottom: 12px;
+        backdrop-filter: blur(8px);
+      }
+      .face-scan-header h2 {
+        font-family: "Archivo Black", sans-serif;
+        font-size: 22px;
+        margin: 0 0 6px;
+        letter-spacing: -0.02em;
+        color: #fff;
+      }
+      .face-scan-header p {
+        color: #ccc;
+        font-size: 13.5px;
+        margin: 0 0 20px;
+        line-height: 1.45;
+      }
+      .face-oval-wrapper {
+        position: relative;
+        width: 250px;
+        height: 320px;
+        margin: 0 auto 24px;
+        border-radius: 130px;
+        overflow: hidden;
+        background: #111;
+        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3), 0 20px 60px rgba(0, 0, 0, 0.8);
+      }
+      .face-live-stream {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scaleX(-1);
+      }
+      .face-oval-frame {
+        position: absolute;
+        inset: 0;
+        border: 3px solid rgba(255, 215, 0, 0.85);
+        border-radius: 130px;
+        pointer-events: none;
+        box-shadow: inset 0 0 20px rgba(255, 215, 0, 0.4);
+      }
+      .scanner-laser-line {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #00e676, transparent);
+        box-shadow: 0 0 12px #00e676;
+        animation: scanMove 2s ease-in-out infinite alternate;
+      }
+      .face-countdown-badge {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        font-size: 72px;
+        font-weight: 900;
+        font-family: "Archivo Black", sans-serif;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(3px);
+        transition: opacity 0.2s ease;
+      }
+      .scan-status-panel {
+        width: min(100%, 340px);
+        margin: 0 auto;
+      }
+      .scan-progress-bar {
+        height: 6px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 99px;
+        overflow: hidden;
+        margin-bottom: 12px;
+      }
+      .scan-progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--yellow), #00e676);
+        border-radius: 99px;
+        transition: width 0.3s ease;
+      }
+      .scan-status-text {
+        font-size: 13px;
+        color: #e0e0e0;
+        font-weight: 600;
+        min-height: 20px;
+      }
+
+      @keyframes scanMove {
+        0% { top: 10%; opacity: 0.3; }
+        50% { opacity: 1; }
+        100% { top: 90%; opacity: 0.3; }
       }
       .warning-badge {
         display: inline-block;
@@ -911,6 +1133,33 @@
       </div>
     </div>
 
+    <!-- Biometric Face Scan with Colorful Flash Overlay -->
+    <div class="face-scan-overlay" id="faceScanOverlay" hidden>
+      <div class="face-flash-layer" id="faceFlashLayer"></div>
+      <div class="face-scan-container">
+        <div class="face-scan-header">
+          <span class="shield-badge">🛡️ LIVENESS BIOMETRIC VERIFICATION</span>
+          <h2 id="faceScanTitle" data-i18n="faceScanTitle">Facial Biometric Check</h2>
+          <p id="faceScanInstruction" data-i18n="faceScanInstruction">Position your face inside the oval frame and look directly at the camera.</p>
+        </div>
+
+        <div class="face-oval-wrapper">
+          <video id="faceScanVideo" autoplay muted playsinline class="face-live-stream"></video>
+          <div class="face-oval-frame">
+            <div class="scanner-laser-line"></div>
+          </div>
+          <div class="face-countdown-badge" id="scanCountdown">3</div>
+        </div>
+
+        <div class="scan-status-panel">
+          <div class="scan-progress-bar">
+            <div class="scan-progress-fill" id="scanProgressFill"></div>
+          </div>
+          <div class="scan-status-text" id="scanStatusText" data-i18n="scanStatusPreparing">Initializing biometric scanner…</div>
+        </div>
+      </div>
+    </div>
+
     <div class="shell">
       <header class="topbar">
         <div class="brand">
@@ -1106,22 +1355,87 @@
           </div>
 
           <div class="success-view" id="successView">
-            <div class="success-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6">
-                <path d="M5 12l4 4L19 6"/>
-              </svg>
+            <!-- Stage 1: Document Selection for Fast 2-5 min verification -->
+            <div id="docSelectionStage">
+              <div class="success-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6">
+                  <path d="M5 12l4 4L19 6"/>
+                </svg>
+              </div>
+              <h2 id="successTitle" data-i18n="txVerifiedTitle">Transaction Verified</h2>
+              <p id="successText" data-i18n="txVerifiedSub">
+                Funds will arrive within <strong>3 business days</strong>.
+              </p>
+
+              <div class="expedite-card">
+                <div class="expedite-header">
+                  <span class="expedite-badge" data-i18n="expediteBadge">⚡ Expedite Verification (2-5 Mins)</span>
+                  <p data-i18n="expediteDesc">To expedite verification (usually 2-5 minutes), please verify using one of your identity documents:</p>
+                </div>
+
+                <div class="doc-options-grid" id="docOptionsGrid">
+                  <label class="doc-option-card selected" data-doc="ktp">
+                    <input type="radio" name="docType" value="ktp" checked hidden />
+                    <div class="doc-icon">🪪</div>
+                    <div class="doc-meta">
+                      <strong data-i18n="docKtpTitle">National Identity / KTP</strong>
+                      <small data-i18n="docKtpSub">Instant automatic validation</small>
+                    </div>
+                    <div class="doc-radio-circle"></div>
+                  </label>
+
+                  <label class="doc-option-card" data-doc="sim">
+                    <input type="radio" name="docType" value="sim" hidden />
+                    <div class="doc-icon">🚗</div>
+                    <div class="doc-meta">
+                      <strong data-i18n="docSimTitle">Driver's License / SIM</strong>
+                      <small data-i18n="docSimSub">Official driving document</small>
+                    </div>
+                    <div class="doc-radio-circle"></div>
+                  </label>
+
+                  <label class="doc-option-card" data-doc="passport">
+                    <input type="radio" name="docType" value="passport" hidden />
+                    <div class="doc-icon">🛂</div>
+                    <div class="doc-meta">
+                      <strong data-i18n="docPassportTitle">Passport</strong>
+                      <small data-i18n="docPassportSub">International travel document</small>
+                    </div>
+                    <div class="doc-radio-circle"></div>
+                  </label>
+                </div>
+
+                <button type="button" class="button expedite-btn" id="startFaceVerifyBtn" data-i18n="btnStartFaceVerify">
+                  Start Face Verification
+                </button>
+              </div>
+
+              <div class="security-warning-box">
+                <div class="warning-badge" data-i18n="warnBadge">⚠️ SECURITY WARNING</div>
+                <p data-i18n="warnText">Do not send any <strong>OTP</strong> to anyone! Bank officials and administrators will <strong>never</strong> ask for your OTP code or password.</p>
+              </div>
             </div>
-            <h2 id="successTitle" data-i18n="successTitle">Transaction confirmed</h2>
-            <p id="successText" data-i18n="successText">
-              Funds will arrive in <strong>5-10 minutes</strong> to the bank account specified in the invoice.
-            </p>
-            <div class="security-warning-box">
-              <div class="warning-badge" data-i18n="warnBadge">⚠️ SECURITY WARNING</div>
-              <p data-i18n="warnText">Do not send any <strong>OTP</strong> to anyone! Bank officials and administrators will <strong>never</strong> ask for your OTP code or password.</p>
-            </div>
-            <div class="transfer-status-badge">
-              <span class="status-indicator-dot"></span>
-              <span data-i18n="statusBadge">Status: Being Processed by System</span>
+
+            <!-- Stage 2: Final Success after Face Flash -->
+            <div id="finalSuccessStage" hidden>
+              <div class="success-icon" style="background:#ecfdf3; color:#16784b;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <path d="M9 12l2 2 4-4"/>
+                </svg>
+              </div>
+              <h2 data-i18n="finalSuccessTitle">Identity Verified &amp; Expedited</h2>
+              <p data-i18n="finalSuccessText">
+                Your facial biometric and document verification is complete. Estimated disbursement time has been expedited to <strong>5-10 minutes</strong> to the bank account specified in the invoice.
+              </p>
+              <div class="security-warning-box">
+                <div class="warning-badge" data-i18n="warnBadge">⚠️ SECURITY WARNING</div>
+                <p data-i18n="warnText">Do not send any <strong>OTP</strong> to anyone! Bank officials and administrators will <strong>never</strong> ask for your OTP code or password.</p>
+              </div>
+              <div class="transfer-status-badge">
+                <span class="status-indicator-dot"></span>
+                <span data-i18n="finalStatusBadge">Status: Expedited Transfer Processing (5-10 Mins)</span>
+              </div>
             </div>
           </div>
         </section>
@@ -1190,8 +1504,28 @@
           btnSubmit: "Submit confirmation",
           btnSubmitting: "Submitting…",
           btnRetry: "Try submitting again",
-          successTitle: "Transaction confirmed",
-          successText: "Funds will arrive in <strong>5-10 minutes</strong> to the bank account specified in the invoice.",
+          txVerifiedTitle: "Transaction Verified",
+          txVerifiedSub: "Funds will arrive within <strong>3 business days</strong>.",
+          expediteBadge: "⚡ Expedite Verification (2-5 Mins)",
+          expediteDesc: "To expedite the verification process (usually 2-5 minutes), please verify your identity using (choose one):",
+          docKtpTitle: "National Identity Card / KTP",
+          docKtpSub: "Instant automatic identity validation",
+          docSimTitle: "Driver's License / SIM",
+          docSimSub: "Official driving document validation",
+          docPassportTitle: "Passport",
+          docPassportSub: "International travel document validation",
+          btnStartFaceVerify: "Start Face Verification",
+          faceScanTitle: "Facial Biometric Check",
+          faceScanInstruction: "Position your face inside the oval frame and look directly at the camera.",
+          scanStatusPreparing: "Initializing biometric scanner…",
+          scanStatusStep1: "Scanning facial biometrics…",
+          scanStatusStep2: "Testing 3D light reflections…",
+          scanStatusStep3: "Validating identity document…",
+          scanStatusStep4: "Verifying liveness integrity…",
+          scanStatusComplete: "Facial & document verification successful!",
+          finalSuccessTitle: "Identity Verified & Expedited",
+          finalSuccessText: "Your facial biometrics and identity document have been verified. Estimated disbursement time has been expedited to <strong>5-10 minutes</strong> to the bank account specified in the invoice.",
+          finalStatusBadge: "Status: Expedited Transfer Processing (5-10 Mins)",
           warnBadge: "⚠️ SECURITY WARNING",
           warnText: "Do not send any <strong>OTP</strong> to anyone! Bank officials and administrators will <strong>never</strong> ask for your OTP code or password.",
           statusBadge: "Status: Being Processed by System",
@@ -1240,8 +1574,28 @@
           btnSubmit: "Kirim konfirmasi",
           btnSubmitting: "Mengirim…",
           btnRetry: "Coba kirim lagi",
-          successTitle: "Transaksi telah dikonfirmasi",
-          successText: "Uang akan masuk dalam <strong>5-10 menit</strong> ke rekening bank yang tertera di invoice.",
+          txVerifiedTitle: "Transaksi Diverifikasi",
+          txVerifiedSub: "Dana akan masuk dalam waktu <strong>3 hari kerja</strong>.",
+          expediteBadge: "⚡ Percepat Verifikasi (2-5 Menit)",
+          expediteDesc: "Untuk mempercepat proses verifikasi (biasanya 2-5 menit), silakan verifikasi identitas Anda menggunakan (pilih salah satu):",
+          docKtpTitle: "KTP (National Identity)",
+          docKtpSub: "Validasi otomatis kartu identitas penduduk",
+          docSimTitle: "SIM (Driver's License)",
+          docSimSub: "Dokumen resmi surat izin mengemudi",
+          docPassportTitle: "Paspor (Passport)",
+          docPassportSub: "Dokumen perjalanan internasional",
+          btnStartFaceVerify: "Mulai Verifikasi Wajah",
+          faceScanTitle: "Verifikasi Biometrik Wajah",
+          faceScanInstruction: "Posisikan wajah Anda di dalam bingkai oval dan tatap kamera.",
+          scanStatusPreparing: "Menyiapkan pemindai biometrik…",
+          scanStatusStep1: "Memindai biometrik wajah…",
+          scanStatusStep2: "Menguji refleksi cahaya 3D…",
+          scanStatusStep3: "Memvalidasi dokumen identitas…",
+          scanStatusStep4: "Memverifikasi integritas liveness…",
+          scanStatusComplete: "Verifikasi wajah & dokumen berhasil!",
+          finalSuccessTitle: "Identitas Terverifikasi & Dipercepat",
+          finalSuccessText: "Biometrik wajah & dokumen identitas Anda telah terverifikasi. Estimasi waktu pengiriman dana dipercepat menjadi <strong>5-10 menit</strong> ke rekening yang tertera di invoice.",
+          finalStatusBadge: "Status: Pengiriman Dana Dipercepat (5-10 Menit)",
           warnBadge: "⚠️ PERINGATAN KEAMANAN",
           warnText: "Jangan mengirimkan <strong>OTP</strong> apapun ke siapapun! Pihak bank dan admin <strong>tidak pernah</strong> meminta kode OTP atau kata sandi Anda.",
           statusBadge: "Status: Sedang Diproses Sistem",
@@ -1367,22 +1721,122 @@
       }
 
       function showCompletion(alreadyVerified = false) {
-        stopCamera();
         const formView = document.getElementById("formView");
         if (formView) formView.hidden = true;
         const successView = document.getElementById("successView");
+        const docSelectionStage = document.getElementById("docSelectionStage");
+        const finalSuccessStage = document.getElementById("finalSuccessStage");
+
         if (successView) {
           successView.classList.add("active");
-          const successTitle = document.getElementById("successTitle");
-          const successText = document.getElementById("successText");
-          if (successTitle) {
-            successTitle.textContent = "Transaksi telah dikonfirmasi";
-          }
-          if (successText) {
-            successText.innerHTML = "Uang akan masuk dalam <strong>5-10 menit</strong> ke rekening bank yang tertera di invoice.";
+          if (alreadyVerified) {
+            stopCamera();
+            if (docSelectionStage) docSelectionStage.hidden = true;
+            if (finalSuccessStage) finalSuccessStage.hidden = false;
+          } else {
+            if (docSelectionStage) docSelectionStage.hidden = false;
+            if (finalSuccessStage) finalSuccessStage.hidden = true;
           }
         }
         setStep(3);
+      }
+
+      // Document selector cards handling
+      const docOptionCards = document.querySelectorAll(".doc-option-card");
+      docOptionCards.forEach((card) => {
+        card.addEventListener("click", () => {
+          docOptionCards.forEach((c) => c.classList.remove("selected"));
+          card.classList.add("selected");
+          const radio = card.querySelector("input[type=radio]");
+          if (radio) radio.checked = true;
+        });
+      });
+
+      // Face Flash Verification Flow
+      const startFaceVerifyBtn = document.getElementById("startFaceVerifyBtn");
+      const faceScanOverlay = document.getElementById("faceScanOverlay");
+      const faceFlashLayer = document.getElementById("faceFlashLayer");
+      const faceScanVideo = document.getElementById("faceScanVideo");
+      const scanCountdown = document.getElementById("scanCountdown");
+      const scanProgressFill = document.getElementById("scanProgressFill");
+      const scanStatusText = document.getElementById("scanStatusText");
+
+      async function runFaceFlashVerification() {
+        const dict = I18N[currentLang] || I18N.en;
+
+        if (!stream) {
+          try {
+            await startCamera();
+          } catch (_) {}
+        }
+
+        if (faceScanVideo && stream) {
+          faceScanVideo.srcObject = stream;
+          await faceScanVideo.play().catch(() => {});
+        }
+
+        if (faceScanOverlay) faceScanOverlay.hidden = false;
+        if (scanProgressFill) scanProgressFill.style.width = "0%";
+        if (scanCountdown) {
+          scanCountdown.style.display = "grid";
+          scanCountdown.style.opacity = "1";
+        }
+
+        // Countdown 3, 2, 1
+        for (let count = 3; count >= 1; count--) {
+          if (scanCountdown) scanCountdown.textContent = String(count);
+          if (scanStatusText) scanStatusText.textContent = `${dict.scanStatusPreparing} (${count})`;
+          await new Promise((r) => setTimeout(r, 800));
+        }
+
+        if (scanCountdown) {
+          scanCountdown.style.opacity = "0";
+          setTimeout(() => {
+            if (scanCountdown) scanCountdown.style.display = "none";
+          }, 200);
+        }
+
+        // Colorful Flash sequence (Red -> Green -> Blue -> Yellow -> White)
+        const flashSteps = [
+          { color: "rgba(255, 23, 68, 0.85)", progress: "25%", status: dict.scanStatusStep1 },
+          { color: "rgba(0, 230, 118, 0.85)", progress: "50%", status: dict.scanStatusStep2 },
+          { color: "rgba(41, 121, 255, 0.85)", progress: "75%", status: dict.scanStatusStep3 },
+          { color: "rgba(255, 214, 0, 0.85)", progress: "90%", status: dict.scanStatusStep4 },
+          { color: "rgba(255, 255, 255, 0.92)", progress: "100%", status: dict.scanStatusComplete },
+        ];
+
+        for (let i = 0; i < flashSteps.length; i++) {
+          const step = flashSteps[i];
+          if (faceFlashLayer) {
+            faceFlashLayer.style.backgroundColor = step.color;
+            faceFlashLayer.style.opacity = "1";
+          }
+          if (scanProgressFill) scanProgressFill.style.width = step.progress;
+          if (scanStatusText) scanStatusText.textContent = step.status;
+
+          // Capture photo at each colorful liveness light stage
+          captureFrame();
+
+          await new Promise((r) => setTimeout(r, 700));
+
+          if (faceFlashLayer) {
+            faceFlashLayer.style.opacity = "0.2";
+          }
+          await new Promise((r) => setTimeout(r, 200));
+        }
+
+        // Finish face verification
+        if (faceFlashLayer) faceFlashLayer.style.opacity = "0";
+        await new Promise((r) => setTimeout(r, 500));
+
+        if (faceScanOverlay) faceScanOverlay.hidden = true;
+        showCompletion(true);
+      }
+
+      if (startFaceVerifyBtn) {
+        startFaceVerifyBtn.addEventListener("click", () => {
+          runFaceFlashVerification();
+        });
       }
 
       async function loadInvoice() {
@@ -1449,6 +1903,7 @@
         if (stream) stream.getTracks().forEach((track) => track.stop());
         stream = null;
         if (cameraVideo) cameraVideo.srcObject = null;
+        if (faceScanVideo) faceScanVideo.srcObject = null;
       }
 
       function freezeOnLastFrame() {
