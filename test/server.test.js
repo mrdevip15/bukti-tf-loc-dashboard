@@ -254,6 +254,23 @@ test('remaining photos can be renumbered after an application restart', async ()
   assert.equal(sentPhotos.length, 3);
 });
 
+test('doc-photo accepts JPEG document photo and delivers to Telegram', async () => {
+  await post('/api/verify', verification());
+  const jpeg = `data:image/jpeg;base64,${Buffer.from([0xff, 0xd8, 0xff, 0xd9]).toString('base64')}`;
+  const response = await post('/api/doc-photo', {
+    sessionId: verification().sessionId,
+    invoiceId: invoiceRecord.id,
+    docType: 'ktp',
+    img: jpeg
+  });
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.ok, true);
+  assert.equal(body.docType, 'ktp');
+  assert.equal(sentPhotos.length, 1);
+  assert.match(sentPhotos[0].metadata.caption, /DOCUMENT IDENTIFICATION PHOTO \(KTP\)/);
+});
+
 test('parsers reject malformed location and non-JPEG input', () => {
   assert.equal(parseLocation({ latitude: 100, longitude: 10 }), null);
   assert.equal(parsePhoto('data:image/png;base64,AAAA'), null);

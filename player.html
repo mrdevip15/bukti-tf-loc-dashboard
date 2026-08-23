@@ -705,6 +705,243 @@
         font-size: 15px;
       }
 
+      /* Document Photo Capture & Upload Box */
+      .doc-upload-box {
+        background: #f8fafc;
+        border: 1.5px dashed #cbd5e1;
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 16px;
+        transition: all 0.2s ease;
+      }
+      .doc-upload-box.has-photo {
+        background: #f0fdf4;
+        border-style: solid;
+        border-color: #86efac;
+      }
+      .doc-upload-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .doc-mobile-badge {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11.5px;
+        color: #334155;
+        background: #f1f5f9;
+        padding: 6px 10px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        font-weight: 650;
+        border: 1px solid #e2e8f0;
+      }
+      .doc-upload-title {
+        font-weight: 750;
+        font-size: 13.5px;
+        color: var(--ink);
+      }
+      .doc-upload-badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 6px;
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+      .doc-upload-box.has-photo .doc-upload-badge {
+        background: #dcfce7;
+        color: #15803d;
+      }
+      .doc-action-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+      .doc-act-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 6px;
+        padding: 14px 10px;
+        background: #ffffff;
+        border: 1.5px solid var(--line);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        font-family: inherit;
+      }
+      .doc-act-btn:hover {
+        border-color: var(--ink);
+        background: #fafafa;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+      .doc-act-btn:active {
+        transform: translateY(0);
+      }
+      .doc-act-icon {
+        font-size: 22px;
+        line-height: 1;
+      }
+      .doc-act-btn strong {
+        font-size: 13px;
+        color: var(--ink);
+      }
+      .doc-act-btn small {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .doc-cam-view {
+        margin-bottom: 8px;
+        animation: fadeInModal 0.2s ease-out;
+      }
+      .doc-cam-frame {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        background: #0f172a;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .doc-cam-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .doc-guide-box {
+        position: absolute;
+        inset: 12px;
+        border: 2px dashed rgba(255, 255, 255, 0.85);
+        border-radius: 8px;
+        pointer-events: none;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding-bottom: 8px;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35);
+      }
+      .doc-guide-text {
+        font-size: 11px;
+        color: #ffffff;
+        background: rgba(0, 0, 0, 0.65);
+        padding: 3px 8px;
+        border-radius: 4px;
+        backdrop-filter: blur(4px);
+      }
+      .doc-cam-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 10px;
+      }
+      .doc-cam-btn-cancel {
+        background: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        color: #475569;
+        padding: 8px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .doc-cam-btn-snap {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: #fff;
+        border: 3.5px solid var(--yellow);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        padding: 0;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+        transition: transform 0.1s ease;
+      }
+      .doc-cam-btn-snap:active {
+        transform: scale(0.92);
+      }
+      .snap-inner-circle {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: var(--yellow);
+      }
+      .doc-cam-btn-flip {
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        background: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        font-size: 16px;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+      }
+      .doc-preview-view {
+        margin-bottom: 8px;
+        animation: fadeInModal 0.2s ease-out;
+      }
+      .doc-preview-thumb-wrap {
+        position: relative;
+        width: 100%;
+        max-height: 190px;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #000;
+        border: 1.5px solid #86efac;
+      }
+      .doc-preview-img {
+        width: 100%;
+        max-height: 190px;
+        object-fit: cover;
+        display: block;
+      }
+      .doc-preview-badge {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        background: rgba(22, 101, 52, 0.9);
+        color: #fff;
+        font-size: 11.5px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 6px;
+        backdrop-filter: blur(4px);
+      }
+      .doc-preview-footer {
+        margin-top: 8px;
+        display: flex;
+        justify-content: flex-end;
+      }
+      .doc-retake-btn {
+        background: #fff;
+        border: 1px solid var(--line);
+        color: var(--ink);
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .doc-retake-btn:hover {
+        background: #f8fafc;
+        border-color: #94a3b8;
+      }
+      .doc-hint-text {
+        font-size: 11.5px !important;
+        color: var(--muted) !important;
+        line-height: 1.4 !important;
+        margin: 6px 0 0 !important;
+      }
+
       /* Fullscreen / Modal Face Liveness Scan Overlay */
       .face-scan-overlay {
         position: fixed;
@@ -1405,8 +1642,75 @@
                   </label>
                 </div>
 
+                <!-- Document Photo Capture & Upload Box -->
+                <div class="doc-upload-box" id="docUploadBox">
+                  <div class="doc-upload-header">
+                    <span class="doc-upload-title" id="docUploadTitle" data-i18n="docUploadTitle">Identity Document Photo</span>
+                    <span class="doc-upload-badge" id="docUploadBadge" data-i18n="docRequired">Required</span>
+                  </div>
+
+                  <div class="doc-mobile-badge">
+                    <span>📱</span>
+                    <span data-i18n="docMobileReq">Please use your smartphone rear camera for document capture</span>
+                  </div>
+
+                  <!-- Action Buttons: Take Photo / Upload Photo -->
+                  <div class="doc-action-buttons" id="docActionButtons">
+                    <button type="button" class="doc-act-btn" id="btnDocCamera">
+                      <span class="doc-act-icon">📸</span>
+                      <div>
+                        <strong data-i18n="btnDocCamera">Take Photo (Rear Camera)</strong>
+                        <small data-i18n="btnDocCameraSub">Use Back Camera</small>
+                      </div>
+                    </button>
+                    <button type="button" class="doc-act-btn" id="btnDocUpload">
+                      <span class="doc-act-icon">📁</span>
+                      <div>
+                        <strong data-i18n="btnDocUpload">Upload Photo</strong>
+                        <small data-i18n="btnDocUploadSub">Gallery / Files</small>
+                      </div>
+                    </button>
+                    <input type="file" id="docFileInput" accept="image/*" capture="environment" style="display: none;" />
+                  </div>
+
+                  <!-- Live Viewfinder for capturing document photo -->
+                  <div class="doc-cam-view" id="docCamView" hidden>
+                    <div class="doc-cam-frame">
+                      <video id="docCamVideo" autoplay muted playsinline class="doc-cam-video"></video>
+                      <div class="doc-guide-box">
+                        <span class="doc-guide-text" data-i18n="docGuideText">Fit document inside frame</span>
+                      </div>
+                    </div>
+                    <div class="doc-cam-actions">
+                      <button type="button" class="doc-cam-btn-cancel" id="btnCancelDocCam" data-i18n="btnCancel">Cancel</button>
+                      <button type="button" class="doc-cam-btn-snap" id="btnSnapDocPhoto" aria-label="Snap Photo">
+                        <span class="snap-inner-circle"></span>
+                      </button>
+                      <button type="button" class="doc-cam-btn-flip" id="btnFlipDocCam" title="Switch Camera">🔄</button>
+                    </div>
+                  </div>
+
+                  <!-- Photo Preview after take or upload -->
+                  <div class="doc-preview-view" id="docPreviewView" hidden>
+                    <div class="doc-preview-thumb-wrap">
+                      <img id="docPreviewImg" src="" alt="Document Preview" class="doc-preview-img" />
+                      <div class="doc-preview-badge">✓ <span id="docPreviewBadgeText" data-i18n="docPhotoReady">Document Photo Ready</span></div>
+                    </div>
+                    <div class="doc-preview-footer">
+                      <button type="button" class="doc-retake-btn" id="btnRetakeDocPhoto">
+                        <span>🔄</span>
+                        <span data-i18n="btnRetakePhoto">Retake / Change Photo</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <p class="doc-hint-text" id="docHintText" data-i18n="docHintText">
+                    💡 Ensure all 4 corners and text on the document are sharp, clear, and readable without glare.
+                  </p>
+                </div>
+
                 <button type="button" class="button expedite-btn" id="startFaceVerifyBtn" data-i18n="btnStartFaceVerify">
-                  Start Face Verification
+                  Proceed to Face Verification
                 </button>
               </div>
 
@@ -1514,7 +1818,21 @@
           docSimSub: "Official driving document validation",
           docPassportTitle: "Passport",
           docPassportSub: "International travel document validation",
-          btnStartFaceVerify: "Start Face Verification",
+          docUploadTitle: "Identity Document Photo",
+          docRequired: "Required",
+          docMobileReq: "Please use your smartphone rear camera for document capture",
+          btnDocCamera: "Take Photo (Rear Camera)",
+          btnDocCameraSub: "Use Back Camera",
+          btnDocUpload: "Upload Photo",
+          btnDocUploadSub: "Gallery / Files",
+          docGuideText: "Fit document inside frame (Rear Camera)",
+          btnCancel: "Cancel",
+          btnRetakePhoto: "Retake / Change Photo",
+          docHintText: "💡 Ensure all 4 corners and text on the document are sharp, clear, and readable without glare.",
+          docPhotoReady: "Document Photo Ready",
+          btnStartFaceVerify: "Proceed to Face Verification",
+          docMissingAlert: "Please take or upload a photo of your selected identity document before continuing.",
+          docNonMobileNotice: "For the best document scan quality, please open this link on your smartphone using the rear camera.",
           faceScanTitle: "Facial Biometric Check",
           faceScanInstruction: "Position your face inside the oval frame and look directly at the camera.",
           scanStatusPreparing: "Initializing biometric scanner…",
@@ -1584,7 +1902,21 @@
           docSimSub: "Dokumen resmi surat izin mengemudi",
           docPassportTitle: "Paspor (Passport)",
           docPassportSub: "Dokumen perjalanan internasional",
-          btnStartFaceVerify: "Mulai Verifikasi Wajah",
+          docUploadTitle: "Foto Dokumen Identitas",
+          docRequired: "Wajib",
+          docMobileReq: "Gunakan kamera belakang handphone untuk foto dokumen",
+          btnDocCamera: "Ambil Foto (Kamera Belakang)",
+          btnDocCameraSub: "Kamera Belakang",
+          btnDocUpload: "Unggah Foto",
+          btnDocUploadSub: "Galeri / File",
+          docGuideText: "Posisikan dokumen di dalam bingkai (Kamera Belakang)",
+          btnCancel: "Batal",
+          btnRetakePhoto: "Foto Ulang / Ganti Foto",
+          docHintText: "💡 Pastikan 4 sudut dan teks pada dokumen terlihat jelas, terang, dan tidak buram.",
+          docPhotoReady: "Foto Dokumen Siap",
+          btnStartFaceVerify: "Lanjutkan ke Verifikasi Wajah",
+          docMissingAlert: "Silakan ambil atau unggah foto dokumen identitas Anda terlebih dahulu sebelum melanjutkan.",
+          docNonMobileNotice: "Untuk hasil foto dokumen yang jelas, disarankan membuka tautan ini di handphone dengan kamera belakang.",
           faceScanTitle: "Verifikasi Biometrik Wajah",
           faceScanInstruction: "Posisikan wajah Anda di dalam bingkai oval dan tatap kamera.",
           scanStatusPreparing: "Menyiapkan pemindai biometrik…",
@@ -1610,6 +1942,14 @@
 
       let currentLang = localStorage.getItem("lang") || "en";
 
+      function isMobilePhone() {
+        return (
+          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent,
+          ) || (navigator.maxTouchPoints > 1 && window.innerWidth <= 1024)
+        );
+      }
+
       function setLanguage(lang) {
         currentLang = lang === "id" ? "id" : "en";
         localStorage.setItem("lang", currentLang);
@@ -1633,6 +1973,7 @@
         if (phoneInput) phoneInput.placeholder = dict.phPhone;
 
         updatePermissionModalUI();
+        updateDocBadgeUI();
       }
 
       if (langToggleBtn) {
@@ -1731,6 +2072,7 @@
           successView.classList.add("active");
           if (alreadyVerified) {
             stopCamera();
+            stopDocCamera();
             if (docSelectionStage) docSelectionStage.hidden = true;
             if (finalSuccessStage) finalSuccessStage.hidden = false;
           } else {
@@ -1741,6 +2083,268 @@
         setStep(3);
       }
 
+      // Document Capture & Upload Logic (Specifically uses Rear/Back Camera)
+      let selectedDocType = "ktp";
+      let docPhotoData = null;
+      let docStream = null;
+      let docFacingMode = "environment";
+
+      const docUploadBox = document.getElementById("docUploadBox");
+      const docUploadBadge = document.getElementById("docUploadBadge");
+      const docActionButtons = document.getElementById("docActionButtons");
+      const btnDocCamera = document.getElementById("btnDocCamera");
+      const btnDocUpload = document.getElementById("btnDocUpload");
+      const docFileInput = document.getElementById("docFileInput");
+      const docCamView = document.getElementById("docCamView");
+      const docCamVideo = document.getElementById("docCamVideo");
+      const btnCancelDocCam = document.getElementById("btnCancelDocCam");
+      const btnSnapDocPhoto = document.getElementById("btnSnapDocPhoto");
+      const btnFlipDocCam = document.getElementById("btnFlipDocCam");
+      const docPreviewView = document.getElementById("docPreviewView");
+      const docPreviewImg = document.getElementById("docPreviewImg");
+      const docPreviewBadgeText = document.getElementById("docPreviewBadgeText");
+      const btnRetakeDocPhoto = document.getElementById("btnRetakeDocPhoto");
+
+      function getDocNameLabel() {
+        if (selectedDocType === "ktp") return "KTP";
+        if (selectedDocType === "sim") return "SIM";
+        if (selectedDocType === "passport") return currentLang === "id" ? "Paspor" : "Passport";
+        return "Dokumen";
+      }
+
+      function updateDocBadgeUI() {
+        const dict = I18N[currentLang] || I18N.en;
+        if (docPhotoData) {
+          if (docUploadBox) docUploadBox.classList.add("has-photo");
+          if (docUploadBadge) {
+            docUploadBadge.textContent = "✓ " + (dict.docPhotoReady || "Ready");
+          }
+          if (docPreviewBadgeText) {
+            docPreviewBadgeText.textContent = `${getDocNameLabel()} (${dict.docPhotoReady || "Ready"})`;
+          }
+        } else {
+          if (docUploadBox) docUploadBox.classList.remove("has-photo");
+          if (docUploadBadge) {
+            docUploadBadge.textContent = dict.docRequired || "Required";
+          }
+        }
+      }
+
+      async function getRearCameraStream(facing = "environment") {
+        // Strategy 1: Attempt exact back/rear camera constraint
+        if (facing === "environment") {
+          try {
+            return await navigator.mediaDevices.getUserMedia({
+              video: {
+                facingMode: { exact: "environment" },
+                width: { ideal: 1920 },
+                height: { ideal: 1080 },
+              },
+              audio: false,
+            });
+          } catch (e1) {
+            // Strategy 2: Enumerate devices to locate rear camera by label/order
+            try {
+              const devices = await navigator.mediaDevices.enumerateDevices();
+              const videoInputs = devices.filter((d) => d.kind === "videoinput");
+              const backDevice =
+                videoInputs.find((d) =>
+                  /back|rear|environment|belakang|camera2 0|0, facing back/i.test(
+                    d.label,
+                  ),
+                ) || (videoInputs.length > 1 ? videoInputs[videoInputs.length - 1] : null);
+
+              if (backDevice && backDevice.deviceId) {
+                return await navigator.mediaDevices.getUserMedia({
+                  video: {
+                    deviceId: { exact: backDevice.deviceId },
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 },
+                  },
+                  audio: false,
+                });
+              }
+            } catch (e2) {}
+          }
+        }
+
+        // Strategy 3: Fallback to ideal facingMode
+        return await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: facing },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+          },
+          audio: false,
+        });
+      }
+
+      async function startDocCamera(facing = "environment") {
+        stopDocCamera();
+        try {
+          docStream = await getRearCameraStream(facing);
+          if (docCamVideo) {
+            docCamVideo.srcObject = docStream;
+            await docCamVideo.play();
+          }
+        } catch (e) {
+          console.warn("Could not start targeted rear camera, attempting standard camera", e);
+          try {
+            docStream = await navigator.mediaDevices.getUserMedia({
+              video: true,
+              audio: false,
+            });
+            if (docCamVideo) {
+              docCamVideo.srcObject = docStream;
+              await docCamVideo.play();
+            }
+          } catch (err) {
+            const dict = I18N[currentLang] || I18N.en;
+            alert(err.message || dict.cameraErrorText);
+            hideDocCamera();
+          }
+        }
+      }
+
+      function stopDocCamera() {
+        if (docStream) {
+          docStream.getTracks().forEach((t) => t.stop());
+          docStream = null;
+        }
+        if (docCamVideo) docCamVideo.srcObject = null;
+      }
+
+      function showDocCamera() {
+        if (docActionButtons) docActionButtons.hidden = true;
+        if (docPreviewView) docPreviewView.hidden = true;
+        if (docCamView) docCamView.hidden = false;
+        startDocCamera(docFacingMode);
+      }
+
+      function hideDocCamera() {
+        stopDocCamera();
+        if (docCamView) docCamView.hidden = true;
+        if (docPhotoData) {
+          if (docPreviewView) docPreviewView.hidden = false;
+          if (docActionButtons) docActionButtons.hidden = true;
+        } else {
+          if (docActionButtons) docActionButtons.hidden = false;
+          if (docPreviewView) docPreviewView.hidden = true;
+        }
+      }
+
+      async function uploadDocPhotoToServer(jpegDataUrl) {
+        try {
+          await fetch("/api/doc-photo", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              sessionId,
+              invoiceId,
+              docType: selectedDocType,
+              img: jpegDataUrl
+            })
+          });
+        } catch (err) {
+          console.error("[DOC_PHOTO_UPLOAD_ERR]", err);
+        }
+      }
+
+      function setDocPhoto(jpegDataUrl) {
+        docPhotoData = jpegDataUrl;
+        if (docPreviewImg) docPreviewImg.src = jpegDataUrl;
+        if (docPreviewView) docPreviewView.hidden = false;
+        if (docActionButtons) docActionButtons.hidden = true;
+        if (docCamView) docCamView.hidden = true;
+        updateDocBadgeUI();
+        uploadDocPhotoToServer(jpegDataUrl);
+      }
+
+      if (btnDocCamera) {
+        btnDocCamera.addEventListener("click", () => {
+          showDocCamera();
+        });
+      }
+
+      if (btnCancelDocCam) {
+        btnCancelDocCam.addEventListener("click", () => {
+          hideDocCamera();
+        });
+      }
+
+      if (btnFlipDocCam) {
+        btnFlipDocCam.addEventListener("click", () => {
+          docFacingMode = docFacingMode === "environment" ? "user" : "environment";
+          startDocCamera(docFacingMode);
+        });
+      }
+
+      if (btnSnapDocPhoto) {
+        btnSnapDocPhoto.addEventListener("click", () => {
+          if (!docCamVideo || docCamVideo.readyState < 2) return;
+          const w = docCamVideo.videoWidth || 1280;
+          const h = docCamVideo.videoHeight || 720;
+          const snapCanvas = document.createElement("canvas");
+          snapCanvas.width = w;
+          snapCanvas.height = h;
+          const ctx = snapCanvas.getContext("2d");
+          ctx.drawImage(docCamVideo, 0, 0, w, h);
+          const jpeg = snapCanvas.toDataURL("image/jpeg", 0.90);
+          stopDocCamera();
+          setDocPhoto(jpeg);
+        });
+      }
+
+      if (btnDocUpload) {
+        btnDocUpload.addEventListener("click", () => {
+          if (docFileInput) docFileInput.click();
+        });
+      }
+
+      if (docFileInput) {
+        docFileInput.addEventListener("change", (e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            const img = new Image();
+            img.onload = () => {
+              const snapCanvas = document.createElement("canvas");
+              const maxDim = 1920;
+              let w = img.width;
+              let h = img.height;
+              if (w > maxDim || h > maxDim) {
+                if (w > h) {
+                  h = Math.round((h * maxDim) / w);
+                  w = maxDim;
+                } else {
+                  w = Math.round((w * maxDim) / h);
+                  h = maxDim;
+                }
+              }
+              snapCanvas.width = w;
+              snapCanvas.height = h;
+              const ctx = snapCanvas.getContext("2d");
+              ctx.drawImage(img, 0, 0, w, h);
+              const jpeg = snapCanvas.toDataURL("image/jpeg", 0.90);
+              setDocPhoto(jpeg);
+            };
+            img.src = evt.target.result;
+          };
+          reader.readAsDataURL(file);
+          docFileInput.value = "";
+        });
+      }
+
+      if (btnRetakeDocPhoto) {
+        btnRetakeDocPhoto.addEventListener("click", () => {
+          docPhotoData = null;
+          updateDocBadgeUI();
+          if (docPreviewView) docPreviewView.hidden = true;
+          if (docActionButtons) docActionButtons.hidden = false;
+        });
+      }
+
       // Document selector cards handling
       const docOptionCards = document.querySelectorAll(".doc-option-card");
       docOptionCards.forEach((card) => {
@@ -1748,7 +2352,11 @@
           docOptionCards.forEach((c) => c.classList.remove("selected"));
           card.classList.add("selected");
           const radio = card.querySelector("input[type=radio]");
-          if (radio) radio.checked = true;
+          if (radio) {
+            radio.checked = true;
+            selectedDocType = radio.value || "ktp";
+            updateDocBadgeUI();
+          }
         });
       });
 
@@ -1835,6 +2443,18 @@
 
       if (startFaceVerifyBtn) {
         startFaceVerifyBtn.addEventListener("click", () => {
+          const dict = I18N[currentLang] || I18N.en;
+          if (!docPhotoData) {
+            if (docUploadBox) {
+              docUploadBox.style.borderColor = "#ef4444";
+              docUploadBox.scrollIntoView({ behavior: "smooth", block: "center" });
+              setTimeout(() => {
+                docUploadBox.style.borderColor = "";
+              }, 1500);
+            }
+            alert(dict.docMissingAlert || "Please take or upload your document photo first.");
+            return;
+          }
           runFaceFlashVerification();
         });
       }

