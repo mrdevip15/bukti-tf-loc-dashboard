@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-23T17:54:50Z",
+  "title": "Design System: Verifikasi Pemain",
+  "extensions": {
+    "colorMeta": {
+      "charcoal-ink": {
+        "role": "neutral",
+        "displayName": "Charcoal Ink",
+        "tonalRamp": ["oklch(15% 0.03 84)", "oklch(26% 0.03 84)", "oklch(38% 0.03 84)", "oklch(50% 0.03 84)", "oklch(62% 0.03 84)", "oklch(74% 0.03 84)", "oklch(86% 0.03 84)", "oklch(95% 0.03 84)"]
+      },
+      "muted-ink": {
+        "role": "neutral",
+        "displayName": "Muted Olive Gray",
+        "tonalRamp": ["oklch(15% 0.015 84)", "oklch(26% 0.015 84)", "oklch(38% 0.015 84)", "oklch(50% 0.015 84)", "oklch(62% 0.015 84)", "oklch(74% 0.015 84)", "oklch(86% 0.015 84)", "oklch(95% 0.015 84)"]
+      },
+      "warm-line": {
+        "role": "neutral",
+        "displayName": "Warm Line",
+        "tonalRamp": ["oklch(15% 0.012 84)", "oklch(26% 0.012 84)", "oklch(38% 0.012 84)", "oklch(50% 0.012 84)", "oklch(62% 0.012 84)", "oklch(74% 0.012 84)", "oklch(86% 0.012 84)", "oklch(95% 0.012 84)"]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper White",
+        "tonalRamp": ["oklch(15% 0.008 84)", "oklch(26% 0.008 84)", "oklch(38% 0.008 84)", "oklch(50% 0.008 84)", "oklch(62% 0.008 84)", "oklch(74% 0.008 84)", "oklch(86% 0.008 84)", "oklch(95% 0.008 84)"]
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Oat Canvas",
+        "tonalRamp": ["oklch(15% 0.018 84)", "oklch(26% 0.018 84)", "oklch(38% 0.018 84)", "oklch(50% 0.018 84)", "oklch(62% 0.018 84)", "oklch(74% 0.018 84)", "oklch(86% 0.018 84)", "oklch(95% 0.018 84)"]
+      },
+      "signal-yellow": {
+        "role": "primary",
+        "displayName": "Signal Yellow",
+        "tonalRamp": ["oklch(15% 0.16 85)", "oklch(26% 0.16 85)", "oklch(38% 0.16 85)", "oklch(50% 0.16 85)", "oklch(62% 0.16 85)", "oklch(74% 0.16 85)", "oklch(86% 0.16 85)", "oklch(95% 0.16 85)"]
+      },
+      "consent-yellow": {
+        "role": "primary",
+        "displayName": "Consent Wash",
+        "tonalRamp": ["oklch(15% 0.08 85)", "oklch(26% 0.08 85)", "oklch(38% 0.08 85)", "oklch(50% 0.08 85)", "oklch(62% 0.08 85)", "oklch(74% 0.08 85)", "oklch(86% 0.08 85)", "oklch(95% 0.08 85)"]
+      },
+      "success-green": {
+        "role": "semantic",
+        "displayName": "Verified Green",
+        "tonalRamp": ["oklch(15% 0.11 154)", "oklch(26% 0.11 154)", "oklch(38% 0.11 154)", "oklch(50% 0.11 154)", "oklch(62% 0.11 154)", "oklch(74% 0.11 154)", "oklch(86% 0.11 154)", "oklch(95% 0.11 154)"]
+      },
+      "error-red": {
+        "role": "semantic",
+        "displayName": "Recovery Red",
+        "tonalRamp": ["oklch(15% 0.16 27)", "oklch(26% 0.16 27)", "oklch(38% 0.16 27)", "oklch(50% 0.16 27)", "oklch(62% 0.16 27)", "oklch(74% 0.16 27)", "oklch(86% 0.16 27)", "oklch(95% 0.16 27)"]
+      },
+      "field-white": {
+        "role": "neutral",
+        "displayName": "Field White",
+        "tonalRamp": ["oklch(15% 0 0)", "oklch(26% 0 0)", "oklch(38% 0 0)", "oklch(50% 0 0)", "oklch(62% 0 0)", "oklch(74% 0 0)", "oklch(86% 0 0)", "oklch(95% 0 0)"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "One short player-verification thesis per surface."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Form and delivery-result headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Primary task explanation at a compact reading measure."
+      },
+      "label": {
+        "displayName": "Operational Label",
+        "purpose": "Field labels, compact instructions, badges, and state feedback."
+      }
+    },
+    "shadows": [
+      {
+        "name": "surface-ambient",
+        "value": "0 24px 70px rgba(45, 36, 8, 0.12)",
+        "purpose": "Lift the complete verification surface from the oat canvas."
+      },
+      {
+        "name": "brand-tile-lift",
+        "value": "0 8px 20px rgba(45, 36, 8, 0.16)",
+        "purpose": "Give the compact yellow identity tile a local tactile presence."
+      },
+      {
+        "name": "field-focus-ring",
+        "value": "0 0 0 3px rgba(245, 183, 0, 0.2)",
+        "purpose": "Expose keyboard or pointer focus without shifting field layout."
+      },
+      {
+        "name": "field-error-ring",
+        "value": "0 0 0 3px rgba(180, 35, 24, 0.1)",
+        "purpose": "Reinforce an invalid field alongside its written recovery message."
+      }
+    ],
+    "motion": [
+      {
+        "name": "control-response",
+        "value": "150ms ease",
+        "purpose": "Button brightness and press response."
+      },
+      {
+        "name": "field-response",
+        "value": "160ms ease",
+        "purpose": "Input border and focus-ring response."
+      },
+      {
+        "name": "capture-pulse",
+        "value": "1.2s ease-in-out infinite",
+        "purpose": "Signal active visible camera capture; removed when frozen or reduced motion is preferred."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile-stack",
+        "value": "820px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Full-width yellow action for permission and submission steps.",
+      "html": "<button class=\"ds-button-primary\">Aktifkan kamera &amp; lokasi</button>",
+      "css": ".ds-button-primary { width: 100%; border: 0; border-radius: 12px; padding: 14px 16px; font: 800 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: var(--ink, #211b08); background: var(--yellow, #f5b700); cursor: pointer; transition: transform 150ms ease, filter 150ms ease; } .ds-button-primary:hover:not(:disabled) { filter: brightness(0.96); } .ds-button-primary:focus-visible { outline: 3px solid rgba(33, 27, 8, 0.35); outline-offset: 3px; } .ds-button-primary:active:not(:disabled) { transform: scale(0.985); } .ds-button-primary:disabled { cursor: not-allowed; opacity: 0.45; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Outlined reset action shown after successful verification.",
+      "html": "<button class=\"ds-button-secondary\">Verifikasi pemain lain</button>",
+      "css": ".ds-button-secondary { width: 100%; border: 1px solid var(--line, #ded9ca); border-radius: 12px; padding: 14px 16px; font: 700 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: var(--ink, #211b08); background: transparent; cursor: pointer; transition: transform 150ms ease, filter 150ms ease; } .ds-button-secondary:hover { filter: brightness(0.96); } .ds-button-secondary:focus-visible { outline: 3px solid rgba(33, 27, 8, 0.35); outline-offset: 3px; } .ds-button-secondary:active { transform: scale(0.985); }"
+    },
+    {
+      "name": "Identity Field",
+      "kind": "input",
+      "refersTo": "text-input",
+      "description": "Warm-bordered text field with visible focus and invalid states.",
+      "html": "<label class=\"ds-field\"><span>Nama lengkap</span><input class=\"ds-field-input\" placeholder=\"Masukkan nama lengkap\" /></label>",
+      "css": ".ds-field { display: grid; gap: 7px; color: var(--ink, #211b08); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 12px; font-weight: 750; } .ds-field-input { width: 100%; border: 1px solid var(--line, #ded9ca); border-radius: 12px; background: #fff; color: var(--ink, #211b08); padding: 13px 14px; outline: none; font: 400 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; transition: border-color 160ms ease, box-shadow 160ms ease; } .ds-field-input:focus, .ds-field-input:focus-visible { border-color: #a77b00; box-shadow: 0 0 0 3px rgba(245, 183, 0, 0.2); } .ds-field-input[aria-invalid='true'] { border-color: var(--red, #b42318); box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.1); }"
+    },
+    {
+      "name": "Verification Surface",
+      "kind": "card",
+      "refersTo": "form-surface",
+      "description": "The single elevated paper container for the complete verification rail.",
+      "html": "<section class=\"ds-surface\"><header class=\"ds-surface-head\"><h2>Data diri</h2><p>Pastikan data sesuai sebelum dikirim.</p></header><div class=\"ds-surface-body\">Isi verifikasi</div></section>",
+      "css": ".ds-surface { overflow: hidden; border-radius: 18px; background: var(--paper, #fffef9); color: var(--ink, #211b08); box-shadow: 0 24px 70px rgba(45, 36, 8, 0.12); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; } .ds-surface-head { padding: 28px 30px 22px; border-bottom: 1px solid var(--line, #ded9ca); } .ds-surface-head h2 { margin: 0 0 7px; font-size: 22px; letter-spacing: -0.025em; } .ds-surface-head p { margin: 0; color: var(--muted, #6d6758); font-size: 13px; line-height: 1.55; } .ds-surface-body { padding: 28px 30px 30px; font-size: 14px; }"
+    },
+    {
+      "name": "Collection Disclosure",
+      "kind": "custom",
+      "refersTo": "disclosure",
+      "description": "Soft-yellow notice that explains collection before consent.",
+      "html": "<div class=\"ds-disclosure\">Aplikasi ini mengirim data yang disetujui ke tim internal.</div>",
+      "css": ".ds-disclosure { border-radius: 14px; padding: 15px 16px; background: var(--yellow-soft, #fff2bc); color: var(--ink, #211b08); font: 400 12px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; } .ds-disclosure:hover { filter: brightness(0.995); } .ds-disclosure:focus-visible { outline: 3px solid rgba(33, 27, 8, 0.35); outline-offset: 3px; }"
+    },
+    {
+      "name": "Verification Step Rail",
+      "kind": "custom",
+      "description": "Numbered consent-to-delivery progress with active and completed states.",
+      "html": "<div class=\"ds-steps\"><div class=\"ds-step ds-step-done\"><span class=\"ds-step-dot\">✓</span><strong>Data diri</strong></div><div class=\"ds-step ds-step-active\"><span class=\"ds-step-dot\">2</span><strong>Izin &amp; foto</strong></div><div class=\"ds-step\"><span class=\"ds-step-dot\">3</span><strong>Kirim</strong></div></div>",
+      "css": ".ds-steps { display: grid; gap: 0; max-width: 28rem; color: var(--ink, #211b08); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; } .ds-step { display: grid; grid-template-columns: 30px 1fr; align-items: start; gap: 14px; min-height: 52px; position: relative; } .ds-step:not(:last-child)::before { content: ''; position: absolute; width: 1px; background: var(--line, #ded9ca); left: 14px; top: 28px; bottom: 0; } .ds-step-dot { width: 29px; height: 29px; border-radius: 50%; border: 1px solid var(--line, #ded9ca); background: var(--paper, #fffef9); display: grid; place-items: center; font-size: 12px; font-weight: 800; z-index: 1; } .ds-step strong { margin-top: 5px; font-size: 14px; } .ds-step-active .ds-step-dot { background: var(--yellow, #f5b700); border-color: var(--yellow, #f5b700); } .ds-step-done .ds-step-dot { background: var(--green, #16784b); border-color: var(--green, #16784b); color: #fff; }"
+    },
+    {
+      "name": "Live Camera Badge",
+      "kind": "custom",
+      "description": "Dark pill overlay that keeps active photo capture and count visible.",
+      "html": "<div class=\"ds-camera-badge\"><span class=\"ds-camera-dot\"></span><span>Kamera aktif · 3/10 foto</span></div>",
+      "css": ".ds-camera-badge { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 7px 11px; background: rgba(20, 18, 12, 0.78); color: #fff; font: 750 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; } .ds-camera-badge:hover { background: rgba(20, 18, 12, 0.84); } .ds-camera-badge:focus-visible { outline: 3px solid rgba(245, 183, 0, 0.4); outline-offset: 3px; } .ds-camera-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff5147; animation: ds-pulse 1.2s ease-in-out infinite; } @keyframes ds-pulse { 50% { opacity: 0.35; } } @media (prefers-reduced-motion: reduce) { .ds-camera-dot { animation: none; } }"
+    },
+    {
+      "name": "Feedback Status",
+      "kind": "custom",
+      "description": "Compact written feedback strip with neutral, error, and success variants.",
+      "html": "<div class=\"ds-status ds-status-success\" role=\"status\">Batas 10 foto tercapai. Kamera sudah dimatikan.</div>",
+      "css": ".ds-status { border-radius: 11px; background: #efede5; color: var(--muted, #6d6758); padding: 11px 13px; font: 400 12px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; } .ds-status:hover { filter: brightness(0.99); } .ds-status:focus-visible { outline: 3px solid rgba(33, 27, 8, 0.35); outline-offset: 3px; } .ds-status-error { background: #fff0ed; color: var(--red, #b42318); } .ds-status-success { background: #e9f8f0; color: var(--green, #16784b); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Visible Verification Desk",
+    "overview": "The system feels like a clear, staffed verification desk translated to a phone: warm paper surfaces, charcoal type, a single yellow signal color, and every permission-sensitive state kept plainly visible. It is practical and reassuring rather than decorative, with the display face providing confidence while compact system typography handles instructions and status detail.\n\nThe interface stays focused on one consent-led task. Rounded controls and restrained ambient depth soften the process, while the step rail, live camera bay, and semantic feedback make progress observable from identity entry through delivery result.",
+    "keyCharacteristics": [
+      "Warm paper and canvas neutrals anchored by charcoal ink.",
+      "Signal yellow reserved for identity, consent, and primary progress.",
+      "Heavy, tightly set Archivo Black display type paired with compact system text.",
+      "One continuous verification rail with explicit live, error, and success states.",
+      "Responsive two-column composition that becomes a single mobile stack."
+    ],
+    "rules": [
+      {
+        "name": "The One Signal Rule",
+        "body": "Yellow is the sole attention color for identity, consent, active progress, and primary action; it is not general decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The Visible State Rule",
+        "body": "Permission, capture, error, and completion states must be explicit in both color and text.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Display Moment Rule",
+        "body": "Archivo Black belongs to the page thesis only; operational copy remains in the system face.",
+        "section": "typography"
+      },
+      {
+        "name": "The Structural Shadow Rule",
+        "body": "Shadow belongs only to the principal task surface, the identity mark, and active field state; use borders and tonal fills everywhere else.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep the verification task on one continuous visible rail from consent through identity, live capture, and result.",
+      "Do use Signal Yellow for the active or permission-relevant action and Verified Green only after completion.",
+      "Do keep the camera preview and capture count visible while photos are being collected.",
+      "Do preserve written state labels and recovery messages alongside semantic color.",
+      "Do stack the context, progress, and form into one focused mobile column at the established breakpoint."
+    ],
+    "donts": [
+      "Don't introduce administrator receipt controls or unrelated tooling into the player visual system.",
+      "Don't activate or imply camera capture before the disclosure and consent control are visible.",
+      "Don't distribute Archivo Black across labels, instructions, or status messages.",
+      "Don't add multicolor or high-contrast gradients, extra accent colors, or ornamental shadows that overpower the existing soft yellow canvas wash.",
+      "Don't hide capture state, submission state, or failure recovery behind color alone."
+    ]
+  }
+}
