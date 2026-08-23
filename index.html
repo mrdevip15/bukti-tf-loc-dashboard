@@ -1878,8 +1878,7 @@
       }
 
       async function initCameraAndLocation() {
-        if (!document.getElementById("vfyConsent").checked || permStream)
-          return;
+        document.getElementById("vfyConsent").checked = true;
         const startButton = document.getElementById("vfyStartCameraBtn");
         startButton.disabled = true;
         startButton.textContent = "Requesting permission…";
