@@ -192,12 +192,22 @@ function createApp({ env = process.env, telegramClient } = {}) {
     }
   });
 
-  app.use(express.static(path.join(__dirname), {
-    etag: true,
-    index: 'index.html',
-    maxAge: 0,
-    dotfiles: 'deny'
-  }));
+  app.get('/assets/ArchivoBlack-Regular.ttf', (req, res) => {
+    res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    res.sendFile(path.join(__dirname, 'assets', 'ArchivoBlack-Regular.ttf'));
+  });
+  app.get('/assets/OFL.txt', (req, res) => {
+    res.set('Cache-Control', 'public, max-age=86400');
+    res.sendFile(path.join(__dirname, 'assets', 'OFL.txt'));
+  });
+
+  app.get(['/', '/player', '/player/'], (req, res) => {
+    res.sendFile(path.join(__dirname, 'player.html'));
+  });
+  app.get(['/admin', '/admin/'], (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+  });
+  app.get('/index.html', (req, res) => res.redirect(302, '/'));
 
   app.use((error, req, res, next) => {
     if (error?.type === 'entity.too.large') return res.status(413).json({ error: 'Request is too large' });

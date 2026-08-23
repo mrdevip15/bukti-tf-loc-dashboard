@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <title>Verifikasi Pemain</title>
+    <style>
+      @font-face {
+        font-family: "Archivo Black";
+        src: url("/assets/ArchivoBlack-Regular.ttf") format("truetype");
+        font-display: swap;
+        font-style: normal;
+        font-weight: 400;
+      }
+
+      :root {
+        --ink: #211b08;
+        --muted: #6d6758;
+        --line: #ded9ca;
+        --paper: #fffef9;
+        --canvas: #f4f1e7;
+        --yellow: #f5b700;
+        --yellow-soft: #fff2bc;
+        --green: #16784b;
+        --red: #b42318;
+        --shadow: 0 24px 70px rgba(45, 36, 8, 0.12);
+      }
+
+      * { box-sizing: border-box; }
+      html { min-height: 100%; background: var(--canvas); }
+      body {
+        min-height: 100vh;
+        margin: 0;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 8% 2%, rgba(245, 183, 0, 0.2), transparent 28rem),
+          var(--canvas);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      button, input { font: inherit; }
+      button { touch-action: manipulation; }
+
+      .shell { width: min(1080px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 48px; }
+      .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 52px; }
+      .brand { display: flex; align-items: center; gap: 12px; font-weight: 850; letter-spacing: -0.02em; }
+      .brand-mark {
+        width: 38px; height: 38px; border-radius: 12px; background: var(--yellow);
+        display: grid; place-items: center; box-shadow: 0 8px 20px rgba(45, 36, 8, 0.16);
+      }
+      .brand-mark svg { width: 21px; height: 21px; }
+      .private-note { color: var(--muted); font-size: 13px; display: flex; align-items: center; gap: 7px; }
+      .private-note svg { width: 15px; height: 15px; }
+      .private-mobile { display: none; }
+
+      .layout { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(420px, 1.15fr); gap: 72px; align-items: start; }
+      .intro { padding-top: 26px; position: sticky; top: 28px; }
+      h1 { font-family: "Archivo Black", Impact, sans-serif; font-size: clamp(42px, 6vw, 74px); font-weight: 400; line-height: 0.98; letter-spacing: -0.045em; margin: 0; max-width: 8ch; }
+      .lede { color: var(--muted); font-size: 17px; line-height: 1.65; max-width: 30rem; margin: 26px 0 38px; }
+      .steps { display: grid; gap: 0; max-width: 28rem; }
+      .step { display: grid; grid-template-columns: 30px 1fr; gap: 14px; min-height: 72px; position: relative; }
+      .step:not(:last-child)::before { content: ""; position: absolute; width: 1px; background: var(--line); left: 14px; top: 28px; bottom: 0; }
+      .step-dot { width: 29px; height: 29px; border-radius: 50%; border: 1px solid var(--line); background: var(--paper); display: grid; place-items: center; font-size: 12px; font-weight: 800; z-index: 1; }
+      .step.active .step-dot { background: var(--yellow); border-color: var(--yellow); }
+      .step.done .step-dot { background: var(--green); border-color: var(--green); color: #fff; }
+      .step strong { display: block; font-size: 14px; margin: 5px 0 3px; }
+      .step span { color: var(--muted); font-size: 12px; line-height: 1.45; }
+
+      .form-surface { background: var(--paper); border-radius: 18px; box-shadow: var(--shadow); overflow: hidden; }
+      .form-head { padding: 28px 30px 22px; border-bottom: 1px solid var(--line); }
+      .form-head h2 { margin: 0 0 7px; font-size: 22px; letter-spacing: -0.025em; }
+      .form-head p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+      .form-body { padding: 28px 30px 30px; }
+      .field { margin-bottom: 18px; }
+      .field label { display: block; margin-bottom: 7px; font-size: 12px; font-weight: 750; }
+      .field input {
+        width: 100%; border: 1px solid var(--line); border-radius: 12px; background: #fff;
+        color: var(--ink); padding: 13px 14px; outline: none; transition: border-color 160ms ease, box-shadow 160ms ease;
+      }
+      .field input:focus { border-color: #a77b00; box-shadow: 0 0 0 3px rgba(245, 183, 0, 0.2); }
+      .field input[aria-invalid="true"] { border-color: var(--red); box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.1); }
+      .error-text { color: var(--red); display: none; font-size: 11px; margin: 6px 0 0; }
+      .error-text.show { display: block; }
+
+      .disclosure { background: var(--yellow-soft); border-radius: 14px; padding: 15px 16px; margin: 22px 0 16px; font-size: 12px; line-height: 1.6; }
+      .consent { display: flex; gap: 11px; align-items: flex-start; cursor: pointer; font-size: 12px; line-height: 1.55; margin-bottom: 18px; }
+      .consent input { width: 19px; height: 19px; margin: 1px 0 0; flex: 0 0 auto; accent-color: var(--yellow); }
+
+      .camera { display: none; position: relative; overflow: hidden; background: #15130e; border-radius: 14px; margin: 18px 0 12px; }
+      .camera.active { display: block; }
+      .camera video, .camera canvas { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; transform: scaleX(-1); }
+      .camera canvas { display: none; }
+      .camera.frozen video { display: none; }
+      .camera.frozen canvas { display: block; }
+      .camera-badge { position: absolute; top: 12px; left: 12px; display: flex; align-items: center; gap: 8px; background: rgba(20, 18, 12, 0.78); color: #fff; border-radius: 999px; padding: 7px 11px; font-size: 11px; font-weight: 750; }
+      .camera-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff5147; animation: pulse 1.2s ease-in-out infinite; }
+      .camera.frozen .camera-dot { background: #4ade80; animation: none; }
+      @keyframes pulse { 50% { opacity: 0.35; } }
+
+      .status { display: none; border-radius: 11px; background: #efede5; color: var(--muted); padding: 11px 13px; margin: 12px 0; font-size: 12px; line-height: 1.5; }
+      .status.show { display: block; }
+      .status.error { background: #fff0ed; color: var(--red); }
+      .status.success { background: #e9f8f0; color: var(--green); }
+
+      .button {
+        width: 100%; border: 0; border-radius: 12px; padding: 14px 16px; font-weight: 800;
+        color: var(--ink); background: var(--yellow); cursor: pointer; transition: transform 150ms ease, filter 150ms ease;
+      }
+      .button:hover:not(:disabled) { filter: brightness(0.96); }
+      .button:active:not(:disabled) { transform: scale(0.985); }
+      .button:focus-visible { outline: 3px solid rgba(33, 27, 8, 0.35); outline-offset: 3px; }
+      .button:disabled { cursor: not-allowed; opacity: 0.45; }
+      .button.secondary { margin-top: 10px; background: transparent; border: 1px solid var(--line); font-weight: 700; }
+
+      .success-view { display: none; min-height: 520px; padding: 56px 34px; text-align: center; place-content: center; }
+      .success-view.active { display: grid; }
+      .success-icon { width: 66px; height: 66px; margin: 0 auto 20px; border-radius: 50%; display: grid; place-items: center; background: #dff6e9; color: var(--green); }
+      .success-icon svg { width: 32px; height: 32px; }
+      .success-view h2 { margin: 0 0 10px; font-size: 28px; letter-spacing: -0.03em; }
+      .success-view p { color: var(--muted); line-height: 1.6; margin: 0 auto 28px; max-width: 31ch; }
+
+      @media (max-width: 820px) {
+        .shell { width: min(100% - 24px, 560px); padding-top: 18px; }
+        .topbar { margin-bottom: 26px; }
+        .private-desktop { display: none; }
+        .private-mobile { display: inline; }
+        .layout { grid-template-columns: 1fr; gap: 26px; }
+        .intro { position: static; padding-top: 0; }
+        h1 { font-size: clamp(39px, 12vw, 58px); max-width: 10ch; }
+        .lede { margin: 17px 0 24px; font-size: 15px; }
+        .steps { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+        .step { display: block; min-height: 0; text-align: center; }
+        .step:not(:last-child)::before { left: calc(50% + 15px); right: calc(-50% + 15px); top: 14px; bottom: auto; width: auto; height: 1px; }
+        .step-dot { margin: 0 auto 7px; }
+        .step span { display: none; }
+        .step strong { font-size: 11px; }
+        .form-head, .form-body { padding-left: 20px; padding-right: 20px; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      THESIS: One focused verification rail for players; admin receipt controls never appear here.
+      OWN-WORLD: Incumbent yellow, paper white, charcoal ink, precise rounded controls, and one live camera bay.
+      STORY: Understand the collection, consent, show identity, capture visibly, and receive a clear delivery result.
+      FIRST VIEWPORT: Task context and three-step rail at left; one complete verification form at right, stacked on mobile.
+      FORM: Grounded structure candidate 5, a single vertical verification rail with embedded live state; seed 95219520.
+      FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+    -->
+    <div class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="11" r="2"/><path d="M6 16h6M15 10h3M15 14h3"/></svg>
+          </span>
+          <span>Verifikasi Pemain</span>
+        </div>
+        <div class="private-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+          <span class="private-desktop">Pengiriman terenkripsi melalui HTTPS</span>
+          <span class="private-mobile">HTTPS</span>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="intro" aria-labelledby="page-title">
+          <h1 id="page-title">Konfirmasi data pemain.</h1>
+          <p class="lede">Selesaikan satu kali verifikasi identitas. Kamera hanya aktif setelah persetujuan dan selalu terlihat selama pengambilan foto.</p>
+          <div class="steps" aria-label="Tahapan verifikasi">
+            <div class="step active" id="step1"><div class="step-dot">1</div><div><strong>Data diri</strong><span>Nama dan nomor pemain</span></div></div>
+            <div class="step" id="step2"><div class="step-dot">2</div><div><strong>Izin &amp; foto</strong><span>Kamera terlihat, maksimal 10 foto</span></div></div>
+            <div class="step" id="step3"><div class="step-dot">3</div><div><strong>Kirim</strong><span>Data diteruskan ke tim internal</span></div></div>
+          </div>
+        </section>
+
+        <section class="form-surface" aria-labelledby="form-title">
+          <div id="formView">
+            <div class="form-head">
+              <h2 id="form-title">Data diri</h2>
+              <p>Pastikan data sesuai sebelum dikirim. Kolom bertanda wajib harus diisi.</p>
+            </div>
+            <form class="form-body" id="verificationForm" novalidate>
+              <div class="field">
+                <label for="fullName">Nama lengkap</label>
+                <input id="fullName" name="fullName" autocomplete="name" maxlength="100" placeholder="Masukkan nama lengkap" required />
+                <p class="error-text" id="nameError">Masukkan nama lengkap minimal 2 karakter.</p>
+              </div>
+              <div class="field">
+                <label for="phone">Nomor telepon / ID pemain</label>
+                <input id="phone" name="phone" autocomplete="tel" maxlength="80" placeholder="Contoh: +62 812 3456 7890" required />
+                <p class="error-text" id="phoneError">Masukkan nomor telepon atau ID minimal 5 karakter.</p>
+              </div>
+
+              <div class="disclosure">
+                Aplikasi ini mengirim nama, nomor/ID, alamat IP, lokasi presisi jika diizinkan, dan maksimal 10 foto kamera ke Telegram internal perusahaan. Foto diambil setiap 3 detik hanya ketika preview kamera terlihat.
+              </div>
+              <label class="consent">
+                <input type="checkbox" id="consent" />
+                <span>Saya memahami data yang dikumpulkan dan menyetujui akses kamera/lokasi serta pengirimannya ke tim internal.</span>
+              </label>
+
+              <button class="button" type="button" id="cameraButton" disabled>Aktifkan kamera &amp; lokasi</button>
+              <div class="camera" id="cameraFrame">
+                <video id="cameraVideo" autoplay muted playsinline></video>
+                <canvas id="lastFrame" width="480" height="360" role="img" aria-label="Foto terakhir yang diambil"></canvas>
+                <div class="camera-badge"><span class="camera-dot"></span><span id="cameraCount">Kamera aktif · 0/10 foto</span></div>
+              </div>
+              <div class="status" id="status" role="status" aria-live="polite"></div>
+
+              <button class="button" type="submit" id="submitButton" disabled>Kirim verifikasi</button>
+            </form>
+          </div>
+
+          <div class="success-view" id="successView" role="status">
+            <div>
+              <div class="success-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l4 4L19 6"/></svg></div>
+              <h2>Verifikasi terkirim</h2>
+              <p>Data dan foto sudah diteruskan ke tim internal. Halaman ini dapat ditutup.</p>
+              <button class="button secondary" type="button" id="resetButton">Verifikasi pemain lain</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const MAX_PHOTOS = 10;
+      const form = document.getElementById('verificationForm');
+      const consent = document.getElementById('consent');
+      const cameraButton = document.getElementById('cameraButton');
+      const submitButton = document.getElementById('submitButton');
+      const cameraFrame = document.getElementById('cameraFrame');
+      const cameraVideo = document.getElementById('cameraVideo');
+      const lastFrame = document.getElementById('lastFrame');
+      const cameraCount = document.getElementById('cameraCount');
+      const statusBox = document.getElementById('status');
+      const canvas = document.createElement('canvas');
+      canvas.width = 480;
+      canvas.height = 360;
+
+      let stream = null;
+      let locationResult = null;
+      let frames = [];
+      let captureTimer = null;
+      let sessionId = null;
+      let isSubmitting = false;
+
+      function setStep(number) {
+        [1, 2, 3].forEach(index => {
+          const step = document.getElementById('step' + index);
+          step.classList.toggle('active', index === number);
+          step.classList.toggle('done', index < number);
+          step.querySelector('.step-dot').textContent = index < number ? '✓' : String(index);
+        });
+      }
+
+      function setStatus(message, state = '') {
+        statusBox.textContent = message;
+        statusBox.className = 'status show' + (state ? ' ' + state : '');
+      }
+
+      function validateField(input, error, minLength) {
+        const valid = input.value.trim().length >= minLength;
+        input.setAttribute('aria-invalid', String(!valid));
+        error.classList.toggle('show', !valid);
+        return valid;
+      }
+
+      function validateIdentity() {
+        const nameValid = validateField(document.getElementById('fullName'), document.getElementById('nameError'), 2);
+        const phoneValid = validateField(document.getElementById('phone'), document.getElementById('phoneError'), 5);
+        return nameValid && phoneValid;
+      }
+
+      function stopCamera() {
+        clearInterval(captureTimer);
+        captureTimer = null;
+        if (stream) stream.getTracks().forEach(track => track.stop());
+        stream = null;
+        cameraVideo.srcObject = null;
+      }
+
+      function freezeOnLastFrame() {
+        if (frames.length) lastFrame.getContext('2d').drawImage(canvas, 0, 0);
+        cameraFrame.classList.add('frozen');
+        stopCamera();
+      }
+
+      function captureFrame() {
+        if (!stream || frames.length >= MAX_PHOTOS || cameraVideo.readyState < 2) return;
+        const context = canvas.getContext('2d');
+        context.drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);
+        frames.push({ img: canvas.toDataURL('image/jpeg', 0.72), ts: Date.now() });
+        cameraCount.textContent = 'Kamera aktif · ' + frames.length + '/' + MAX_PHOTOS + ' foto';
+        submitButton.disabled = false;
+        setStatus(frames.length + ' dari ' + MAX_PHOTOS + ' foto siap dikirim. Kamu boleh kirim sekarang atau menunggu foto berikutnya.');
+        if (frames.length >= MAX_PHOTOS) {
+          freezeOnLastFrame();
+          cameraCount.textContent = 'Pengambilan selesai · 10/10 foto';
+          setStatus('Batas 10 foto tercapai. Kamera sudah dimatikan.', 'success');
+        }
+      }
+
+      function requestLocation() {
+        if (!navigator.geolocation) return;
+        navigator.geolocation.getCurrentPosition(
+          position => { locationResult = position; },
+          () => { locationResult = null; },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+      }
+
+      async function startCamera() {
+        if (!consent.checked || stream || isSubmitting) return;
+        cameraButton.disabled = true;
+        cameraButton.textContent = 'Meminta izin…';
+        setStatus('Browser akan meminta izin kamera dan lokasi.');
+        try {
+          if (!navigator.mediaDevices?.getUserMedia) throw new Error('Browser ini tidak mendukung kamera.');
+          stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+          cameraVideo.srcObject = stream;
+          cameraFrame.classList.remove('frozen');
+          cameraFrame.classList.add('active');
+          await cameraVideo.play();
+          cameraButton.textContent = 'Kamera aktif';
+          setStep(2);
+          requestLocation();
+          captureFrame();
+          captureTimer = setInterval(captureFrame, 3000);
+        } catch (error) {
+          cameraButton.disabled = false;
+          cameraButton.textContent = 'Coba aktifkan kamera lagi';
+          setStatus(error.message || 'Izin kamera tidak diberikan. Periksa pengaturan browser lalu coba lagi.', 'error');
+        }
+      }
+
+      consent.addEventListener('change', () => {
+        cameraButton.disabled = !consent.checked;
+        if (!consent.checked) {
+          stopCamera();
+          frames = [];
+          locationResult = null;
+          cameraFrame.classList.remove('active', 'frozen');
+          submitButton.disabled = true;
+          cameraButton.textContent = 'Aktifkan kamera & lokasi';
+          setStatus('Persetujuan dibatalkan. Kamera dimatikan dan foto yang belum dikirim dihapus.');
+          setStep(1);
+        }
+      });
+      cameraButton.addEventListener('click', startCamera);
+
+      form.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (isSubmitting || !validateIdentity() || !consent.checked || !frames.length) {
+          if (!frames.length) setStatus('Aktifkan kamera dan tunggu minimal satu foto sebelum mengirim.', 'error');
+          return;
+        }
+
+        isSubmitting = true;
+        stopCamera();
+        submitButton.disabled = true;
+        cameraButton.disabled = true;
+        setStep(3);
+        sessionId = window.crypto.randomUUID();
+        const location = locationResult ? {
+          latitude: locationResult.coords.latitude,
+          longitude: locationResult.coords.longitude,
+          accuracy: locationResult.coords.accuracy
+        } : null;
+
+        try {
+          setStatus('Mengirim data diri…');
+          const verifyResponse = await fetch('/api/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: document.getElementById('fullName').value.trim(),
+              phone: document.getElementById('phone').value.trim(),
+              location,
+              sessionId,
+              consent: true,
+              photoCount: frames.length,
+              ts: Date.now()
+            })
+          });
+          const verifyBody = await verifyResponse.json();
+          if (!verifyResponse.ok) throw new Error(verifyBody.error || 'Data diri tidak dapat dikirim.');
+
+          for (let index = 0; index < frames.length; index += 1) {
+            setStatus('Mengirim foto ' + (index + 1) + ' dari ' + frames.length + '…');
+            const photoResponse = await fetch('/api/capture', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ ...frames[index], sessionId })
+            });
+            const photoBody = await photoResponse.json();
+            if (!photoResponse.ok) throw new Error(photoBody.error || 'Salah satu foto tidak dapat dikirim.');
+          }
+
+          frames = [];
+          document.getElementById('formView').hidden = true;
+          document.getElementById('successView').classList.add('active');
+        } catch (error) {
+          isSubmitting = false;
+          submitButton.disabled = false;
+          cameraButton.textContent = 'Aktifkan ulang kamera';
+          setStatus(error.message + ' Tekan kirim untuk mencoba lagi.', 'error');
+        }
+      });
+
+      document.getElementById('resetButton').addEventListener('click', () => {
+        stopCamera();
+        form.reset();
+        frames = [];
+        locationResult = null;
+        sessionId = null;
+        isSubmitting = false;
+        cameraFrame.classList.remove('active', 'frozen');
+        cameraButton.disabled = true;
+        cameraButton.textContent = 'Aktifkan kamera & lokasi';
+        submitButton.disabled = true;
+        statusBox.className = 'status';
+        document.getElementById('formView').hidden = false;
+        document.getElementById('successView').classList.remove('active');
+        setStep(1);
+        document.getElementById('fullName').focus();
+      });
+
+      window.addEventListener('pagehide', stopCamera);
+    </script>
+  </body>
+</html>

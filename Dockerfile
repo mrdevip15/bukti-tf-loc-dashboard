@@ -6,7 +6,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 
-COPY index.html server.js ./
+COPY index.html player.html server.js ./
+COPY assets ./assets
 
 USER node
 EXPOSE 3000

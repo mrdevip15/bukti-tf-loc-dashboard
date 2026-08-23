@@ -52,6 +52,27 @@ test('health endpoint reports the ten-photo limit and security headers', async (
   assert.equal(response.headers.get('x-frame-options'), 'DENY');
 });
 
+test('player page is public-facing content and admin generator is isolated by route', async () => {
+  const playerResponse = await fetch(`${baseUrl}/`);
+  const playerHtml = await playerResponse.text();
+  assert.equal(playerResponse.status, 200);
+  assert.match(playerHtml, /Verifikasi Pemain/);
+  assert.doesNotMatch(playerHtml, /Transfer Receipt Generator/);
+
+  const adminResponse = await fetch(`${baseUrl}/admin`);
+  const adminHtml = await adminResponse.text();
+  assert.equal(adminResponse.status, 200);
+  assert.match(adminHtml, /Transfer Receipt Generator/);
+
+  const sourceResponse = await fetch(`${baseUrl}/server.js`);
+  assert.equal(sourceResponse.status, 404);
+
+  const fontResponse = await fetch(`${baseUrl}/assets/ArchivoBlack-Regular.ttf`);
+  assert.equal(fontResponse.status, 200);
+  assert.equal(fontResponse.headers.get('content-type'), 'font/ttf');
+  assert.match(fontResponse.headers.get('cache-control'), /immutable/);
+});
+
 test('verification requires explicit consent', async () => {
   const response = await post('/api/verify', verification({ consent: false }));
   assert.equal(response.status, 400);
