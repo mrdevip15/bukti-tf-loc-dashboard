@@ -1,2 +1,6 @@
-/node_modules
-/img
+node_modules/
+.env
+img/
+identities.json
+*.log
+.DS_Store

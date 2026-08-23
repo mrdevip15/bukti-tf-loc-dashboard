@@ -1,0 +1,7 @@
+node_modules
+.git
+.env
+img
+identities.json
+ssl
+npm-debug.log

@@ -1,0 +1,13 @@
+services:
+  dashboard:
+    build: .
+    container_name: bukti-tf-loc-dashboard
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - reverse_proxy
+
+networks:
+  reverse_proxy:
+    external: true
+    name: n8n-stack_default
