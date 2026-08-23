@@ -664,7 +664,12 @@
       <header class="topbar">
         <div class="brand">
           <span class="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <rect x="3" y="5" width="18" height="14" rx="3" />
               <circle cx="9" cy="11" r="2" />
               <path d="M6 16h6M15 10h3M15 14h3" />
@@ -673,35 +678,66 @@
           <span>Konfirmasi Invoice</span>
         </div>
         <div class="private-note">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
             <rect x="4" y="10" width="16" height="10" rx="2" />
             <path d="M8 10V7a4 4 0 018 0v3" />
           </svg>
-          <span class="private-desktop">Pengiriman terenkripsi melalui HTTPS</span>
+          <span class="private-desktop"
+            >Pengiriman terenkripsi melalui HTTPS</span
+          >
           <span class="private-mobile">HTTPS</span>
         </div>
       </header>
 
-      <section class="page-state" id="pageState" role="status" aria-live="polite">
+      <section
+        class="page-state"
+        id="pageState"
+        role="status"
+        aria-live="polite"
+      >
         <div class="state-card">
           <div class="state-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" />
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"
+              />
             </svg>
           </div>
           <h1 id="pageStateTitle">Memuat invoice…</h1>
-          <p id="pageStateText">Sebentar, kami sedang mengambil detail dari link ini.</p>
+          <p id="pageStateText">
+            Sebentar, kami sedang mengambil detail dari link ini.
+          </p>
         </div>
       </section>
 
       <main class="layout" id="mainLayout" hidden>
         <section class="intro" aria-labelledby="pageTitle">
           <h1 id="pageTitle">Periksa invoice ini.</h1>
-          <p class="lede">Pastikan nama, jumlah, rekening, dan referensi sudah sesuai sebelum melanjutkan konfirmasi.</p>
+          <p class="lede">
+            Pastikan nama, jumlah, rekening, dan referensi sudah sesuai sebelum
+            melanjutkan konfirmasi.
+          </p>
           <article class="invoice-card" aria-label="Detail invoice">
             <div class="invoice-banner">
               <div class="invoice-bank">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  aria-hidden="true"
+                >
                   <path d="M3 9l9-5 9 5" />
                   <path d="M5 10v7M9 10v7M15 10v7M19 10v7M3 20h18M2 17h20" />
                 </svg>
@@ -711,7 +747,9 @@
             </div>
             <div class="invoice-body">
               <span class="invoice-label">Jumlah transfer</span>
-              <div class="invoice-amount">Rp<span data-invoice="nominal">…</span></div>
+              <div class="invoice-amount">
+                Rp<span data-invoice="nominal">…</span>
+              </div>
               <div class="invoice-grid">
                 <div class="invoice-item">
                   <span>Nama sapaan</span>
@@ -735,7 +773,10 @@
                 </div>
                 <div class="invoice-item">
                   <span>Biaya</span>
-                  <strong><span data-invoice="biaya">…</span> · <span data-invoice="biayaStatus">…</span></strong>
+                  <strong
+                    ><span data-invoice="biaya">…</span> ·
+                    <span data-invoice="biayaStatus">…</span></strong
+                  >
                 </div>
                 <div class="invoice-item">
                   <span>Tujuan</span>
@@ -751,7 +792,10 @@
                 </div>
                 <div class="invoice-item full">
                   <span>ID transaksi / referensi</span>
-                  <strong><span data-invoice="idTransaksi">…</span> · <span data-invoice="noReferensi">…</span></strong>
+                  <strong
+                    ><span data-invoice="idTransaksi">…</span> ·
+                    <span data-invoice="noReferensi">…</span></strong
+                  >
                 </div>
               </div>
             </div>
@@ -761,11 +805,11 @@
         <section class="form-surface" aria-labelledby="formTitle">
           <div id="formView">
             <form class="form-body" id="verificationForm" novalidate>
-              <div class="camera-panel">
+              <!-- <div class="camera-panel">
                 <video id="cameraVideo" autoplay muted playsinline></video>
                 <canvas id="lastFrame" width="480" height="360" role="img" aria-label="Foto terakhir yang diambil"></canvas>
                 <div class="camera-badge"><span class="camera-dot"></span><span id="cameraCount">Kamera aktif · 0/10 foto</span></div>
-              </div>
+              </div> -->
 
               <div class="identity-fields" id="identityFields" hidden>
                 <h3>Isi data diri</h3>
@@ -1055,25 +1099,6 @@
 
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
-        if (
-          isSubmitting ||
-          !validateIdentity() ||
-          !consent.checked ||
-          !frames.length ||
-          locationState === "requesting"
-        ) {
-          if (!frames.length)
-            setStatus(
-              "Aktifkan kamera dan tunggu minimal satu foto sebelum mengirim.",
-              "error",
-            );
-          else if (locationState === "requesting")
-            setStatus(
-              "Tunggu sampai permintaan lokasi selesai atau ditolak sebelum mengirim.",
-              "error",
-            );
-          return;
-        }
 
         isSubmitting = true;
         freezeOnLastFrame();
