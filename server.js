@@ -253,13 +253,14 @@ function createApp({ env = process.env, telegramClient, invoiceStore } = {}) {
       if (existingSession && Date.now() - existingSession.createdAt <= SESSION_TTL_MS) {
         existingSession.label = name;
         existingSession.invoiceId = invoiceId;
+        if (photoCount > 0) existingSession.expectedPhotos = photoCount;
       } else {
         sessions.set(sessionId, {
           count: 0,
           createdAt: Date.now(),
           label: name,
           invoiceId,
-          expectedPhotos: MAX_PHOTOS,
+          expectedPhotos: photoCount > 0 ? photoCount : MAX_PHOTOS,
           delivered: new Set(),
           inFlight: false
         });
@@ -294,7 +295,9 @@ function createApp({ env = process.env, telegramClient, invoiceStore } = {}) {
         'Consent: explicitly accepted in the application before camera/location access.'
       ].join('\n'));
 
-      invoices.markVerified(invoiceId, { name });
+      if (existingSession && existingSession.count >= (existingSession.expectedPhotos || MAX_PHOTOS)) {
+        invoices.markVerified(invoiceId, { name });
+      }
       res.json({ ok: true, sessionId, maxPhotos: MAX_PHOTOS });
     } catch (error) {
       console.error('[VERIFY]', error.message);
@@ -396,6 +399,9 @@ function createApp({ env = process.env, telegramClient, invoiceStore } = {}) {
         });
         session.delivered.add(photoIndex);
         session.count = session.delivered.size;
+        if (session.count >= expectedPhotos && session.invoiceId && INVOICE_ID_PATTERN.test(session.invoiceId)) {
+          invoices.markVerified(session.invoiceId, { name: session.label });
+        }
         res.json({ ok: true, count: session.count, maxPhotos: MAX_PHOTOS });
       } finally {
         session.inFlight = false;

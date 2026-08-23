@@ -173,7 +173,7 @@
           </div>
           <form class="form-body" id="invoiceForm">
             <div class="section-title">Transfer</div>
-            <div class="field"><label for="greetName">Nama sapaan pengirim</label><input id="greetName" name="greetName" value="MUHAMMAD" maxlength="80" required /></div>
+            <div class="field"><label for="greetName">Nama Pengirim</label><input id="greetName" name="greetName" value="MUHAMMAD" maxlength="80" required /></div>
             <div class="field"><label for="nominal">Nominal</label><input id="nominal" name="nominal" value="2.000.000,00" maxlength="80" required /></div>
             <div class="row">
               <div class="field"><label for="metode">Metode</label><input id="metode" name="metode" value="BI-Fast" maxlength="80" /></div>
@@ -183,7 +183,7 @@
               <div class="field"><label for="biaya">Biaya</label><input id="biaya" name="biaya" value="Rp2.500,00" maxlength="80" /></div>
               <div class="field"><label for="biayaStatus">Status biaya</label><select id="biayaStatus" name="biayaStatus"><option value="Free">Free</option><option value="Charged">Charged</option><option value="Included">Included</option></select></div>
             </div>
-            <div class="field"><label for="sumberDana">Sumber dana / pengirim</label><input id="sumberDana" name="sumberDana" value="Wallet · Fluid Asset GG" maxlength="120" required /></div>
+            <div class="field"><label for="sumberDana">Sumber Dana</label><input id="sumberDana" name="sumberDana" value="Tabungan Utama" maxlength="120" required /></div>
 
             <div class="section-title">Penerima</div>
             <div class="field"><label for="penerimaNama">Nama penerima</label><input id="penerimaNama" name="penerimaNama" value="Muhammad Hidayat" maxlength="100" required /></div>
@@ -191,7 +191,16 @@
             <div class="field"><label for="tujuan">Tujuan transfer</label><input id="tujuan" name="tujuan" value="Fund Transfer" maxlength="100" /></div>
 
             <div class="section-title">Referensi</div>
-            <div class="field"><label for="tanggal">Tanggal</label><input id="tanggal" name="tanggal" value="22 Aug 2026, 15:23 WIB" maxlength="100" required /></div>
+            <div class="field">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <label for="tanggal" style="margin-bottom: 0;">Tanggal &amp; Waktu</label>
+                <label style="font-size: 12px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-weight: normal; color: var(--muted);">
+                  <input type="checkbox" id="realtimeToggle" checked style="margin: 0; width: 14px; height: 14px; cursor: pointer;" />
+                  <span>Waktu Realtime (Live)</span>
+                </label>
+              </div>
+              <input id="tanggal" name="tanggal" value="" maxlength="100" required />
+            </div>
             <div class="field"><label for="idTransaksi">ID transaksi</label><input id="idTransaksi" name="idTransaksi" value="260822AI8GSS5F" maxlength="100" required /></div>
             <div class="field"><label for="noReferensi">Nomor referensi</label><input id="noReferensi" name="noReferensi" value="2026082200012345" maxlength="100" /></div>
 
@@ -218,7 +227,7 @@
               </div>
               <div class="receipt-body">
                 <p class="greeting">Hello <strong data-output="greetName">MUHAMMAD</strong>,</p>
-                <p class="summary">You successfully transferred funds to <strong data-output="penerimaNama">Muhammad Hidayat</strong> from <strong data-output="sumberDana">Wallet · Fluid Asset GG</strong>.</p>
+                <p class="summary">You successfully transferred funds to <strong data-output="penerimaNama">Muhammad Hidayat</strong> from <strong data-output="sumberDana">Tabungan Utama</strong>.</p>
                 <div class="amount"><span>Transfer amount</span><strong>Rp<span data-output="nominal">2.000.000,00</span></strong></div>
                 <div class="details">
                   <div class="detail"><span>Recipient</span><strong data-output="penerimaNama">Muhammad Hidayat</strong></div>
@@ -226,7 +235,7 @@
                   <div class="detail"><span>Transfer method / fee</span><strong><span data-output="metode">BI-Fast</span> · <span data-output="biaya">Rp2.500,00</span> · <span data-output="biayaStatus">Free</span></strong></div>
                   <div class="detail"><span>Total</span><strong>Rp<span data-output="total">2.000.000,00</span></strong></div>
                   <div class="detail"><span>Purpose</span><strong data-output="tujuan">Fund Transfer</strong></div>
-                  <div class="detail"><span>Date</span><strong data-output="tanggal">22 Aug 2026, 15:23 WIB</strong></div>
+                  <div class="detail"><span>Date</span><strong data-output="tanggal">…</strong></div>
                   <div class="detail full"><span>Transaction / reference</span><strong><span data-output="idTransaksi">260822AI8GSS5F</span> · <span data-output="noReferensi">2026082200012345</span></strong></div>
                 </div>
               </div>
@@ -254,7 +263,30 @@
       const shareDock = document.getElementById('shareDock');
       const shareLink = document.getElementById('shareLink');
       const shareStatus = document.getElementById('shareStatus');
+      const realtimeToggle = document.getElementById('realtimeToggle');
+      const tanggalInput = document.getElementById('tanggal');
+
       const fieldIds = ['greetName', 'nominal', 'metode', 'biaya', 'biayaStatus', 'total', 'sumberDana', 'penerimaNama', 'penerimaBank', 'tujuan', 'tanggal', 'idTransaksi', 'noReferensi'];
+
+      function getNowFormatted() {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const now = new Date();
+        const d = String(now.getDate()).padStart(2, '0');
+        const m = months[now.getMonth()];
+        const y = now.getFullYear();
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        return `${d} ${m} ${y}, ${hh}:${mm} WIB`;
+      }
+
+      function updateRealtimeClock() {
+        if (realtimeToggle && realtimeToggle.checked) {
+          tanggalInput.value = getNowFormatted();
+          refreshPreview();
+        }
+      }
+
+      tanggalInput.value = getNowFormatted();
       const defaults = Object.fromEntries(fieldIds.map(id => [id, document.getElementById(id).value]));
 
       function setFormStatus(message, state = '') {
@@ -281,12 +313,32 @@
       }
 
       fieldIds.forEach(id => {
-        document.getElementById(id).addEventListener('input', refreshPreview);
+        document.getElementById(id).addEventListener('input', () => {
+          if (id === 'tanggal' && realtimeToggle && realtimeToggle.checked) {
+            realtimeToggle.checked = false;
+          }
+          refreshPreview();
+        });
         document.getElementById(id).addEventListener('change', refreshPreview);
       });
 
+      if (realtimeToggle) {
+        realtimeToggle.addEventListener('change', () => {
+          if (realtimeToggle.checked) {
+            tanggalInput.value = getNowFormatted();
+            refreshPreview();
+          }
+        });
+      }
+
+      setInterval(updateRealtimeClock, 1000);
+
       document.getElementById('resetBtn').addEventListener('click', () => {
-        fieldIds.forEach(id => { document.getElementById(id).value = defaults[id]; });
+        if (realtimeToggle) realtimeToggle.checked = true;
+        tanggalInput.value = getNowFormatted();
+        fieldIds.forEach(id => {
+          if (id !== 'tanggal') document.getElementById(id).value = defaults[id];
+        });
         shareDock.hidden = true;
         formStatus.className = 'form-status';
         refreshPreview();
